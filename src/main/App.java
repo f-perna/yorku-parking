@@ -2,14 +2,13 @@ package main;
 
 import javax.swing.JFrame;
 
-import ui.LandingUI;
+import ui.MainUI;
 
 public class App {
 	public static void main(String[] args) {
 
-		JFrame frame = new LandingUI();
+		JFrame frame = MainUI.getInstance();
 		frame.setSize(900, 600);
-		frame.pack();
 		frame.setVisible(true);
 	}
 }
