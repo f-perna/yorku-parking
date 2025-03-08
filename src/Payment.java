@@ -1,8 +1,8 @@
-public abstract class Payment {
+public class Payment {
 	private int paymentID;
 	private double amount;
   	public PaymentStatus status;
-	public PaymentMethod method;
+	public PaymentMethod paymentMethod;
 
 	public static enum PaymentStatus {
 		PENDING, COMPLETED, FAILED, REFUNDED;
@@ -11,16 +11,23 @@ public abstract class Payment {
 	public Payment(int paymentID, double amount, PaymentMethod method) {
 		this.paymentID = paymentID;
 		this.amount = amount;
-		this.method = method;
+		this.paymentMethod = paymentMethod;
 		this.status = PaymentStatus.PENDING;
 	}
 
+	public void setPaymentMethod(PaymentMethod paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
+
+	// process payment using the selected strategy
 	public boolean processPayment() {
 		if (status == PaymentStatus.PENDING) {
-			// payment process
-			status = PaymentStatus.COMPLETED;
-			System.out.println("Payment processed successfully.");
-			return true;
+			if (paymentMethod.processPayment(amount)) {
+				// payment process
+				status = PaymentStatus.COMPLETED;
+				System.out.println("Payment processed successfully.");
+				return true;
+			}
 		}
 		return false;	
 	}
@@ -28,12 +35,8 @@ public abstract class Payment {
   	public void refundDeposit(){
   		if (status == PaymentStatus.COMPLETED) {
 			status = PaymentStatus.REFUNDED;
-			System.out,println("Deposit refunded.");
+			System.out.println("Deposit refunded.");
 		}
-  	}
-
-  	public void setPaymentMethod(PaymentMethod method) {
-		this.method = method;
   	}
 
 	public PaymentStatus getStatus() {
@@ -49,6 +52,6 @@ public abstract class Payment {
 	}
 
 	public PaymentMethod getMethod() {
-		return method;
+		return paymentMethod;
 	}
 }
