@@ -1,37 +1,42 @@
-public abstract class PaymentMethod {
-        protected String paymentType;
+// PaymentMethod Interface (Strategy Pattern)
+public interface PaymentMethod {
+        boolean processPayment(double amount);
+}
 
-        public abstract void setPaymentMethod(String method);
+// Strategies for each Payment Method
 
-        public String getPaymentType() {
-                return paymentType;
+class Debit implements PaymentMethod {
+        @Override
+        public boolean processPayment(double amount) {
+                //Simulate debit payment
+                System.out.println("Processing debit payment of " + amount);
+                return true;
         }
 }
 
-class Debit extends PaymentMethod {
+class Credit implements PaymentMethod {
         @Override
-        public void setPaymentMethod(String method) {
-                this.paymentType = "Debit";
+        public boolean processPayment(double amount) {
+                //Simulate credit payment
+                System.out.println("Processing credit payment of " + amount);
+                return true;
         }
 }
 
-class Credit extends PaymentMethod {
+class Mobile implements PaymentMethod {
         @Override
-        public void setPaymentMethod(String method) {
-                this.paymentType = "Credit";
+        public boolean processPayment(double amount) {
+                //Simulate mobile payment
+                System.out.println("Processing mobile payment of " + amount);
+                return true;
         }
 }
 
-class Mobile extends PaymentMethod {
+class Cash implements PaymentMethod {
         @Override
-        public void setPaymentMethod(String method) {
-                this.paymentType = "Mobile";
-        }
-}
-
-class Cash extends PaymentMethod {
-        @Override
-        public void setPaymentMethod(String method) {
-                this.paymentType = "Cash";
+        public boolean processPayment(double amount) {
+                //Simulate cash payment
+                System.out.println("Processing cash payment of " + amount);
+                return true;
         }
 }
