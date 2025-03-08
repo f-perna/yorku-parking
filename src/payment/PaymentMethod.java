@@ -1,3 +1,5 @@
+package payment;
+
 // PaymentMethod Interface (Strategy Pattern)
 public interface PaymentMethod {
         boolean processPayment(double amount);
