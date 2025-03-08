@@ -1,3 +1,5 @@
+package payment;
+
 public class Payment {
 	private int paymentID;
 	private double amount;
