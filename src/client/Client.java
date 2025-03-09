@@ -37,5 +37,38 @@ public abstract class Client {
 	public void makePayment() {
 		
 	}
-	
+
+
+	public String getLicenceplateN() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setDeposit(double deposit) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public boolean clientnoshow(int durationinhours) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public double getDeposit() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+
+    
+
 }
