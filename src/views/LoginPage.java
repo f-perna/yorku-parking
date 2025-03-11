@@ -1,0 +1,76 @@
+package views;
+
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import controllers.NavigationController;
+
+public class LoginPage extends JPanel {
+	private JTextField usernameField;
+	private JPasswordField passwordField;
+	private JLabel statusLabel;
+
+	public LoginPage(JFrame parent) {
+		setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.anchor = GridBagConstraints.CENTER;
+
+		JLabel titleLabel = new JLabel("Login");
+		titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		add(titleLabel, gbc);
+
+		JLabel userLabel = new JLabel("Username:");
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		add(userLabel, gbc);
+
+		usernameField = new JTextField(15);
+		gbc.gridx = 1;
+		add(usernameField, gbc);
+
+		JLabel passLabel = new JLabel("Password:");
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		add(passLabel, gbc);
+
+		passwordField = new JPasswordField(15);
+		gbc.gridx = 1;
+		add(passwordField, gbc);
+
+		JButton loginButton = new JButton("Login");
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		add(loginButton, gbc);
+
+		statusLabel = new JLabel(" ");
+		statusLabel.setForeground(Color.RED);
+		gbc.gridy = 4;
+		add(statusLabel, gbc);
+		
+		JButton goToRegister = new JButton("Don't have an account? Click Here");
+        gbc.gridy = 0;
+        gbc.gridy = 5;
+        add(goToRegister, gbc);
+        goToRegister.addActionListener((ActionEvent e) -> NavigationController.showPage("Register"));
+
+//		loginButton.addActionListener((ActionEvent e) -> handleLogin());
+	}
+
+}

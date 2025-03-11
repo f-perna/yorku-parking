@@ -1,14 +1,15 @@
 package main;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
-import ui.MainUI;
+import views.MainFrame;
 
 public class App {
 	public static void main(String[] args) {
 
-		JFrame frame = MainUI.getInstance();
-		frame.setSize(900, 600);
-		frame.setVisible(true);
+		SwingUtilities.invokeLater(() -> {
+            new MainFrame();
+        });
 	}
 }
