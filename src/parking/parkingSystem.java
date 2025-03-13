@@ -17,15 +17,26 @@ abstract class parkingsystemsubject {
 
 //Concrete Subject class
 class parkingSystem extends parkingsystemsubject {
+	
+	private static parkingSystem instance;
+	
     public List<parkingspaceobserver> observers;
     public List<parkingspace> parkingspaces;
     public List<Client> Clients;
 
-    public parkingSystem() {
+    private parkingSystem() {
         observers = new ArrayList<>();
         parkingspaces = new ArrayList<>();
         Clients = new ArrayList<>();
     }
+    
+    public static synchronized parkingSystem getInstance() {
+        if (instance == null) {
+            instance = new parkingSystem();
+        }
+        return instance;
+    }
+    
     /* Main parking logic methods : */
     public void addparkingspace(parkingspace parkingspace) {
         parkingspaces.add(parkingspace);
