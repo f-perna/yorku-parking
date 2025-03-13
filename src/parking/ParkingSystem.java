@@ -24,6 +24,8 @@ public class ParkingSystem extends parkingsystemsubject {
     public List<parkingspaceobserver> observers;
     public List<parkingspace> parkingspaces;
     public List<Client> clients;
+    
+    private Client loggedInClient;
 
     private ParkingSystem() {
         observers = new ArrayList<>();
@@ -49,16 +51,21 @@ public class ParkingSystem extends parkingsystemsubject {
         clients.add(Client);
     }
 
-    public Client login(String inputEmail, String inputPassword) {
+    public boolean login(String inputEmail, String inputPassword) {
         for (Client client : clients) {
             String email = client.getEmail();
             String password = client.getPassword();
             
             if (inputEmail.equals(email) && inputPassword.equals(password)) {
-            	return client;
+            	loggedInClient = client;
+            	return true;
             }
         }
-        return null;
+        return false;
+    }
+    
+    public Client getLoggedInClient() {
+    	return loggedInClient;
     }
 
     public boolean bookparkingspace(Client client, int spacenumber) {

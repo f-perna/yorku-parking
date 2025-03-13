@@ -24,13 +24,14 @@ public class MainFrame extends JFrame {
 		cardLayout = new CardLayout();
 		cardPanel = new JPanel(cardLayout);
 		
-		cardPanel.add(new HomePage(this), "Home");
-		cardPanel.add(new LoginPage(this), "Login");
-		cardPanel.add(new RegisterPage(this), "Register");
-		cardPanel.add(new ClientPage(this), "Client");
+		NavigationController.init(cardLayout, cardPanel);
+		
+		NavigationController.addPage("Home", new HomePage(this));
+        NavigationController.addPage("Login", new LoginPage(this));
+        NavigationController.addPage("Register", new RegisterPage(this));
+        NavigationController.addPage("Client", new ClientPage(this));
 		
 		getContentPane().add(cardPanel, BorderLayout.CENTER);
-		NavigationController.init(cardLayout, cardPanel);
 		
 		setVisible(true);
 		
