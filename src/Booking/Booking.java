@@ -4,7 +4,7 @@ import java.time.format.DateTimeFormatter;
 public class Booking {
 	private int bookingId; 
 	private int parkingSpaceId; 
-	private String startTime;
+	private long startTime;
 	private String endTime;
 	private double deposit; 
 	private BookingStatus status; 
@@ -13,7 +13,7 @@ public class Booking {
 		this.bookingId = bookingId; 
 		this.parkingSpaceId = parkingSpaceId; 
 		this.deposit = deposit; 
-		this.startTime = getCurrentTime();
+		this.startTime = System.currentTimeMillis();
 		this.endTime = "";
 	}
 	
