@@ -1,6 +1,7 @@
 package views;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -25,13 +26,19 @@ public class ClientPage extends JPanel {
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
-
+		gbc.anchor = GridBagConstraints.NORTH;
 		welcomeMessage = new JLabel();
-		
+		welcomeMessage.setFont(new Font("Arial", Font.BOLD, 18));
 		add(welcomeMessage, gbc);
+		
+		JButton bookButton = new JButton("Book Parking Space");
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.anchor = GridBagConstraints.CENTER;
+		add(bookButton, gbc);
 	}
 	
 	public void refresh() {
