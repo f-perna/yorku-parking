@@ -1,4 +1,4 @@
-package Booking;
+package booking;
 import java.time.LocalDateTime;
 
 import java.time.format.DateTimeFormatter;
