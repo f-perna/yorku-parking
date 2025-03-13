@@ -1,6 +1,8 @@
 package booking;
 import java.time.LocalDateTime;
+
 import java.time.format.DateTimeFormatter;
+
 public class Booking {
 	private int bookingId; 
 	private int parkingSpaceId; 

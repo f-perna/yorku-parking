@@ -1,6 +1,7 @@
 package views;
 
 import java.awt.Color;
+
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -17,10 +18,12 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+import client.Client;
 import controllers.NavigationController;
+import parking.ParkingSystem;
 
 public class LoginPage extends JPanel {
-	private JTextField usernameField;
+	private JTextField emailField;
 	private JPasswordField passwordField;
 	private JLabel statusLabel;
 
@@ -36,14 +39,14 @@ public class LoginPage extends JPanel {
 		gbc.gridy = 0;
 		add(titleLabel, gbc);
 
-		JLabel userLabel = new JLabel("Username:");
+		JLabel emailLabel = new JLabel("Email:");
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		add(userLabel, gbc);
+		add(emailLabel, gbc);
 
-		usernameField = new JTextField(15);
+		emailField = new JTextField(15);
 		gbc.gridx = 1;
-		add(usernameField, gbc);
+		add(emailField, gbc);
 
 		JLabel passLabel = new JLabel("Password:");
 		gbc.gridx = 0;
@@ -70,7 +73,20 @@ public class LoginPage extends JPanel {
         add(goToRegister, gbc);
         goToRegister.addActionListener((ActionEvent e) -> NavigationController.showPage("Register"));
 
-//		loginButton.addActionListener((ActionEvent e) -> handleLogin());
+		loginButton.addActionListener((ActionEvent e) -> handleLogin(emailField.getText(), passwordField.getText()));
+	}
+
+	private void handleLogin(String email, String password) {
+		ParkingSystem ps = ParkingSystem.getInstance();
+		
+		Client client = ps.login(email, password);
+		
+		System.out.println(client);
+		
+		if (client != null) {
+			NavigationController.showPage("Client");
+		}
+		
 	}
 
 }
