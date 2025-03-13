@@ -17,6 +17,22 @@ public class Booking {
 		this.endTime = "";
 	}
 	
+	private String getCurrentTime() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void confirm() {
+		this.status = BookingStatus.CONFIRMED;
+		System.out.println("Booking " + bookingId + "Confirmed.");
+	}
+	
+	public void cancel() {
+		this.status = BookingStatus.CANCELED;
+		System.out.println("Booking " + bookingId + "Canceled.");
+	}
+	
+	
 	
 
 }
