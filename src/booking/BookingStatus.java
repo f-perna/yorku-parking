@@ -1,4 +1,4 @@
-package booking;
+package Booking;
 
 public enum BookingStatus {
 	PENDING,
