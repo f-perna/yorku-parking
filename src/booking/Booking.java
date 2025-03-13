@@ -1,4 +1,4 @@
-package Booking;
+package booking;
 import java.time.LocalDateTime;
 
 import java.time.format.DateTimeFormatter;
@@ -19,10 +19,6 @@ public class Booking {
 		this.endTime = "";
 	}
 	
-	private String getCurrentTime() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public void confirm() {
 		this.status = BookingStatus.CONFIRMED;
@@ -34,7 +30,34 @@ public class Booking {
 		System.out.println("Booking " + bookingId + "Canceled.");
 	}
 	
+	public void updateStatus(BookingStatus newStatus) {
+		this.status = newStatus;
+		System.out.println("Booking " + bookingId + " updated to " + newStatus);
+	}
 	
+	public int getBookingId() {
+		return bookingId;
+	}
 	
-
+	public int getParkingSpaceId(){
+		return parkingSpaceId;
+	}
+	
+	public long getStartTime() {
+		return startTime;
+	}
+	
+	public String getEndTime() {
+		return endTime;
+	}
+	
+	public double getDeposit() {
+		return deposit;
+		
+	}
+	
+	public BookingStatus getStatus(){
+		return status; 
+	
+	}
 }
