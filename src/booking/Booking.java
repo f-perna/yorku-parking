@@ -7,7 +7,7 @@ public class Booking {
 	private int bookingId; 
 	private int parkingSpaceId; 
 	private long startTime;
-	private String endTime;
+	private long endTime;
 	private double deposit; 
 	private BookingStatus status; 
 	
@@ -15,8 +15,9 @@ public class Booking {
 		this.bookingId = bookingId; 
 		this.parkingSpaceId = parkingSpaceId; 
 		this.deposit = deposit; 
+		this.status = BookingStatus.PENDING;
 		this.startTime = System.currentTimeMillis();
-		this.endTime = "";
+		this.endTime = 0;
 	}
 	
 
@@ -28,6 +29,12 @@ public class Booking {
 	public void cancel() {
 		this.status = BookingStatus.CANCELED;
 		System.out.println("Booking " + bookingId + "Canceled.");
+	}
+	
+	public void complete() {
+		this.status = BookingStatus.COMPELETED;
+		this.endTime = System.currentTimeMillis();
+		System.out.println("Booking " + bookingId + "Completed.");
 	}
 	
 	public void updateStatus(BookingStatus newStatus) {
@@ -47,7 +54,7 @@ public class Booking {
 		return startTime;
 	}
 	
-	public String getEndTime() {
+	public long getEndTime() {
 		return endTime;
 	}
 	
