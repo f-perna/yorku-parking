@@ -20,10 +20,6 @@ public abstract class Client {
 		this.licensePlate = licensePlate;
 	}
 	
-	public void login(String email, String password) {
-		//TODO Implement
-		System.out.println("Logged in");
-	}
 	
 	public void bookParkingSpace() {
 		
