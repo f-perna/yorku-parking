@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import client.Client;
+import main.CSVProcessor;
 
 //Subject class
 abstract class parkingsystemsubject {
@@ -16,23 +17,24 @@ abstract class parkingsystemsubject {
 }
 
 //Concrete Subject class
-class parkingSystem extends parkingsystemsubject {
+public class ParkingSystem extends parkingsystemsubject {
 	
-	private static parkingSystem instance;
+	private static ParkingSystem instance;
 	
     public List<parkingspaceobserver> observers;
     public List<parkingspace> parkingspaces;
-    public List<Client> Clients;
+    public List<Client> clients;
 
-    private parkingSystem() {
+    private ParkingSystem() {
         observers = new ArrayList<>();
         parkingspaces = new ArrayList<>();
-        Clients = new ArrayList<>();
+        clients = CSVProcessor.readClientData();
+        
     }
     
-    public static synchronized parkingSystem getInstance() {
+    public static synchronized ParkingSystem getInstance() {
         if (instance == null) {
-            instance = new parkingSystem();
+            instance = new ParkingSystem();
         }
         return instance;
     }
@@ -44,21 +46,24 @@ class parkingSystem extends parkingsystemsubject {
     }
 
     public void addClient(Client Client) {
-        Clients.add(Client);
+        clients.add(Client);
     }
 
-    public boolean Login(String licenceplateN) {
-        for (Client Client : Clients) {
-            if (Client.getLicencePlate().equalsIgnoreCase(licenceplateN)) {
-                return true;
+    public Client login(String inputEmail, String inputPassword) {
+        for (Client client : clients) {
+            String email = client.getEmail();
+            String password = client.getPassword();
+            
+            if (inputEmail.equals(email) && inputPassword.equals(password)) {
+            	return client;
             }
         }
-        return false;
+        return null;
     }
 
     public boolean bookparkingspace(Client client, int spacenumber) {
         // Check if client is logged in
-        if (!Clients.contains(client)) {
+        if (!clients.contains(client)) {
             System.out.println("Please log in to book a parking space.");
             return false;
         }
@@ -87,7 +92,7 @@ class parkingSystem extends parkingsystemsubject {
     
     public void removebookedparking(Client client, int spaceNumber) {
         // Check if client is logged in
-        if (!Clients.contains(client)) {
+        if (!clients.contains(client)) {
             System.out.println("removeBookedParking: FAILED, Client does not exist in the database.");
             return;
         }

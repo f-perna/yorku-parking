@@ -27,6 +27,7 @@ public class MainFrame extends JFrame {
 		cardPanel.add(new HomePage(this), "Home");
 		cardPanel.add(new LoginPage(this), "Login");
 		cardPanel.add(new RegisterPage(this), "Register");
+		cardPanel.add(new ClientPage(this), "Client");
 		
 		getContentPane().add(cardPanel, BorderLayout.CENTER);
 		NavigationController.init(cardLayout, cardPanel);
