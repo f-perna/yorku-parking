@@ -5,16 +5,18 @@ public abstract class Client {
 	private String password;
 	private String name;
 	private String licensePlate;
+	private type type;
 	protected int rate;
 	
 	public static enum type {
 		STUDENT, FACULTY, NON_FACULTY, VISITOR;
 	}
 	
-	Client(String name, String email, String password) {
+	Client(String name, String email, String password, type type) {
 		this.name = name;
 		this.email = email;
 		this.password = password;
+		this.type = type;
 	}
 	
 	public void login(String email, String password) {
@@ -65,6 +67,14 @@ public abstract class Client {
 	public double getDeposit() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	public type getType() {
+		return this.type;
+	}
+	
+	public void setType(type type) {
+		this.type = type;
 	}
 
 

@@ -3,7 +3,7 @@ package client;
 public class NonFacultyMember extends Client{
 
 	NonFacultyMember(String name, String email, String password) {
-		super(name, email, password);
+		super(name, email, password, type.NON_FACULTY);
 		rate = 10;
 	}
 
