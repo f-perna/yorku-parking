@@ -12,11 +12,12 @@ public abstract class Client {
 		STUDENT, FACULTY, NON_FACULTY, VISITOR;
 	}
 	
-	Client(String name, String email, String password, type type) {
+	Client(String name, String email, String password, type type, String licensePlate) {
 		this.name = name;
 		this.email = email;
 		this.password = password;
 		this.type = type;
+		this.licensePlate = licensePlate;
 	}
 	
 	public void login(String email, String password) {
@@ -41,9 +42,12 @@ public abstract class Client {
 	}
 
 
-	public String getLicenceplateN() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getLicencePlate() {
+		return licensePlate;
+	}
+	
+	public void setLicensePlate(String licensePlate) {
+		this.licensePlate = licensePlate;
 	}
 
 	public String getName() {
@@ -52,6 +56,14 @@ public abstract class Client {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public String getEmail() {
+		return email;
+	}
+	
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public void setDeposit(double deposit) {

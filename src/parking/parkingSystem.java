@@ -49,7 +49,7 @@ class parkingSystem extends parkingsystemsubject {
 
     public boolean Login(String licenceplateN) {
         for (Client Client : Clients) {
-            if (Client.getLicenceplateN().equalsIgnoreCase(licenceplateN)) {
+            if (Client.getLicencePlate().equalsIgnoreCase(licenceplateN)) {
                 return true;
             }
         }
@@ -220,7 +220,7 @@ class parkingspace {
     }
     
     public String getClientLicence() {
-    	return bookedby.getLicenceplateN();
+    	return bookedby.getLicencePlate();
     }
     
     // will check this method again
