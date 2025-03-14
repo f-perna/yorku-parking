@@ -1,5 +1,9 @@
 package client;
 
+import java.util.List;
+
+import booking.Booking;
+
 public abstract class Client {
 	private String email;
 	private String password;
@@ -67,18 +71,17 @@ public abstract class Client {
 	}
 
 	public void setDeposit(double deposit) {
-		// TODO Auto-generated method stub
+		// TODO Auto-genegd method stub
 		
+	}
+	
+	public int getRate() {
+		return rate;
 	}
 
 	public boolean clientnoshow(int durationinhours) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	public double getDeposit() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 	
 	public type getType() {

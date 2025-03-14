@@ -1,0 +1,2 @@
+bookingID, clientEmail, parkingID, bookingStatus, startTime, endTime, deposit, finalAmount
+e347cc81-aa28-4b75-98a3-bd3ffe50a0db,johndoe@gmail.com,2a0dae26-727b-45ed-bb3d-ce0aa0e5730a,PENDING,2025-03-13T09:30:00,2025-03-13T09:30:00,10,10
