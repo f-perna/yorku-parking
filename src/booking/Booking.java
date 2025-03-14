@@ -102,8 +102,8 @@ public class Booking {
 		return client;
 	}
 	
-	public UUID getParkingSpaceId(){
-		return parkingSpace.getID();
+	public ParkingSpace getParkingSpace(){
+		return parkingSpace;
 	}
 
 	public LocalDateTime getStartTime() {
@@ -125,4 +125,9 @@ public class Booking {
 	public BookingStatus getStatus() {
 		return status;
 	}
+	
+	@Override
+    public String toString() {
+        return "Lot: " + parkingSpace.getLot().getName();
+    }
 }

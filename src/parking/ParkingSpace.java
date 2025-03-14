@@ -16,4 +16,8 @@ public class ParkingSpace {
 		return id;
 	}
 	
+	public ParkingLot getLot() {
+		return parkingLot;
+	}
+	
 }

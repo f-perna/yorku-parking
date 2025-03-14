@@ -19,6 +19,10 @@ public class ParkingLot {
 		this.id = id;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	public UUID getID() {
 		return id;
 	}
