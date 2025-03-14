@@ -73,7 +73,7 @@ public final class CSVProcessor {
 	public static List<ParkingLot> readLotData() {
 		List<ParkingLot> parkingLots = new ArrayList<>();
 
-		try (BufferedReader br = new BufferedReader(new FileReader(SPACES_CSV))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(LOTS_CSV))) {
 
 			String line = br.readLine();
 

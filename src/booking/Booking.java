@@ -2,6 +2,8 @@ package booking;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.UUID;
 import client.Client;
 import parking.ParkingSpace;
@@ -36,7 +38,7 @@ public class Booking {
 		this.client = client;
 		this.parkingSpace = parkingSpace;
 		this.status = BookingStatus.PENDING;
-		this.startTime = LocalDateTime.now();
+		this.startTime = startTime;
 		this.endTime = endTime;
 		this.deposit = deposit;
 		this.finalPaymentAmount = this.calculatePrice();
@@ -128,6 +130,8 @@ public class Booking {
 	
 	@Override
     public String toString() {
-        return "Lot: " + parkingSpace.getLot().getName();
+		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
+		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
+        return "Lot " + parkingSpace.getLot().getName() + " | " + startTime.format(startFormatter) + " - " + endTime.format(endFormatter);
     }
 }
