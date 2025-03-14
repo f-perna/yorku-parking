@@ -42,8 +42,7 @@ public class ClientPage extends JPanel {
 	}
 	
 	public void refresh() {
-		 ParkingSystem ps = ParkingSystem.getInstance();
-	     Client client = ps.getLoggedInClient();
+	     Client client = ParkingSystem.getLoggedInClient();
 	     
 	     welcomeMessage.setText("Welcome, " + client.getName());
 	}

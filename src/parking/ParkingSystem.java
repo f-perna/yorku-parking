@@ -19,26 +19,16 @@ abstract class parkingsystemsubject {
 //Concrete Subject class
 public class ParkingSystem extends parkingsystemsubject {
 	
-	private static ParkingSystem instance;
-	
-    public List<parkingspaceobserver> observers;
-    public List<parkingspace> parkingspaces;
-    public List<Client> clients;
+    public static List<parkingspaceobserver> observers;
+    public static List<parkingspace> parkingspaces;
+    public static List<Client> clients;
     
-    private Client loggedInClient;
-
-    private ParkingSystem() {
-        observers = new ArrayList<>();
+    private static Client loggedInClient;
+    
+    public static void loadFromDatabase() {
+    	observers = new ArrayList<>();
         parkingspaces = new ArrayList<>();
         clients = CSVProcessor.readClientData();
-        
-    }
-    
-    public static synchronized ParkingSystem getInstance() {
-        if (instance == null) {
-            instance = new ParkingSystem();
-        }
-        return instance;
     }
     
     /* Main parking logic methods : */
@@ -51,7 +41,7 @@ public class ParkingSystem extends parkingsystemsubject {
         clients.add(Client);
     }
 
-    public boolean login(String inputEmail, String inputPassword) {
+    public static boolean login(String inputEmail, String inputPassword) {
         for (Client client : clients) {
             String email = client.getEmail();
             String password = client.getPassword();
@@ -64,7 +54,7 @@ public class ParkingSystem extends parkingsystemsubject {
         return false;
     }
     
-    public Client getLoggedInClient() {
+    public static Client getLoggedInClient() {
     	return loggedInClient;
     }
 

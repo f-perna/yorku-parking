@@ -77,9 +77,7 @@ public class LoginPage extends JPanel {
 	}
 
 	private void handleLogin(String email, String password) {
-		ParkingSystem ps = ParkingSystem.getInstance();
-		
-		if (ps.login(email, password)) {
+		if (ParkingSystem.login(email, password)) {
 			ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
 			clientPage.refresh();
 			NavigationController.showPage("Client");
