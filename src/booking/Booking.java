@@ -85,16 +85,13 @@ public class Booking {
 	public UUID getBookingId() {
 		return bookingId;
 	}
-
-	public int getParkingSpaceId() {
-		return parkingSpaceId;
 	
 	public Client getClient() {
 		return client;
 	}
 	
 	public int getParkingSpaceId(){
-		return parkingSpace.getID();
+		return parkingSpaceId;
 	}
 
 	public LocalDateTime getStartTime() {
@@ -111,10 +108,6 @@ public class Booking {
 
 	public double getFinalPaymentAmount() {
 		return finalPaymentAmount;
-	}
-
-	public Client getClient() {
-		return client;
 	}
 
 	public BookingStatus getStatus() {
