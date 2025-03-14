@@ -1,5 +1,9 @@
 package client;
 
+import java.util.List;
+
+import booking.Booking;
+
 public abstract class Client {
 	private String email;
 	private String password;

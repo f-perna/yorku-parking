@@ -3,17 +3,23 @@ import java.time.LocalDateTime;
 
 import java.time.format.DateTimeFormatter;
 
+import client.Client;
+import parking.ParkingLot;
+import parking.ParkingSpace;
+
 public class Booking {
 	private int bookingId; 
-	private int parkingSpaceId; 
+	private ParkingSpace parkingSpace;
 	private long startTime;
 	private long endTime;
 	private double deposit; 
 	private BookingStatus status; 
+	private Client client;
 	
-	public Booking(int bookingId, int parkingSpceId, double desposit) {
+	public Booking(int bookingId, ParkingSpace parkingSpace, double deposit, Client client) {
+		this.client = client;
 		this.bookingId = bookingId; 
-		this.parkingSpaceId = parkingSpaceId; 
+		this.parkingSpace = parkingSpace;
 		this.deposit = deposit; 
 		this.status = BookingStatus.PENDING;
 		this.startTime = System.currentTimeMillis();
@@ -46,8 +52,12 @@ public class Booking {
 		return bookingId;
 	}
 	
+	public Client getClient() {
+		return client;
+	}
+	
 	public int getParkingSpaceId(){
-		return parkingSpaceId;
+		return parkingSpace.getID();
 	}
 	
 	public long getStartTime() {

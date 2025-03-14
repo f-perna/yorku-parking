@@ -6,20 +6,25 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 
+import booking.Booking;
 import client.Client;
 import controllers.NavigationController;
 import parking.ParkingSystem;
 
 public class ClientPage extends JPanel {
 	
+	private JComboBox<Booking> bookingsList;
 	private JLabel welcomeMessage;
 
 	public ClientPage(JFrame parent) {
@@ -27,11 +32,10 @@ public class ClientPage extends JPanel {
 
 		GridBagConstraints gbc = new GridBagConstraints();
 
+		welcomeMessage = new JLabel();
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.NORTH;
-		welcomeMessage = new JLabel();
-		welcomeMessage.setFont(new Font("Arial", Font.BOLD, 18));
 		add(welcomeMessage, gbc);
 		
 		JButton bookButton = new JButton("Book Parking Space");
@@ -39,11 +43,30 @@ public class ClientPage extends JPanel {
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(bookButton, gbc);
+		
+		JLabel bookingsMessage = new JLabel("Bookings: ");
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.anchor = GridBagConstraints.CENTER;
+		add(bookingsMessage, gbc);
+		
+		bookingsList = new JComboBox<>();
+		gbc.gridx = 0;
+		gbc.gridy = 6;
+		gbc.anchor = GridBagConstraints.CENTER;
+		add(bookingsList, gbc);
 	}
 	
 	public void refresh() {
 	     Client client = ParkingSystem.getLoggedInClient();
+	     List<Booking> clientBookings = ParkingSystem.getBookingsForClient(client);
 	     
 	     welcomeMessage.setText("Welcome, " + client.getName());
+	     
+	     bookingsList.removeAllItems();
+
+	     for (Booking booking : clientBookings) {
+	         bookingsList.addItem(booking);
+	     }
 	}
 }
