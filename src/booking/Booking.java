@@ -81,10 +81,6 @@ public class Booking {
 		System.out.println("Deposit of $" + this.deposit + " paid for booking " + bookingId);
 	}
 
-	// Implement this method
-	public void completeBooking() {
-	}
-
 	public void noShow() {
 		if (this.status == BookingStatus.CONFIRMED) {
 			this.status = BookingStatus.NO_SHOW;
