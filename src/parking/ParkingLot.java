@@ -1,5 +1,6 @@
 package parking;
 
+import java.util.ArrayList;
 import java.util.List;
 import parking.ParkingSpace;
 
@@ -11,6 +12,7 @@ public class ParkingLot {
 	
 	
 	public ParkingLot(String name, int id) {
+		this.parkingSpaces = new ArrayList<>();
 		this.name = name;
 		this.id = id;
 	}

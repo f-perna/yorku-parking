@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import client.Client;
+import parking.ParkingSpace;
 
 public class Booking {
 
@@ -12,7 +13,7 @@ public class Booking {
 	}
 
 	private UUID bookingId;
-	private int parkingSpaceId;
+	private ParkingSpace parkingSpace;
 	private LocalDateTime startTime;
 	private Client client;
 	private LocalDateTime endTime;
@@ -20,10 +21,10 @@ public class Booking {
 	private double finalPaymentAmount;
 	private BookingStatus status;
 
-	public Booking(int parkingSpaceId, LocalDateTime endTime, Client client) {
+	public Booking(ParkingSpace parkingSpace, LocalDateTime endTime, Client client) {
 		this.bookingId = UUID.randomUUID();
 		this.client = client;
-		this.parkingSpaceId = parkingSpaceId;
+		this.parkingSpace = parkingSpace;
 		this.status = BookingStatus.PENDING;
 		this.startTime = LocalDateTime.now();
 		this.endTime = endTime;
@@ -91,7 +92,7 @@ public class Booking {
 	}
 	
 	public int getParkingSpaceId(){
-		return parkingSpaceId;
+		return parkingSpace.getID();
 	}
 
 	public LocalDateTime getStartTime() {

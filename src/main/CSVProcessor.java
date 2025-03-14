@@ -78,7 +78,7 @@ public final class CSVProcessor {
 
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
-				if (data.length != 6) {
+				if (data.length != 2) {
 					System.err.println("Error: Invalid number of columns in line: " + line);
 					continue;
 				}
@@ -100,7 +100,7 @@ public final class CSVProcessor {
 	public static void readSpaceData() {
 		List<ParkingLot> parkingLots = ParkingSystem.getParkingLots();
 
-		try (BufferedReader br = new BufferedReader(new FileReader(LOTS_CSV))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(SPACES_CSV))) {
 
 			String line = br.readLine();
 
@@ -110,7 +110,7 @@ public final class CSVProcessor {
 
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
-				if (data.length != 6) {
+				if (data.length != 2) {
 					System.err.println("Error: Invalid number of columns in line: " + line);
 					continue;
 				}
