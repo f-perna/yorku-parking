@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import parking.ParkingSpace;
+import parking.ParkingSpace.ParkingStatus;
 
 public class ParkingLot {
 	
@@ -31,8 +32,8 @@ public class ParkingLot {
 		parkingSpaces.add(parkingSpace);
 	}
 	
-	public void addParkingSpace(UUID id) {
-		parkingSpaces.add(new ParkingSpace(id, this));
+	public void addParkingSpace(UUID id, ParkingStatus status) {
+		parkingSpaces.add(new ParkingSpace(id, this, status));
 	}
 	
 	public List<ParkingSpace> getParkingSpaces() {

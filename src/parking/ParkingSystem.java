@@ -26,8 +26,9 @@ public class ParkingSystem {
     }
     
     /* Main parking logic methods : */
-    public void addClient(Client Client) {
+    public static void registerClient(Client Client) {
         clients.add(Client);
+        CSVProcessor.setClientData(clients);
     }
 
     public static boolean login(String inputEmail, String inputPassword) {

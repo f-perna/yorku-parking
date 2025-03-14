@@ -1,7 +1,9 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +17,7 @@ import client.GenerateClientFactory;
 import parking.ParkingLot;
 import parking.ParkingSpace;
 import parking.ParkingSystem;
+import parking.ParkingSpace.ParkingStatus;
 
 public final class CSVProcessor {
 	private static final String CSV_DELIMITER = ",";
@@ -58,8 +61,9 @@ public final class CSVProcessor {
 				String email = data[1];
 				String password = data[2];
 				String licensePlate = data[3];
+				Boolean approved = Boolean.valueOf(data[5]);
 
-				Client client = GenerateClientFactory.getClientType(name, email, password, clientType, licensePlate);
+				Client client = GenerateClientFactory.getClientType(name, email, password, clientType, licensePlate, approved);
 				clients.add(client);
 			}
 
@@ -70,6 +74,31 @@ public final class CSVProcessor {
 		return clients;
 	}
 	
+	public static void setClientData(List<Client> clients) {
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(USERS_CSV))) {
+	        // Write header (assuming the CSV has a header row)
+	        bw.write("name, email, password, licensePlate, type, approved");
+	        bw.newLine();
+
+	        for (Client client : clients) {
+	            String line = String.join(CSV_DELIMITER, 
+	                client.getName(), 
+	                client.getEmail(), 
+	                client.getPassword(), 
+	                client.getLicencePlate(), 
+	                client.getType().name(), 
+	                String.valueOf(client.isApproved()) // Ensure boolean is written as a string
+	            );
+	            bw.write(line);
+	            bw.newLine();
+	        }
+
+	    } catch (IOException e) {
+	        System.err.println("Error writing to CSV file: " + e.getMessage());
+	    }
+	}
+
+
 	public static List<ParkingLot> readLotData() {
 		List<ParkingLot> parkingLots = new ArrayList<>();
 
@@ -102,7 +131,7 @@ public final class CSVProcessor {
 
 		return parkingLots;
 	}
-	
+
 	public static void readSpaceData() {
 		List<ParkingLot> parkingLots = ParkingSystem.getParkingLots();
 
@@ -116,27 +145,28 @@ public final class CSVProcessor {
 
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
-				if (data.length != 2) {
+				if (data.length != 3) {
 					System.err.println("Error: Invalid number of columns in line: " + line);
 					continue;
 				}
 
 				UUID id = UUID.fromString(data[0]);
 				UUID lotID = UUID.fromString(data[1]);
+				ParkingStatus status = ParkingStatus.valueOf(data[2]);
 
 				ParkingLot parkingLot = ParkingSystem.getParkingLotByID(lotID);
-				
-				parkingLot.addParkingSpace(id);
+
+				parkingLot.addParkingSpace(id, status);
 			}
 
 		} catch (IOException e) {
 			System.err.println("Error reading CSV file: " + e.getMessage());
 		}
 	}
-	
+
 	public static List<Booking> readBookingData() {
 		List<Booking> bookings = new ArrayList<>();
-		
+
 		try (BufferedReader br = new BufferedReader(new FileReader(BOOKINGS_CSV))) {
 
 			String line = br.readLine();
@@ -160,15 +190,16 @@ public final class CSVProcessor {
 				LocalDateTime endTime = LocalDateTime.parse(data[5]);
 				double deposit = Double.parseDouble(data[6]);
 				double finalAmount = Double.parseDouble(data[6]);
-				
-				Booking booking = new Booking(bookingID, client, parkingSpace, status, startTime, endTime, deposit, finalAmount);
+
+				Booking booking = new Booking(bookingID, client, parkingSpace, status, startTime, endTime, deposit,
+						finalAmount);
 				bookings.add(booking);
 			}
 
 		} catch (IOException e) {
 			System.err.println("Error reading CSV file: " + e.getMessage());
 		}
-		
+
 		return bookings;
 	}
 }

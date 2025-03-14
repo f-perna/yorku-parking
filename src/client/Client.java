@@ -11,17 +11,19 @@ public abstract class Client {
 	private String licensePlate;
 	private type type;
 	protected int rate;
+	private boolean approved;
 	
 	public static enum type {
 		STUDENT, FACULTY, NON_FACULTY, VISITOR;
 	}
 	
-	Client(String name, String email, String password, type type, String licensePlate) {
+	Client(String name, String email, String password, type type, String licensePlate, boolean approved) {
 		this.name = name;
 		this.email = email;
 		this.password = password;
 		this.type = type;
 		this.licensePlate = licensePlate;
+		this.approved = approved;
 	}
 	
 	
@@ -93,7 +95,7 @@ public abstract class Client {
 	}
 
 
-
-    
-
+	public boolean isApproved() {
+		return approved;
+	}
 }
