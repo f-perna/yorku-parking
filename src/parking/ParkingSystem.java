@@ -3,6 +3,7 @@ package parking;
 import java.util.ArrayList;
 import java.util.List;
 
+import booking.Booking;
 import client.Client;
 import main.CSVProcessor;
 
@@ -20,8 +21,10 @@ abstract class parkingsystemsubject {
 public class ParkingSystem extends parkingsystemsubject {
 	
     public static List<parkingspaceobserver> observers;
+    public static List<ParkingLot> parkingLots;
     public static List<parkingspace> parkingspaces;
     public static List<Client> clients;
+    public static List<Booking> bookings;
     
     private static Client loggedInClient;
     
@@ -29,6 +32,8 @@ public class ParkingSystem extends parkingsystemsubject {
     	observers = new ArrayList<>();
         parkingspaces = new ArrayList<>();
         clients = CSVProcessor.readClientData();
+        parkingLots = CSVProcessor.readLotData();
+        CSVProcessor.readSpaceData();
     }
     
     /* Main parking logic methods : */
@@ -56,6 +61,29 @@ public class ParkingSystem extends parkingsystemsubject {
     
     public static Client getLoggedInClient() {
     	return loggedInClient;
+    }
+    
+    public static List<Booking> getBookingsForClient(Client inputClient) {
+    	List<Booking> clientBookings = new ArrayList<>();
+    	for (Booking booking : bookings) {
+    		if (booking.getClient() == inputClient) {
+    			clientBookings.add(booking);
+    		}
+    	}
+    	return clientBookings;
+    }
+    
+    public static List<ParkingLot> getParkingLots() {
+    	return parkingLots;
+    }
+    
+    public static ParkingLot getParkingLotByID(int id) {
+    	for (ParkingLot parkingLot : parkingLots) {
+    		if (parkingLot.getID() == id) {
+    			return parkingLot;
+    		}
+    	}
+    	return null;
     }
 
     public boolean bookparkingspace(Client client, int spacenumber) {

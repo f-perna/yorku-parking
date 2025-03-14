@@ -88,6 +88,13 @@ public class Booking {
 
 	public int getParkingSpaceId() {
 		return parkingSpaceId;
+	
+	public Client getClient() {
+		return client;
+	}
+	
+	public int getParkingSpaceId(){
+		return parkingSpace.getID();
 	}
 
 	public LocalDateTime getStartTime() {
