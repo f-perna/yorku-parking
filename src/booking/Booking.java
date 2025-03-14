@@ -67,4 +67,9 @@ public class Booking {
 		return status; 
 	
 	}
+	
+	@Override 
+	public String toString() {
+		return "booking [ID= " + bookingId + ", ParkingSpaceID " + parkingSpaceId + ", Deposit= " + deposit + " , Status=" + status + ", StartTime=" + startTime + ", EndTime=" +endTime + "]";
+	}
 }
