@@ -30,6 +30,17 @@ public class Booking {
 		this.endTime = endTime;
 		this.finalPaymentAmount = this.calculatePrice();
 	}
+	
+	public Booking(UUID bookingId, Client client, ParkingSpace parkingSpace, BookingStatus status, LocalDateTime startTime, LocalDateTime endTime, double deposit, double finalAmount) {
+		this.bookingId = UUID.randomUUID();
+		this.client = client;
+		this.parkingSpace = parkingSpace;
+		this.status = BookingStatus.PENDING;
+		this.startTime = LocalDateTime.now();
+		this.endTime = endTime;
+		this.deposit = deposit;
+		this.finalPaymentAmount = this.calculatePrice();
+	}
 
 	public void confirmBooking() {
 		this.status = BookingStatus.CONFIRMED;
@@ -91,7 +102,7 @@ public class Booking {
 		return client;
 	}
 	
-	public int getParkingSpaceId(){
+	public UUID getParkingSpaceId(){
 		return parkingSpace.getID();
 	}
 

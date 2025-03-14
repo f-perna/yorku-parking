@@ -2,22 +2,24 @@ package parking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import parking.ParkingSpace;
 
 public class ParkingLot {
 	
 	private String name;
-	private int id;
+	private UUID id;
 	private List<ParkingSpace> parkingSpaces;
 	
 	
-	public ParkingLot(String name, int id) {
+	public ParkingLot(String name, UUID id) {
 		this.parkingSpaces = new ArrayList<>();
 		this.name = name;
 		this.id = id;
 	}
 	
-	public int getID() {
+	public UUID getID() {
 		return id;
 	}
 	
@@ -25,7 +27,7 @@ public class ParkingLot {
 		parkingSpaces.add(parkingSpace);
 	}
 	
-	public void addParkingSpace(int id) {
+	public void addParkingSpace(UUID id) {
 		parkingSpaces.add(new ParkingSpace(id, this));
 	}
 	

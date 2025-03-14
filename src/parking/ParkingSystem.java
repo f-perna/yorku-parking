@@ -2,6 +2,7 @@ package parking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import booking.Booking;
 import client.Client;
@@ -21,6 +22,7 @@ public class ParkingSystem {
         clients = CSVProcessor.readClientData();
         parkingLots = CSVProcessor.readLotData();
         CSVProcessor.readSpaceData();
+        bookings = CSVProcessor.readBookingData();
     }
     
     /* Main parking logic methods : */
@@ -59,10 +61,30 @@ public class ParkingSystem {
     	return parkingLots;
     }
     
-    public static ParkingLot getParkingLotByID(int id) {
+    public static ParkingLot getParkingLotByID(UUID id) {
     	for (ParkingLot parkingLot : parkingLots) {
-    		if (parkingLot.getID() == id) {
+    		if (parkingLot.getID().equals(id)) {
     			return parkingLot;
+    		}
+    	}
+    	return null;
+    }
+    
+    public static Client getClientByEmail(String email) {
+    	for (Client client : clients) {
+    		if (client.getEmail().equals(email)) {
+    			return client;
+    		}
+    	}
+    	return null;
+    }
+    
+    public static ParkingSpace getParkingSpaceByID(UUID id) {
+    	for (ParkingLot parkingLot : parkingLots) {
+    		for (ParkingSpace parkingSpace: parkingLot.getParkingSpaces()) {
+    			if (parkingSpace.getID().equals(id)) {
+    				return parkingSpace;
+    			}
     		}
     	}
     	return null;

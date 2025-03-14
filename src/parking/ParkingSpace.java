@@ -1,16 +1,18 @@
 package parking;
 
+import java.util.UUID;
+
 public class ParkingSpace {
 	
-	private int id;
+	private UUID id;
 	private ParkingLot parkingLot;
 	
-	public ParkingSpace(int id, ParkingLot parkingLot) {
+	public ParkingSpace(UUID id, ParkingLot parkingLot) {
 		this.parkingLot = parkingLot;
 		this.id = id;
 	}
 	
-	public int getID() {
+	public UUID getID() {
 		return id;
 	}
 	
