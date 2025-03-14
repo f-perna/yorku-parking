@@ -128,6 +128,18 @@ public class Booking {
 		return status;
 	}
 	
+<<<<<<< HEAD
+	public BookingStatus getStatus(){
+		return status; 
+	
+	}
+	
+	@Override 
+	public String toString() {
+		return "booking [ID= " + bookingId + ", ParkingSpaceID " + parkingSpaceId + ", Deposit= " + deposit + " , Status=" + status + ", StartTime=" + startTime + ", EndTime=" +endTime + "]";
+	}
+}
+=======
 	@Override
     public String toString() {
 		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
@@ -135,3 +147,4 @@ public class Booking {
         return "Lot " + parkingSpace.getLot().getName() + " | " + startTime.format(startFormatter) + " - " + endTime.format(endFormatter);
     }
 }
+>>>>>>> a9f47cbe54b81108c71f790a63abb561fb6abeb4
