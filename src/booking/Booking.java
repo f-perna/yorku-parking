@@ -1,68 +1,134 @@
 package booking;
-import java.time.LocalDateTime;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.UUID;
+import client.Client;
+import parking.ParkingSpace;
 
 public class Booking {
-	private int bookingId; 
-	private int parkingSpaceId; 
-	private long startTime;
-	private long endTime;
-	private double deposit; 
-	private BookingStatus status; 
-	
-	public Booking(int bookingId, int parkingSpceId, double desposit) {
-		this.bookingId = bookingId; 
-		this.parkingSpaceId = parkingSpaceId; 
-		this.deposit = deposit; 
-		this.status = BookingStatus.PENDING;
-		this.startTime = System.currentTimeMillis();
-		this.endTime = 0;
-	}
-	
 
-	public void confirm() {
+	public static enum BookingStatus {
+		PENDING, CONFIRMED, CANCELED, COMPLETED, NO_SHOW
+	}
+
+	private UUID bookingId;
+	private ParkingSpace parkingSpace;
+	private LocalDateTime startTime;
+	private Client client;
+	private LocalDateTime endTime;
+	private double deposit = 0;
+	private double finalPaymentAmount;
+	private BookingStatus status;
+
+	public Booking(ParkingSpace parkingSpace, LocalDateTime endTime, Client client) {
+		this.bookingId = UUID.randomUUID();
+		this.client = client;
+		this.parkingSpace = parkingSpace;
+		this.status = BookingStatus.PENDING;
+		this.startTime = LocalDateTime.now();
+		this.endTime = endTime;
+		this.finalPaymentAmount = this.calculatePrice();
+	}
+	
+	public Booking(UUID bookingId, Client client, ParkingSpace parkingSpace, BookingStatus status, LocalDateTime startTime, LocalDateTime endTime, double deposit, double finalAmount) {
+		this.bookingId = UUID.randomUUID();
+		this.client = client;
+		this.parkingSpace = parkingSpace;
+		this.status = BookingStatus.PENDING;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.deposit = deposit;
+		this.finalPaymentAmount = this.calculatePrice();
+	}
+
+	public void confirmBooking() {
 		this.status = BookingStatus.CONFIRMED;
-		System.out.println("Booking " + bookingId + "Confirmed.");
+		System.out.println("Booking " + bookingId + " Confirmed.");
 	}
-	
-	public void cancel() {
+
+	public void cancelBooking() {
 		this.status = BookingStatus.CANCELED;
-		System.out.println("Booking " + bookingId + "Canceled.");
+		System.out.println("Booking " + bookingId + " Canceled.");
 	}
-	
-	public void complete() {
-		this.status = BookingStatus.COMPELETED;
-		this.endTime = System.currentTimeMillis();
-		System.out.println("Booking " + bookingId + "Completed.");
-	}
-	
+
 	public void updateStatus(BookingStatus newStatus) {
 		this.status = newStatus;
 		System.out.println("Booking " + bookingId + " updated to " + newStatus);
 	}
-	
-	public int getBookingId() {
+
+	public void extendBooking(LocalDateTime endTime) {
+		if (this.endTime.isAfter(endTime)) {
+			throw new IllegalArgumentException("New end time must be greater than the current end time.");
+		}
+		this.endTime = endTime;
+	}
+
+	public long calculateHours() {
+		long minutes = Duration.between(startTime, endTime).toMinutes();
+		return (minutes + 59) / 60;
+	}
+
+	public double calculatePrice() {
+		return this.calculateHours() * this.client.getRate();
+	}
+
+	public void payDeposit() {
+		this.deposit = this.client.getRate();
+		this.status = BookingStatus.CONFIRMED;
+		System.out.println("Deposit of $" + this.deposit + " paid for booking " + bookingId);
+	}
+
+	// Implement this method
+	public void completeBooking() {
+	}
+
+	public void noShow() {
+		if (this.status == BookingStatus.CONFIRMED) {
+			this.status = BookingStatus.NO_SHOW;
+//			this.depositRefunded = false;
+			System.out.println("Client no-show for booking " + bookingId);
+			System.out.println("Deposit of $" + deposit + " not refunded.");
+		} else {
+			System.out.println("Cannot mark as no-show for booking with status: " + status);
+		}
+	}
+
+	public UUID getBookingId() {
 		return bookingId;
 	}
 	
-	public int getParkingSpaceId(){
-		return parkingSpaceId;
+	public Client getClient() {
+		return client;
 	}
 	
-	public long getStartTime() {
+	public ParkingSpace getParkingSpace(){
+		return parkingSpace;
+	}
+
+	public LocalDateTime getStartTime() {
 		return startTime;
 	}
-	
-	public long getEndTime() {
+
+	public LocalDateTime getEndTime() {
 		return endTime;
 	}
-	
+
 	public double getDeposit() {
 		return deposit;
-		
+	}
+
+	public double getFinalPaymentAmount() {
+		return finalPaymentAmount;
+	}
+
+	public BookingStatus getStatus() {
+		return status;
 	}
 	
+<<<<<<< HEAD
 	public BookingStatus getStatus(){
 		return status; 
 	
@@ -73,3 +139,12 @@ public class Booking {
 		return "booking [ID= " + bookingId + ", ParkingSpaceID " + parkingSpaceId + ", Deposit= " + deposit + " , Status=" + status + ", StartTime=" + startTime + ", EndTime=" +endTime + "]";
 	}
 }
+=======
+	@Override
+    public String toString() {
+		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
+		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
+        return "Lot " + parkingSpace.getLot().getName() + " | " + startTime.format(startFormatter) + " - " + endTime.format(endFormatter);
+    }
+}
+>>>>>>> a9f47cbe54b81108c71f790a63abb561fb6abeb4
