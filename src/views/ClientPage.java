@@ -43,6 +43,7 @@ public class ClientPage extends JPanel {
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(bookButton, gbc);
+		bookButton.addActionListener((ActionEvent e) -> handleNewBooking());
 		
 		JLabel bookingsMessage = new JLabel("Bookings: ");
 		gbc.gridx = 0;
@@ -55,6 +56,12 @@ public class ClientPage extends JPanel {
 		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(bookingsList, gbc);
+	}
+	
+	public void handleNewBooking() {
+		BookingPage bookingPage = (BookingPage) NavigationController.getPage("Booking");
+		bookingPage.refresh();
+		NavigationController.showPage("Booking");
 	}
 	
 	public void refresh() {

@@ -1,5 +1,6 @@
 package parking;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.UUID;
 import booking.Booking;
 import client.Client;
 import main.CSVProcessor;
+import parking.ParkingSpace.ParkingStatus;
 
 
 //Concrete Subject class
@@ -29,6 +31,13 @@ public class ParkingSystem {
     public static void registerClient(Client Client) {
         clients.add(Client);
         CSVProcessor.setClientData(clients);
+    }
+    
+    public static void createBooking(ParkingSpace parkingSpace, int durationAmount) {
+    	bookings.add(new Booking(parkingSpace, durationAmount, loggedInClient));
+    	parkingSpace.setStatus(ParkingStatus.BOOKED);
+    	CSVProcessor.setBookingData(bookings);
+    	CSVProcessor.setLotAndSpaceData(parkingLots);
     }
 
     public static boolean login(String inputEmail, String inputPassword) {

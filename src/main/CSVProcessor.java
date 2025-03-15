@@ -97,6 +97,73 @@ public final class CSVProcessor {
 	        System.err.println("Error writing to CSV file: " + e.getMessage());
 	    }
 	}
+	
+	public static void setBookingData(List<Booking> bookings) {
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(BOOKINGS_CSV))) {
+	        // Write header (assuming the CSV has a header row)
+	        bw.write("bookingID, clientEmail, parkingID, bookingStatus, startTime, endTime, deposit, finalAmount");
+	        bw.newLine();
+
+	        for (Booking booking : bookings) {
+	            String line = String.join(CSV_DELIMITER, 
+	                booking.getBookingId().toString(), 
+	                booking.getClient().getEmail(), 
+	                booking.getParkingSpace().getID().toString(), 
+	                booking.getStartTime().toString(), 
+	                booking.getEndTime().toString(),
+	                Double.toString(booking.getDeposit()),
+	                Double.toString(booking.getFinalPaymentAmount())
+	            );
+	            bw.write(line);
+	            bw.newLine();
+	        }
+
+	    } catch (IOException e) {
+	        System.err.println("Error writing to CSV file: " + e.getMessage());
+	    }
+	}
+	
+	public static void setLotAndSpaceData(List<ParkingLot> parkingLots) {
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(LOTS_CSV))) {
+	        // Write header (assuming the CSV has a header row)
+	        bw.write("name, id");
+	        bw.newLine();
+
+	        for (ParkingLot parkingLot : parkingLots) {
+	            String line = String.join(CSV_DELIMITER, 
+	                parkingLot.getName(),
+	                parkingLot.getID().toString()
+	            );
+	            bw.write(line);
+	            bw.newLine();
+	        }
+
+	    } catch (IOException e) {
+	        System.err.println("Error writing to CSV file: " + e.getMessage());
+	    }
+	    
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(SPACES_CSV))) {
+	        // Write header (assuming the CSV has a header row)
+	        bw.write("id, lotID, status, name");
+	        bw.newLine();
+
+	        for (ParkingLot parkingLot : parkingLots) {
+	            for (ParkingSpace parkingSpace : parkingLot.getParkingSpaces()) {
+	            	String line = String.join(CSV_DELIMITER, 
+    	                parkingSpace.getID().toString(),
+    	                parkingSpace.getLot().getID().toString(),
+    	                parkingSpace.getStatus().toString(),
+    	                parkingSpace.getName()
+    	            );
+    	            bw.write(line);
+    	            bw.newLine();
+	            }
+	        }
+
+	    } catch (IOException e) {
+	        System.err.println("Error writing to CSV file: " + e.getMessage());
+	    }
+	}
 
 
 	public static List<ParkingLot> readLotData() {
@@ -145,7 +212,7 @@ public final class CSVProcessor {
 
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
-				if (data.length != 3) {
+				if (data.length != 4) {
 					System.err.println("Error: Invalid number of columns in line: " + line);
 					continue;
 				}
@@ -153,10 +220,11 @@ public final class CSVProcessor {
 				UUID id = UUID.fromString(data[0]);
 				UUID lotID = UUID.fromString(data[1]);
 				ParkingStatus status = ParkingStatus.valueOf(data[2]);
+				String name = data[3];
 
 				ParkingLot parkingLot = ParkingSystem.getParkingLotByID(lotID);
 
-				parkingLot.addParkingSpace(id, status);
+				parkingLot.addParkingSpace(id, status, name);
 			}
 
 		} catch (IOException e) {

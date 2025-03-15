@@ -23,13 +23,13 @@ public class Booking {
 	private double finalPaymentAmount;
 	private BookingStatus status;
 
-	public Booking(ParkingSpace parkingSpace, LocalDateTime endTime, Client client) {
+	public Booking(ParkingSpace parkingSpace, int durationAmount, Client client) {
 		this.bookingId = UUID.randomUUID();
 		this.client = client;
 		this.parkingSpace = parkingSpace;
 		this.status = BookingStatus.PENDING;
 		this.startTime = LocalDateTime.now();
-		this.endTime = endTime;
+		this.endTime = this.startTime.plusHours(durationAmount);
 		this.finalPaymentAmount = this.calculatePrice();
 	}
 	

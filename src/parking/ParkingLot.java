@@ -32,11 +32,16 @@ public class ParkingLot {
 		parkingSpaces.add(parkingSpace);
 	}
 	
-	public void addParkingSpace(UUID id, ParkingStatus status) {
-		parkingSpaces.add(new ParkingSpace(id, this, status));
+	public void addParkingSpace(UUID id, ParkingStatus status, String name) {
+		parkingSpaces.add(new ParkingSpace(id, this, status, name));
 	}
 	
 	public List<ParkingSpace> getParkingSpaces() {
 		return parkingSpaces;
 	}
+	
+	@Override
+    public String toString() {
+		return name;
+    }
 }

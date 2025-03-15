@@ -11,11 +11,13 @@ public class ParkingSpace {
 	private UUID id;
 	private ParkingLot parkingLot;
 	private ParkingStatus status;
+	private String name;
 	
-	public ParkingSpace(UUID id, ParkingLot parkingLot, ParkingStatus status) {
+	public ParkingSpace(UUID id, ParkingLot parkingLot, ParkingStatus status, String name) {
 		this.parkingLot = parkingLot;
 		this.id = id;
 		this.status = status;
+		this.name = name;
 	}
 	
 	public UUID getID() {
@@ -24,6 +26,23 @@ public class ParkingSpace {
 	
 	public ParkingLot getLot() {
 		return parkingLot;
+	}
+	
+	public ParkingStatus getStatus() {
+		return status;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setStatus(ParkingStatus parkingStatus) {
+		this.status = parkingStatus;
+	}
+	
+	@Override
+    public String toString() {
+		return name;
 	}
 	
 }
