@@ -109,6 +109,7 @@ public final class CSVProcessor {
 	                booking.getBookingId().toString(), 
 	                booking.getClient().getEmail(), 
 	                booking.getParkingSpace().getID().toString(), 
+	                booking.getStatus().toString(),
 	                booking.getStartTime().toString(), 
 	                booking.getEndTime().toString(),
 	                Double.toString(booking.getDeposit()),
