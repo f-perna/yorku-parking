@@ -1,5 +1,8 @@
 package payment;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 // PaymentMethod Interface (Strategy Pattern)
 public interface PaymentMethod {
         boolean processPayment(double amount);
@@ -14,6 +17,11 @@ class Debit implements PaymentMethod {
                 System.out.println("Processing debit payment of " + amount);
                 return true;
         }
+        
+        @Override
+        public String toString() {
+        	return "Debit";
+        }
 }
 
 class Credit implements PaymentMethod {
@@ -22,6 +30,11 @@ class Credit implements PaymentMethod {
                 //Simulate credit payment
                 System.out.println("Processing credit payment of " + amount);
                 return true;
+        }
+        
+        @Override
+        public String toString() {
+        	return "Credit";
         }
 }
 
@@ -32,6 +45,10 @@ class Mobile implements PaymentMethod {
                 System.out.println("Processing mobile payment of " + amount);
                 return true;
         }
+        @Override
+        public String toString() {
+        	return "Mobile";
+        }
 }
 
 class Cash implements PaymentMethod {
@@ -40,5 +57,9 @@ class Cash implements PaymentMethod {
                 //Simulate cash payment
                 System.out.println("Processing cash payment of " + amount);
                 return true;
+        }
+        @Override
+        public String toString() {
+        	return "Cash";
         }
 }

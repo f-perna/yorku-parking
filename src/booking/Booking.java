@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.UUID;
 import client.Client;
 import parking.ParkingSpace;
+import payment.Payment;
 
 public class Booking {
 
@@ -22,6 +23,7 @@ public class Booking {
 	private double deposit = 0;
 	private double finalPaymentAmount;
 	private BookingStatus status;
+	private Payment payment;
 
 	public Booking(ParkingSpace parkingSpace, int durationAmount, Client client) {
 		this.bookingId = UUID.randomUUID();
@@ -30,10 +32,11 @@ public class Booking {
 		this.status = BookingStatus.PENDING;
 		this.startTime = LocalDateTime.now();
 		this.endTime = this.startTime.plusHours(durationAmount);
+		this.deposit = this.client.getRate();
 		this.finalPaymentAmount = this.calculatePrice();
 	}
 	
-	public Booking(UUID bookingId, Client client, ParkingSpace parkingSpace, BookingStatus status, LocalDateTime startTime, LocalDateTime endTime, double deposit, double finalAmount) {
+	public Booking(UUID bookingId, Client client, ParkingSpace parkingSpace, BookingStatus status, LocalDateTime startTime, LocalDateTime endTime, double deposit, double finalAmount, Payment payment) {
 		this.bookingId = UUID.randomUUID();
 		this.client = client;
 		this.parkingSpace = parkingSpace;
@@ -42,6 +45,11 @@ public class Booking {
 		this.endTime = endTime;
 		this.deposit = deposit;
 		this.finalPaymentAmount = this.calculatePrice();
+		this.payment = payment;
+	}
+	
+	public void setPayment(Payment payment) {
+		this.payment = payment;
 	}
 
 	public void confirmBooking() {
@@ -100,12 +108,16 @@ public class Booking {
 		return client;
 	}
 	
-	public ParkingSpace getParkingSpace(){
+	public ParkingSpace getParkingSpace() {
 		return parkingSpace;
 	}
 
 	public LocalDateTime getStartTime() {
 		return startTime;
+	}
+	
+	public Payment getPayment() {
+		return payment;
 	}
 
 	public LocalDateTime getEndTime() {
@@ -122,6 +134,12 @@ public class Booking {
 
 	public BookingStatus getStatus() {
 		return status;
+	}
+	
+	public String getDuration() {
+		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
+		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
+		return startTime.format(startFormatter) + " - " + endTime.format(endFormatter);
 	}
 	
 	@Override

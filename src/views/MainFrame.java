@@ -31,6 +31,7 @@ public class MainFrame extends JFrame {
         NavigationController.addPage("Register", new RegisterPage(this));
         NavigationController.addPage("Client", new ClientPage(this));
         NavigationController.addPage("Booking", new BookingPage(this));
+        NavigationController.addPage("Checkout", new CheckoutPage(this));
 		
 		getContentPane().add(cardPanel, BorderLayout.CENTER);
 		

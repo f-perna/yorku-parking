@@ -1,7 +1,10 @@
 package payment;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.UUID;
+
 public class Payment {
-	private int paymentID;
+	private UUID paymentID;
 	private double amount;
   	public PaymentStatus status;
 	public PaymentMethod paymentMethod;
@@ -10,11 +13,11 @@ public class Payment {
 		PENDING, COMPLETED, FAILED, REFUNDED;
 	}
 	
-	public Payment(int paymentID, double amount, PaymentMethod method) {
+	public Payment(UUID paymentID, double amount, PaymentMethod method, PaymentStatus status) {
 		this.paymentID = paymentID;
 		this.amount = amount;
-		this.paymentMethod = paymentMethod;
-		this.status = PaymentStatus.PENDING;
+		this.paymentMethod = method;
+		this.status = status;
 	}
 
 	public void setPaymentMethod(PaymentMethod paymentMethod) {
@@ -45,7 +48,7 @@ public class Payment {
 		return status;
 	}
 
-	public int getPaymentID() {
+	public UUID getPaymentID() {
 		return paymentID;
 	}
 
@@ -55,5 +58,19 @@ public class Payment {
 
 	public PaymentMethod getMethod() {
 		return paymentMethod;
+	}
+	
+	public static PaymentMethod generateMethod(String method) {
+		if (method.equals("Debit")) {
+			return new Debit();
+		} else if (method.equals("Credit")) {
+			return new Credit();
+		} else if (method.equals("Mobile")) {
+			return new Mobile();
+		} else if (method.equals("Cash")) {
+			return new Cash();
+		} else {
+			return null;
+		}
 	}
 }

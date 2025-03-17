@@ -99,10 +99,10 @@ public class BookingPage extends JPanel {
 		
 		int durationAmount = durationAmounts.get(durationComboBox.getSelectedItem());
 		
-		parkingSystem.createBooking((ParkingSpace) spaceComboBox.getSelectedItem(), durationAmount);
-		ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
-		clientPage.refresh();
-		NavigationController.showPage("Client");
+		Booking newBooking = parkingSystem.createBooking((ParkingSpace) spaceComboBox.getSelectedItem(), durationAmount);
+		CheckoutPage checkoutPage = (CheckoutPage) NavigationController.getPage("Checkout");
+		checkoutPage.refresh(newBooking);
+		NavigationController.showPage("Checkout");
 		
 	}
 	

@@ -16,6 +16,8 @@ import client.GenerateClientFactory;
 import parking.ParkingLot;
 import parking.ParkingSpace;
 import parking.ParkingSystem;
+import payment.Payment;
+import payment.PaymentMethod;
 import parking.ParkingSpace.ParkingStatus;
 
 public final class CSVProcessor {
@@ -26,6 +28,7 @@ public final class CSVProcessor {
 	private static final String USERS_CSV = "data/client.csv";
 	private static final String LOTS_CSV = "data/lots.csv";
 	private static final String SPACES_CSV = "data/spaces.csv";
+	private static final String PAYMENTS_CSV = "data/payments.csv";
 	private static final String BOOKINGS_CSV = "data/bookings.csv";
 
 	private CSVProcessor() {
@@ -107,6 +110,7 @@ public final class CSVProcessor {
 	        bw.newLine();
 
 	        for (Booking booking : bookings) {
+	        	String paymentID = (booking.getPayment() == null) ? "null" : booking.getPayment().getPaymentID().toString();
 	            String line = String.join(CSV_DELIMITER, 
 	                booking.getBookingId().toString(), 
 	                booking.getClient().getEmail(), 
@@ -115,7 +119,8 @@ public final class CSVProcessor {
 	                booking.getStartTime().toString(), 
 	                booking.getEndTime().toString(),
 	                Double.toString(booking.getDeposit()),
-	                Double.toString(booking.getFinalPaymentAmount())
+	                Double.toString(booking.getFinalPaymentAmount()),
+	                paymentID
 	            );
 	            bw.write(line);
 	            bw.newLine();
@@ -161,6 +166,28 @@ public final class CSVProcessor {
     	            bw.write(line);
     	            bw.newLine();
 	            }
+	        }
+
+	    } catch (IOException e) {
+	        System.err.println("Error writing to CSV file: " + e.getMessage());
+	    }
+	}
+	
+	public static void setPaymentData(List<Payment> payments) {
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(PAYMENTS_CSV))) {
+	        // Write header (assuming the CSV has a header row)
+	        bw.write("paymentID, amount, status, paymentMethod");
+	        bw.newLine();
+
+	        for (Payment payment : payments) {
+	            String line = String.join(CSV_DELIMITER, 
+	                payment.getPaymentID().toString(),
+	                Double.toString(payment.getAmount()),
+	                payment.getStatus().toString(),
+	                payment.getMethod().toString()
+	            );
+	            bw.write(line);
+	            bw.newLine();
 	        }
 
 	    } catch (IOException e) {
@@ -232,6 +259,40 @@ public final class CSVProcessor {
 			System.err.println("Error reading CSV file: " + e.getMessage());
 		}
 	}
+	
+	public static List<Payment> readPaymentsData() {
+		List<Payment> payments = new ArrayList<>();
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(PAYMENTS_CSV))) {
+
+			String line = br.readLine();
+
+			if (line == null) {
+				System.err.println("Error: CSV file is empty");
+			}
+
+			while ((line = br.readLine()) != null) {
+				String[] data = line.split(CSV_DELIMITER);
+				if (data.length != 4) {
+					System.err.println("Error: Invalid number of columns in line: " + line);
+					continue;
+				}
+
+				UUID id = UUID.fromString(data[0]);
+				double amount = Double.parseDouble(data[1]);
+				Payment.PaymentStatus status = Payment.PaymentStatus.valueOf(data[2]);
+				PaymentMethod paymentMethod = Payment.generateMethod(data[3]);
+
+				Payment newPayment = new Payment(id, amount, paymentMethod, status);
+				
+				payments.add(newPayment);
+			}
+
+		} catch (IOException e) {
+			System.err.println("Error reading CSV file: " + e.getMessage());
+		}
+		return payments;
+	}
 
 	public static List<Booking> readBookingData() {
 		List<Booking> bookings = new ArrayList<>();
@@ -246,7 +307,7 @@ public final class CSVProcessor {
 
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
-				if (data.length != 8) {
+				if (data.length != 9) {
 					System.err.println("Error: Invalid number of columns in line: " + line);
 					continue;
 				}
@@ -258,10 +319,11 @@ public final class CSVProcessor {
 				LocalDateTime startTime = LocalDateTime.parse(data[4]);
 				LocalDateTime endTime = LocalDateTime.parse(data[5]);
 				double deposit = Double.parseDouble(data[6]);
-				double finalAmount = Double.parseDouble(data[6]);
+				double finalAmount = Double.parseDouble(data[7]);
+				Payment payment = (data[8] == null || data[8].equalsIgnoreCase("null")) ? null : parkingSystem.getPaymentByID(UUID.fromString(data[8]));
 
 				Booking booking = new Booking(bookingID, client, parkingSpace, status, startTime, endTime, deposit,
-						finalAmount);
+						finalAmount, payment);
 				bookings.add(booking);
 			}
 

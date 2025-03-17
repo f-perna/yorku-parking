@@ -9,6 +9,7 @@ import booking.Booking;
 import client.Client;
 import main.CSVProcessor;
 import parking.ParkingSpace.ParkingStatus;
+import payment.Payment;
 
 //Concrete Subject class
 public class ParkingSystem {
@@ -18,6 +19,7 @@ public class ParkingSystem {
 	private static List<ParkingLot> parkingLots = new ArrayList<>();
 	private static List<Client> clients = new ArrayList<>();
 	private static List<Booking> bookings = new ArrayList<>();
+	private static List<Payment> payments = new ArrayList<>();
 	private static Client loggedInClient;
 
 	private ParkingSystem() {
@@ -38,6 +40,7 @@ public class ParkingSystem {
 		clients = CSVProcessor.readClientData();
 		parkingLots = CSVProcessor.readLotData();
 		CSVProcessor.readSpaceData();
+		payments = CSVProcessor.readPaymentsData();
 		bookings = CSVProcessor.readBookingData();
 	}
 
@@ -47,11 +50,22 @@ public class ParkingSystem {
 		CSVProcessor.setClientData(clients);
 	}
 
-	public void createBooking(ParkingSpace parkingSpace, int durationAmount) {
-		bookings.add(new Booking(parkingSpace, durationAmount, loggedInClient));
+	public Booking createBooking(ParkingSpace parkingSpace, int durationAmount) {
+		Booking newBooking = new Booking(parkingSpace, durationAmount, loggedInClient);
+		bookings.add(newBooking);
 		parkingSpace.setStatus(ParkingStatus.BOOKED);
 		CSVProcessor.setBookingData(bookings);
 		CSVProcessor.setLotAndSpaceData(parkingLots);
+		return newBooking;
+	}
+	
+	public void createPayment(double amount, String paymentMethod, Booking booking) {
+		Payment newPayment = new Payment(UUID.randomUUID(), amount, Payment.generateMethod(paymentMethod), Payment.PaymentStatus.PENDING);
+		
+		payments.add(newPayment);
+		booking.setPayment(newPayment);
+		CSVProcessor.setPaymentData(payments);
+		CSVProcessor.setBookingData(bookings);
 	}
 
 	public boolean login(String inputEmail, String inputPassword) {
@@ -109,6 +123,15 @@ public class ParkingSystem {
 				if (parkingSpace.getID().equals(id)) {
 					return parkingSpace;
 				}
+			}
+		}
+		return null;
+	}
+	
+	public Payment getPaymentByID(UUID id) {
+		for (Payment payment : payments) {
+			if (payment.getPaymentID().equals(id)) {
+				return payment;
 			}
 		}
 		return null;
