@@ -23,6 +23,9 @@ import controllers.NavigationController;
 import parking.ParkingSystem;
 
 public class LoginPage extends JPanel {
+	
+	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
+	
 	private JTextField emailField;
 	private JPasswordField passwordField;
 	private JLabel statusLabel;
@@ -77,7 +80,7 @@ public class LoginPage extends JPanel {
 	}
 
 	private void handleLogin(String email, String password) {
-		if (ParkingSystem.login(email, password)) {
+		if (parkingSystem.login(email, password)) {
 			ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
 			clientPage.refresh();
 			NavigationController.showPage("Client");

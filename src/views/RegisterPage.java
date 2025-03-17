@@ -13,6 +13,9 @@ import controllers.NavigationController;
 import parking.ParkingSystem;
 
 public class RegisterPage extends JPanel {
+	
+	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
+	
     private JTextField nameField, emailField, licencePlateField;
     private JPasswordField passwordField;
     private JLabel statusLabel;
@@ -100,7 +103,7 @@ public class RegisterPage extends JPanel {
 	private void handleRegister() {
 		boolean approved = (type.getSelectedItem() == Client.type.VISITOR) ? true : false;
 		Client newClient = GenerateClientFactory.getClientType(nameField.getText(), emailField.getText(), passwordField.getText(), (Client.type) type.getSelectedItem(), licencePlateField.getText(), approved);
-		ParkingSystem.registerClient(newClient);
+		parkingSystem.registerClient(newClient);
 		NavigationController.showPage("Login");
 	}
     

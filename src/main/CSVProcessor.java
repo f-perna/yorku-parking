@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,9 @@ import parking.ParkingSystem;
 import parking.ParkingSpace.ParkingStatus;
 
 public final class CSVProcessor {
+	
+	private static ParkingSystem parkingSystem = ParkingSystem.getInstance();
+	
 	private static final String CSV_DELIMITER = ",";
 	private static final String USERS_CSV = "data/client.csv";
 	private static final String LOTS_CSV = "data/lots.csv";
@@ -201,8 +203,6 @@ public final class CSVProcessor {
 	}
 
 	public static void readSpaceData() {
-		List<ParkingLot> parkingLots = ParkingSystem.getParkingLots();
-
 		try (BufferedReader br = new BufferedReader(new FileReader(SPACES_CSV))) {
 
 			String line = br.readLine();
@@ -223,7 +223,7 @@ public final class CSVProcessor {
 				ParkingStatus status = ParkingStatus.valueOf(data[2]);
 				String name = data[3];
 
-				ParkingLot parkingLot = ParkingSystem.getParkingLotByID(lotID);
+				ParkingLot parkingLot = parkingSystem.getParkingLotByID(lotID);
 
 				parkingLot.addParkingSpace(id, status, name);
 			}
@@ -252,8 +252,8 @@ public final class CSVProcessor {
 				}
 
 				UUID bookingID = UUID.fromString(data[0]);
-				Client client = ParkingSystem.getClientByEmail(data[1]);
-				ParkingSpace parkingSpace = ParkingSystem.getParkingSpaceByID(UUID.fromString(data[2]));
+				Client client = parkingSystem.getClientByEmail(data[1]);
+				ParkingSpace parkingSpace = parkingSystem.getParkingSpaceByID(UUID.fromString(data[2]));
 				Booking.BookingStatus status = Booking.BookingStatus.valueOf(data[3]);
 				LocalDateTime startTime = LocalDateTime.parse(data[4]);
 				LocalDateTime endTime = LocalDateTime.parse(data[5]);

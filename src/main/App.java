@@ -7,7 +7,8 @@ import views.MainFrame;
 
 public class App {
 	public static void main(String[] args) {
-		ParkingSystem.loadFromDatabase();
+		ParkingSystem parkingSystem = ParkingSystem.getInstance();
+		parkingSystem.loadFromDatabase();
 		
 		SwingUtilities.invokeLater(() -> {
 			new MainFrame();
