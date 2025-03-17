@@ -1,6 +1,5 @@
 package parking;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -12,25 +11,25 @@ import parking.ParkingSpace.ParkingStatus;
 
 //Concrete Subject class
 public class ParkingSystem {
-	
+
 	private static ParkingSystem instance;
 
-	private static List<ParkingLot> parkingLots = new ArrayList<>();
-	private static List<Client> clients = new ArrayList<>();
-	private static List<Booking> bookings = new ArrayList<>();
-	private static Client loggedInClient;
+	private List<ParkingLot> parkingLots;
+	private List<Client> clients;
+	private List<Booking> bookings;
+	private Client loggedInClient;
 
 	private ParkingSystem() {
 		parkingLots = new ArrayList<>();
 		clients = new ArrayList<>();
 		bookings = new ArrayList<>();
 	}
-	
+
 	public static ParkingSystem getInstance() {
 		if (instance == null) {
 			instance = new ParkingSystem();
 		}
-		
+
 		return instance;
 	}
 
