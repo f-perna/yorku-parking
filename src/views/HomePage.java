@@ -13,13 +13,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import auth.AuthStateObserver;
+import auth.AuthenticationState;
 import controllers.NavigationController;
 
-public class HomePage extends JPanel {
+public class HomePage extends JPanel implements AuthStateObserver {
+	private JPanel buttonArea;
+	private JButton loginButton;
+	private JButton registerButton;
+	private JButton bookingsButton;
 
 	public HomePage(JFrame parent) {
 		setLayout(new GridBagLayout());
-		JPanel buttonArea = new JPanel();
+		buttonArea = new JPanel();
 
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;
@@ -27,19 +33,43 @@ public class HomePage extends JPanel {
 		gbc.anchor = GridBagConstraints.CENTER;
 
 		JLabel label = new JLabel("Welcome to YorkU Parking Booking System!");
-		JButton login = new JButton("Login");
-		JButton register = new JButton("Register");
+		loginButton = new JButton("Login");
+		registerButton = new JButton("Register");
+		bookingsButton = new JButton("Go to Bookings");
 
-		login.addActionListener((ActionEvent e) -> NavigationController.showPage("Login"));
-		register.addActionListener((ActionEvent e) -> NavigationController.showPage("Register"));
-		login.setFocusPainted(false);
+		loginButton.addActionListener((ActionEvent e) -> NavigationController.showPage("Login"));
+		registerButton.addActionListener((ActionEvent e) -> NavigationController.showPage("Register"));
+		bookingsButton.addActionListener((ActionEvent e) -> NavigationController.showPage("Client"));
+		loginButton.setFocusPainted(false);
 
 		add(label, gbc);
-		buttonArea.add(login);
-		buttonArea.add(register);
+		buttonArea.add(loginButton);
+		buttonArea.add(registerButton);
 
 		gbc.gridy = 1;
 		add(buttonArea, gbc);
 
+		// Register as observer
+		AuthenticationState.getInstance().addObserver(this);
+
+		// Initialize UI state
+		updateButtonVisibility(AuthenticationState.getInstance().isLoggedIn());
+	}
+
+	@Override
+	public void onAuthStateChanged(boolean isLoggedIn) {
+		updateButtonVisibility(isLoggedIn);
+	}
+
+	private void updateButtonVisibility(boolean isLoggedIn) {
+		buttonArea.removeAll();
+		if (isLoggedIn) {
+			buttonArea.add(bookingsButton);
+		} else {
+			buttonArea.add(loginButton);
+			buttonArea.add(registerButton);
+		}
+		buttonArea.revalidate();
+		buttonArea.repaint();
 	}
 }
