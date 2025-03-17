@@ -1,10 +1,10 @@
 package parking;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import auth.AuthenticationState;
 import booking.Booking;
 import client.Client;
 import main.CSVProcessor;
@@ -13,7 +13,7 @@ import payment.Payment;
 
 //Concrete Subject class
 public class ParkingSystem {
-	
+
 	private static ParkingSystem instance;
 
 	private static List<ParkingLot> parkingLots = new ArrayList<>();
@@ -27,12 +27,12 @@ public class ParkingSystem {
 		clients = new ArrayList<>();
 		bookings = new ArrayList<>();
 	}
-	
+
 	public static ParkingSystem getInstance() {
 		if (instance == null) {
 			instance = new ParkingSystem();
 		}
-		
+
 		return instance;
 	}
 
@@ -45,8 +45,8 @@ public class ParkingSystem {
 	}
 
 	/* Main parking logic methods : */
-	public void registerClient(Client Client) {
-		clients.add(Client);
+	public void registerClient(Client client) {
+		clients.add(client);
 		CSVProcessor.setClientData(clients);
 	}
 
@@ -74,7 +74,7 @@ public class ParkingSystem {
 			String password = client.getPassword();
 
 			if (inputEmail.equals(email) && inputPassword.equals(password)) {
-				loggedInClient = client;
+				AuthenticationState.getInstance().setLoggedInClient(client);
 				return true;
 			}
 		}
@@ -82,13 +82,13 @@ public class ParkingSystem {
 	}
 
 	public Client getLoggedInClient() {
-		return loggedInClient;
+		return AuthenticationState.getInstance().getLoggedInClient();
 	}
 
-	public List<Booking> getBookingsForClient(Client inputClient) {
+	public List<Booking> getBookingsForClient(Client client) {
 		List<Booking> clientBookings = new ArrayList<>();
 		for (Booking booking : bookings) {
-			if (booking.getClient() == inputClient) {
+			if (booking.getClient().equals(client)) {
 				clientBookings.add(booking);
 			}
 		}
