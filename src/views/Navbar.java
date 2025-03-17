@@ -26,8 +26,8 @@ public class Navbar extends JPanel implements AuthStateObserver {
         homeButton.addActionListener(e -> NavigationController.showPage("Home"));
         logoutButton.addActionListener(e -> handleLogout());
 
-        add(prevButton);
-        add(forwardButton);
+//        add(prevButton);
+//        add(forwardButton);
         add(homeButton);
 
         // Register as observer
