@@ -24,6 +24,8 @@ import parking.ParkingSystem;
 
 public class ClientPage extends JPanel {
 	
+	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
+	
 	private JComboBox<Booking> bookingsList;
 	private JLabel welcomeMessage;
 
@@ -65,8 +67,8 @@ public class ClientPage extends JPanel {
 	}
 	
 	public void refresh() {
-	     Client client = ParkingSystem.getLoggedInClient();
-	     List<Booking> clientBookings = ParkingSystem.getBookingsForClient(client);
+	     Client client = parkingSystem.getLoggedInClient();
+	     List<Booking> clientBookings = parkingSystem.getBookingsForClient(client);
 	     
 	     welcomeMessage.setText("Welcome, " + client.getName());
 	     

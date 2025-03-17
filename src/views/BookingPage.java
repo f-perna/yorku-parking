@@ -19,6 +19,8 @@ import java.util.Map;
 
 public class BookingPage extends JPanel {
 	
+	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
+	
 	private final String[] DURATIONS = {"1 Hour", "2 Hours", "3 Hours"};
 	private JComboBox<ParkingLot> lotComboBox;
 	private JComboBox<ParkingSpace> spaceComboBox;
@@ -97,7 +99,7 @@ public class BookingPage extends JPanel {
 		
 		int durationAmount = durationAmounts.get(durationComboBox.getSelectedItem());
 		
-		ParkingSystem.createBooking((ParkingSpace) spaceComboBox.getSelectedItem(), durationAmount);
+		parkingSystem.createBooking((ParkingSpace) spaceComboBox.getSelectedItem(), durationAmount);
 		ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
 		clientPage.refresh();
 		NavigationController.showPage("Client");
@@ -105,7 +107,7 @@ public class BookingPage extends JPanel {
 	}
 	
 	public void refresh() {
-	     List<ParkingLot> availableLots = ParkingSystem.getParkingLots();
+	     List<ParkingLot> availableLots = parkingSystem.getParkingLots();
 	     
 	     lotComboBox.removeAllItems();
 	     
