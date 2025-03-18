@@ -41,7 +41,7 @@ public class Booking {
 		this.bookingId = UUID.randomUUID();
 		this.client = client;
 		this.parkingSpace = parkingSpace;
-		this.status = BookingStatus.PENDING;
+		this.status = status;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.deposit = deposit;

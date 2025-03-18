@@ -1,4 +1,4 @@
 name, email, password, licensePlate, type, approved
-John Doe,johndoe@gmail.com,123456,123 ANB,STUDENT,false
+John Doe,johndoe@gmail.com,,123 ANB,STUDENT,false
 Bob Doe,bobdoe@gmail.com,123456,ABC 123,STUDENT,false
 James Doe,jamesdoe@gmail.com,123456,ABD 123,STUDENT,false

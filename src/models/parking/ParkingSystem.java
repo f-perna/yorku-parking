@@ -53,7 +53,7 @@ public class ParkingSystem {
 	}
 
 	public Booking createBooking(ParkingSpace parkingSpace, int durationAmount) {
-		Booking newBooking = new Booking(parkingSpace, durationAmount, loggedInClient);
+		Booking newBooking = new Booking(parkingSpace, durationAmount, AuthenticationState.getInstance().getLoggedInClient());
 		bookings.add(newBooking);
 		parkingSpace.setStatus(ParkingStatus.BOOKED);
 		CSVProcessor.setBookingData(bookings);
