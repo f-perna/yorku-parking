@@ -1,5 +1,5 @@
 // For file SuperManager.java
-package manager;
+package models.manager;
 
 public class SuperManager extends Manager {
 

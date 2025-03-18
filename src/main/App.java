@@ -2,7 +2,7 @@ package main;
 
 import javax.swing.SwingUtilities;
 
-import manager.ManagerSystem;
+import models.manager.ManagerSystem;
 import models.parking.ParkingSystem;
 import views.MainFrame;
 

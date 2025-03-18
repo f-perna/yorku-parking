@@ -1,5 +1,5 @@
 // For file Manager.java
-package manager;
+package models.manager;
 
 public class Manager {
 	protected String username;
