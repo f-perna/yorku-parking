@@ -1,4 +1,4 @@
-package payment;
+package models.payment;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;

@@ -17,10 +17,10 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
-import booking.Booking;
-import client.Client;
 import controllers.NavigationController;
-import parking.ParkingSystem;
+import models.booking.Booking;
+import models.client.Client;
+import models.parking.ParkingSystem;
 
 public class ClientPage extends JPanel {
 	

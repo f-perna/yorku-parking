@@ -3,7 +3,7 @@ package main;
 import javax.swing.SwingUtilities;
 
 import manager.ManagerSystem;
-import parking.ParkingSystem;
+import models.parking.ParkingSystem;
 import views.MainFrame;
 
 public class App {

@@ -13,10 +13,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import booking.Booking;
 import controllers.NavigationController;
-import parking.ParkingLot;
-import parking.ParkingSystem;
+import models.booking.Booking;
+import models.parking.ParkingLot;
+import models.parking.ParkingSystem;
+
 
 public class CheckoutPage extends JPanel {
 	

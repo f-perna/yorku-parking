@@ -1,8 +1,9 @@
-package auth;
+package models.auth;
 
 import java.util.ArrayList;
 import java.util.List;
-import client.Client;
+
+import models.client.Client;
 
 public class AuthenticationState {
     private static AuthenticationState instance;

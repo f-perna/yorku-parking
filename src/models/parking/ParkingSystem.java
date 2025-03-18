@@ -1,15 +1,17 @@
-package parking;
+package models.parking;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import auth.AuthenticationState;
-import booking.Booking;
-import client.Client;
 import main.CSVProcessor;
-import parking.ParkingSpace.ParkingStatus;
-import payment.Payment;
+import models.auth.AuthenticationState;
+import models.booking.Booking;
+import models.client.Client;
+import models.parking.ParkingLot;
+import models.parking.ParkingSpace;
+import models.parking.ParkingSpace.ParkingStatus;
+import models.payment.Payment;
 
 //Concrete Subject class
 public class ParkingSystem {
@@ -138,3 +140,4 @@ public class ParkingSystem {
 	}
 
 }
+

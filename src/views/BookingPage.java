@@ -2,13 +2,13 @@ package views;
 
 import javax.swing.*;
 
-import booking.Booking;
-import client.Client;
 import controllers.NavigationController;
-import parking.ParkingLot;
-import parking.ParkingSpace;
-import parking.ParkingSpace.ParkingStatus;
-import parking.ParkingSystem;
+import models.booking.Booking;
+import models.client.Client;
+import models.parking.ParkingLot;
+import models.parking.ParkingSpace;
+import models.parking.ParkingSpace.ParkingStatus;
+import models.parking.ParkingSystem;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

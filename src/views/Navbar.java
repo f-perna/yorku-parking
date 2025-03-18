@@ -6,9 +6,9 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import auth.AuthStateObserver;
-import auth.AuthenticationState;
 import controllers.NavigationController;
+import models.auth.AuthStateObserver;
+import models.auth.AuthenticationState;
 
 public class Navbar extends JPanel implements AuthStateObserver {
     private JButton logoutButton;

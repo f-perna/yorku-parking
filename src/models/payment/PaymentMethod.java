@@ -1,4 +1,4 @@
-package payment;
+package models.payment;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;

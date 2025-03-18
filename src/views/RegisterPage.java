@@ -2,15 +2,14 @@ package views;
 
 import javax.swing.*;
 
-import booking.Booking;
-import client.Client;
-import client.Client.type;
-import client.GenerateClientFactory;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import controllers.NavigationController;
-import parking.ParkingSystem;
+import models.booking.Booking;
+import models.client.Client;
+import models.client.GenerateClientFactory;
+import models.parking.ParkingSystem;
+import models.client.Client.type;
 
 public class RegisterPage extends JPanel {
 	

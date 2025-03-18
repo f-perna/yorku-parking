@@ -1,8 +1,8 @@
-package client;
+package models.client;
 
 import java.util.List;
 
-import booking.Booking;
+import models.booking.Booking;
 
 public abstract class Client {
 	private String email;

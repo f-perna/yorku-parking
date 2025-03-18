@@ -1,13 +1,14 @@
-package booking;
+package models.booking;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.UUID;
-import client.Client;
-import parking.ParkingSpace;
-import payment.Payment;
+
+import models.client.Client;
+import models.parking.ParkingSpace;
+import models.payment.Payment;
 
 public class Booking {
 

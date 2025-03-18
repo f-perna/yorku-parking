@@ -1,4 +1,4 @@
-package parking;
+package models.parking;
 
 import java.util.UUID;
 

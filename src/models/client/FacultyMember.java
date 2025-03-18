@@ -1,4 +1,4 @@
-package client;
+package models.client;
 
 public class FacultyMember extends Client{
 

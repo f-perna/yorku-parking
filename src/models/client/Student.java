@@ -1,4 +1,4 @@
-package client;
+package models.client;
 
 public class Student extends Client {
 	

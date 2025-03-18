@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import controllers.NavigationController;
-import parking.ParkingSystem;
+import models.parking.ParkingSystem;
 
 public class LoginPage extends JPanel {
 

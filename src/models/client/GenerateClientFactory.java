@@ -1,4 +1,4 @@
-package client;
+package models.client;
 
 public class GenerateClientFactory {
 	public static Client getClientType(String name, String email, String password, Client.type clientType, String licensePlate, boolean approved) {

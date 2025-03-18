@@ -13,9 +13,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import auth.AuthStateObserver;
-import auth.AuthenticationState;
 import controllers.NavigationController;
+import models.auth.AuthStateObserver;
+import models.auth.AuthenticationState;
 
 public class HomePage extends JPanel implements AuthStateObserver {
 	private JPanel buttonArea;

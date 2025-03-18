@@ -10,15 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import booking.Booking;
-import client.Client;
-import client.GenerateClientFactory;
-import parking.ParkingLot;
-import parking.ParkingSpace;
-import parking.ParkingSystem;
-import payment.Payment;
-import payment.PaymentMethod;
-import parking.ParkingSpace.ParkingStatus;
+import models.booking.Booking;
+import models.client.Client;
+import models.client.GenerateClientFactory;
+import models.parking.ParkingLot;
+import models.parking.ParkingSpace;
+import models.parking.ParkingSpace.ParkingStatus;
+import models.parking.ParkingSystem;
+import models.payment.Payment;
+import models.payment.PaymentMethod;
 
 public final class CSVProcessor {
 	
