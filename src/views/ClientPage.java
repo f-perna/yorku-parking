@@ -1,5 +1,6 @@
 package views;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -31,7 +32,7 @@ public class ClientPage extends JPanel {
 	private JComboBox<Booking> bookingsList;
 	private JLabel welcomeMessage;
 	private JLabel bookingLabel, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue, depositLabel, depositValue,
-	statusLabel, statusValue, totalLabel, totalValue;
+	statusLabel, statusValue, totalLabel, totalValue, errorLabel;
 	private JButton checkinButton, checkoutButton;
 
 	public ClientPage(JFrame parent) {
@@ -162,14 +163,36 @@ public class ClientPage extends JPanel {
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(checkinButton, gbc);
 		checkinButton.hide();
+		checkinButton.addActionListener((ActionEvent e) -> handleCheckin());
 		
 		checkoutButton = new JButton("Check-Out");
 		gbc.gridy = 9;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(checkoutButton, gbc);
 		checkoutButton.hide();
+		
+		errorLabel = new JLabel();
+		gbc.gridx = 1;
+		gbc.gridy = 10;
+		gbc.anchor = GridBagConstraints.CENTER;
+		add(errorLabel, gbc);
 	}
 	
+	private void handleCheckin() {
+		Booking booking = ((Booking) bookingsList.getSelectedItem());
+		
+		boolean checkedin = parkingSystem.checkin(booking);
+		
+		if (checkedin) {
+			errorLabel.setText("Checked-In!");
+			errorLabel.setForeground(Color.GREEN);
+			refreshBookingInfo();
+		} else {
+			errorLabel.setText("You can't check-in yet!");
+			errorLabel.setForeground(Color.RED);
+		}
+	}
+
 	public void handleNewBooking() {
 		BookingPage bookingPage = (BookingPage) NavigationController.getPage("Booking");
 		bookingPage.refresh();
@@ -216,7 +239,16 @@ public class ClientPage extends JPanel {
 		statusValue.show();
 		depositValue.show();
 		totalValue.show();
-		checkinButton.show();
-		//checkoutButton.show();
+		
+		if (((Booking) bookingsList.getSelectedItem()).getStatus() == Booking.BookingStatus.PENDING) {
+			checkinButton.show();
+			checkoutButton.hide();
+		} else if (((Booking) bookingsList.getSelectedItem()).getStatus() == Booking.BookingStatus.CONFIRMED) {
+			checkinButton.hide();
+			checkoutButton.show();
+		} else {
+			checkinButton.hide();
+			checkoutButton.hide();
+		}
 	}
 }

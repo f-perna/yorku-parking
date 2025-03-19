@@ -1,5 +1,6 @@
 package models.parking;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -59,6 +60,18 @@ public class ParkingSystem {
 		CSVProcessor.setBookingData(bookings);
 		CSVProcessor.setLotAndSpaceData(parkingLots);
 		return newBooking;
+	}
+	
+	public boolean checkin(Booking booking) {
+		LocalDateTime startTime = booking.getStartTime();
+		
+		if (LocalDateTime.now().isAfter(startTime)) {
+			booking.confirmBooking();
+			CSVProcessor.setBookingData(bookings);
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public void createPayment(double amount, String paymentMethod, Booking booking) {
