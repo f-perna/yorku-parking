@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -18,6 +17,10 @@ import models.parking.ParkingSystem;
 
 public class LoginPage extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
 	private JTextField emailField;
 	private JPasswordField passwordField;
@@ -59,7 +62,7 @@ public class LoginPage extends JPanel {
 		gbc.gridy = 3;
 		add(managerCheckBox, gbc);
 
-		managerCheckBox.addActionListener((ActionEvent e) -> {
+		managerCheckBox.addActionListener(_ -> {
 			boolean isManager = managerCheckBox.isSelected();
 			titleLabel.setText(isManager ? "Manager Login" : "Login");
 			emailLabel.setText(isManager ? "Username:" : "Email:");
@@ -78,9 +81,9 @@ public class LoginPage extends JPanel {
 		JButton goToRegister = new JButton("Don't have an account? Click Here");
 		gbc.gridy = 6;
 		add(goToRegister, gbc);
-		goToRegister.addActionListener((ActionEvent e) -> NavigationController.showPage("Register"));
+		goToRegister.addActionListener(_ -> NavigationController.showPage("Register"));
 
-		loginButton.addActionListener((ActionEvent e) -> handleLogin(emailField.getText(),
+		loginButton.addActionListener(_ -> handleLogin(emailField.getText(),
 				new String(passwordField.getPassword()), managerCheckBox.isSelected()));
 	}
 

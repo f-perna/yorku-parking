@@ -1,22 +1,16 @@
 package views;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -27,6 +21,11 @@ import models.parking.ParkingSystem;
 
 public class ClientPage extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
 	
 	private JComboBox<Booking> bookingsList;
@@ -51,7 +50,7 @@ public class ClientPage extends JPanel {
 		gbc.gridy = 1;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(bookButton, gbc);
-		bookButton.addActionListener((ActionEvent e) -> handleNewBooking());
+		bookButton.addActionListener(_ -> handleNewBooking());
 		
 		bookingLabel = new JLabel("Bookings: ");
 		gbc.gridx = 0;
@@ -59,13 +58,13 @@ public class ClientPage extends JPanel {
 		gbc.anchor = GridBagConstraints.CENTER;
 		bookingLabel.setBorder(new EmptyBorder(50, 0, 50, 0));
 		add(bookingLabel, gbc);
-		bookingLabel.hide();
+		bookingLabel.setVisible(false);
 		
 		bookingsList = new JComboBox<>();
 		gbc.gridx = 1;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(bookingsList, gbc);
-		bookingsList.hide();
+		bookingsList.setVisible(false);
 		
 		bookingsList.addActionListener(new ActionListener() {
 			@Override
@@ -79,97 +78,97 @@ public class ClientPage extends JPanel {
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(lotLabel, gbc);
-		lotLabel.hide();
+		lotLabel.setVisible(false);
 		
 		lotValue = new JLabel();
 		gbc.gridx = 1;
 		gbc.gridy = 3;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(lotValue, gbc);
-		lotValue.hide();
+		lotValue.setVisible(false);
 		
 		spaceLabel = new JLabel("Space: ");
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(spaceLabel, gbc);
-		spaceLabel.hide();
+		spaceLabel.setVisible(false);
 		
 		spaceValue = new JLabel();
 		gbc.gridx = 1;
 		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(spaceValue, gbc);
-		spaceValue.hide();
+		spaceValue.setVisible(false);
 		
 		durationLabel = new JLabel("Duration: ");
 		gbc.gridx = 0;
 		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(durationLabel, gbc);
-		durationLabel.hide();
+		durationLabel.setVisible(false);
 		
 		durationValue = new JLabel();
 		gbc.gridx = 1;
 		gbc.gridy = 5;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(durationValue, gbc);
-		durationValue.hide();
+		durationValue.setVisible(false);
 		
 		statusLabel = new JLabel("Status: ");
 		gbc.gridx = 0;
 		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(statusLabel, gbc);
-		statusLabel.hide();
+		statusLabel.setVisible(false);
 		
 		statusValue = new JLabel();
 		gbc.gridx = 1;
 		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(statusValue, gbc);
-		statusValue.hide();
+		statusValue.setVisible(false);
 		
 		depositLabel = new JLabel("Deposit Paid: ");
 		gbc.gridx = 0;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(depositLabel, gbc);
-		depositLabel.hide();
+		depositLabel.setVisible(false);
 		
 		depositValue = new JLabel();
 		gbc.gridx = 1;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(depositValue, gbc);
-		depositValue.hide();
+		depositValue.setVisible(false);
 		
 		totalLabel = new JLabel("Total Due Upon Checkout: ");
 		gbc.gridx = 0;
 		gbc.gridy = 8;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(totalLabel, gbc);
-		totalLabel.hide();
+		totalLabel.setVisible(false);
 		
 		totalValue = new JLabel();
 		gbc.gridx = 1;
 		gbc.gridy = 8;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(totalValue, gbc);
-		totalValue.hide();
+		totalValue.setVisible(false);
 		
 		checkinButton = new JButton("Check-In");
 		gbc.gridy = 9;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(checkinButton, gbc);
-		checkinButton.hide();
-		checkinButton.addActionListener((ActionEvent e) -> handleCheckin());
+		checkinButton.setVisible(false);
+		checkinButton.addActionListener(_ -> handleCheckin());
 		
 		checkoutButton = new JButton("Check-Out");
 		gbc.gridy = 9;
 		gbc.anchor = GridBagConstraints.CENTER;
 		add(checkoutButton, gbc);
-		checkoutButton.hide();
+		checkoutButton.setVisible(false);
 		
 		errorLabel = new JLabel();
 		gbc.gridx = 1;
@@ -212,11 +211,11 @@ public class ClientPage extends JPanel {
 	     }
 	     
 	     if (clientBookings.size() > 0) {
-	    	 bookingLabel.show();
-	    	 bookingsList.show();
+	    	 bookingLabel.setVisible(true);
+	    	 bookingsList.setVisible(true);
 	     } else {
-	    	 bookingLabel.hide();
-	    	 bookingsList.hide();
+	    	 bookingLabel.setVisible(false);
+	    	 bookingsList.setVisible(false);
 		}
 	}
 	
@@ -227,28 +226,28 @@ public class ClientPage extends JPanel {
 		statusValue.setText(((Booking) bookingsList.getSelectedItem()).getStatus().toString());
 		depositValue.setText(Double.toString(((Booking) bookingsList.getSelectedItem()).getDeposit()));
 		totalValue.setText(Double.toString(((Booking) bookingsList.getSelectedItem()).calculatePrice()));
-		lotLabel.show();
-		spaceLabel.show();
-		durationLabel.show();
-		statusLabel.show();
-		depositLabel.show();
-		totalLabel.show();
-		lotValue.show();
-		spaceValue.show();
-		durationValue.show();
-		statusValue.show();
-		depositValue.show();
-		totalValue.show();
+		lotLabel.setVisible(true);
+		spaceLabel.setVisible(true);
+		durationLabel.setVisible(true);
+		statusLabel.setVisible(true);
+		depositLabel.setVisible(true);
+		totalLabel.setVisible(true);
+		lotValue.setVisible(true);
+		spaceValue.setVisible(true);
+		durationValue.setVisible(true);
+		statusValue.setVisible(true);
+		depositValue.setVisible(true);
+		totalValue.setVisible(true);
 		
 		if (((Booking) bookingsList.getSelectedItem()).getStatus() == Booking.BookingStatus.PENDING) {
-			checkinButton.show();
-			checkoutButton.hide();
+			checkinButton.setVisible(true);
+			checkoutButton.setVisible(false);
 		} else if (((Booking) bookingsList.getSelectedItem()).getStatus() == Booking.BookingStatus.CONFIRMED) {
-			checkinButton.hide();
-			checkoutButton.show();
+			checkinButton.setVisible(false);
+			checkoutButton.setVisible(true);
 		} else {
-			checkinButton.hide();
-			checkoutButton.hide();
+			checkinButton.setVisible(false);
+			checkoutButton.setVisible(false);
 		}
 	}
 }

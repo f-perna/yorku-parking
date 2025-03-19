@@ -1,8 +1,5 @@
 package models.payment;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-
 // PaymentMethod Interface (Strategy Pattern)
 public interface PaymentMethod {
         boolean processPayment(double amount);

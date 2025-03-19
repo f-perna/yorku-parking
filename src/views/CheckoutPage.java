@@ -4,8 +4,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,12 +13,16 @@ import javax.swing.JPanel;
 
 import controllers.NavigationController;
 import models.booking.Booking;
-import models.parking.ParkingLot;
 import models.parking.ParkingSystem;
 
 
 public class CheckoutPage extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
 	
 	private Booking currentBooking;
@@ -98,7 +100,7 @@ public class CheckoutPage extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 7;
 		add(payButton, gbc);
-		payButton.addActionListener((ActionEvent e) -> handlePay());
+		payButton.addActionListener(_ -> handlePay());
 	}
 	
 	public void refresh(Booking booking) {

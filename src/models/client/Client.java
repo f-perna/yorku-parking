@@ -1,9 +1,5 @@
 package models.client;
 
-import java.util.List;
-
-import models.booking.Booking;
-
 public abstract class Client {
 	private String email;
 	private String password;

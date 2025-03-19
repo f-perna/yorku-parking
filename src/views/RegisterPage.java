@@ -3,16 +3,18 @@ package views;
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import controllers.NavigationController;
-import models.booking.Booking;
 import models.client.Client;
 import models.client.GenerateClientFactory;
 import models.parking.ParkingSystem;
-import models.client.Client.type;
 
 public class RegisterPage extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
 	
     private JTextField nameField, emailField, licencePlateField;
@@ -95,13 +97,13 @@ public class RegisterPage extends JPanel {
         gbc.gridy = 8;
         add(goToLogin, gbc);
 
-        registerButton.addActionListener((ActionEvent e) -> handleRegister());
-        goToLogin.addActionListener((ActionEvent e) -> NavigationController.showPage("Login"));
+        registerButton.addActionListener(_ -> handleRegister());
+        goToLogin.addActionListener(_ -> NavigationController.showPage("Login"));
     }
 
 	private void handleRegister() {
 		boolean approved = (type.getSelectedItem() == Client.type.VISITOR) ? true : false;
-		Client newClient = GenerateClientFactory.getClientType(nameField.getText(), emailField.getText(), passwordField.getText(), (Client.type) type.getSelectedItem(), licencePlateField.getText(), approved);
+		Client newClient = GenerateClientFactory.getClientType(nameField.getText(), emailField.getText(), new String(passwordField.getPassword()), (Client.type) type.getSelectedItem(), licencePlateField.getText(), approved);
 		parkingSystem.registerClient(newClient);
 		NavigationController.showPage("Login");
 	}

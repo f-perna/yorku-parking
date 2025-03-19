@@ -4,7 +4,6 @@ import javax.swing.*;
 
 import controllers.NavigationController;
 import models.booking.Booking;
-import models.client.Client;
 import models.parking.ParkingLot;
 import models.parking.ParkingSpace;
 import models.parking.ParkingSpace.ParkingStatus;
@@ -19,6 +18,11 @@ import java.util.Map;
 
 public class BookingPage extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
 	
 	private final String[] DURATIONS = {"1 Hour", "2 Hours", "3 Hours"};
@@ -76,12 +80,12 @@ public class BookingPage extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		add(backButton, gbc);
-		backButton.addActionListener((ActionEvent e) -> handleBack());
+		backButton.addActionListener(_ -> handleBack());
 		
 		JButton continueButton = new JButton("Continue");
 		gbc.gridx = 1;
 		add(continueButton, gbc);
-		continueButton.addActionListener((ActionEvent e) -> handleContinue());
+		continueButton.addActionListener(_ -> handleContinue());
 	}
 	
 	private void handleBack() {
