@@ -23,8 +23,8 @@ public class NavigationController {
 		pages.put(pageName, panel);
 		cardPanel.add(panel, pageName);
 		if (history.isEmpty()) {
-            showPage(pageName);
-        }
+			showPage(pageName);
+		}
 	}
 
 	public static void showPage(String pageName) {
@@ -33,7 +33,7 @@ public class NavigationController {
 		}
 		history.add(pageName);
 		historyIndex = history.size() - 1;
-		
+
 		cardLayout.show(cardPanel, pageName);
 	}
 
@@ -44,14 +44,14 @@ public class NavigationController {
 			cardLayout.show(cardPanel, pageName);
 		}
 	}
-	
+
 	public static void forwardPage() {
-        if (historyIndex < history.size() - 1) {
-            historyIndex++;
-            String pageName = history.get(historyIndex);
-            cardLayout.show(cardPanel, pageName);
-        }
-    }
+		if (historyIndex < history.size() - 1) {
+			historyIndex++;
+			String pageName = history.get(historyIndex);
+			cardLayout.show(cardPanel, pageName);
+		}
+	}
 
 	public static JPanel getPage(String pageName) {
 		return pages.get(pageName);

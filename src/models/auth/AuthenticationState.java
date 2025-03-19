@@ -14,7 +14,7 @@ public class AuthenticationState {
         observers = new ArrayList<>();
     }
 
-    public static AuthenticationState getInstance() {
+    public static synchronized AuthenticationState getInstance() {
         if (instance == null) {
             instance = new AuthenticationState();
         }
@@ -29,13 +29,13 @@ public class AuthenticationState {
         observers.remove(observer);
     }
 
+    public Client getLoggedInClient() {
+        return loggedInClient;
+    }
+
     public void setLoggedInClient(Client client) {
         this.loggedInClient = client;
         notifyObservers();
-    }
-
-    public Client getLoggedInClient() {
-        return loggedInClient;
     }
 
     public boolean isLoggedIn() {

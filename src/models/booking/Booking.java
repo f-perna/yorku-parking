@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import models.client.Client;
-import models.parking.ParkingSpace;
+import models.parkingSpace.ParkingSpace;
 import models.payment.Payment;
 
 public class Booking {
@@ -36,8 +36,9 @@ public class Booking {
 		this.deposit = this.client.getRate();
 		this.finalPaymentAmount = this.calculatePrice();
 	}
-	
-	public Booking(UUID bookingId, Client client, ParkingSpace parkingSpace, BookingStatus status, LocalDateTime startTime, LocalDateTime endTime, double deposit, double finalAmount, Payment payment) {
+
+	public Booking(UUID bookingId, Client client, ParkingSpace parkingSpace, BookingStatus status,
+			LocalDateTime startTime, LocalDateTime endTime, double deposit, double finalAmount, Payment payment) {
 		this.bookingId = UUID.randomUUID();
 		this.client = client;
 		this.parkingSpace = parkingSpace;
@@ -48,7 +49,7 @@ public class Booking {
 		this.finalPaymentAmount = this.calculatePrice();
 		this.payment = payment;
 	}
-	
+
 	public void setPayment(Payment payment) {
 		this.payment = payment;
 	}
@@ -104,11 +105,11 @@ public class Booking {
 	public UUID getBookingId() {
 		return bookingId;
 	}
-	
+
 	public Client getClient() {
 		return client;
 	}
-	
+
 	public ParkingSpace getParkingSpace() {
 		return parkingSpace;
 	}
@@ -116,7 +117,7 @@ public class Booking {
 	public LocalDateTime getStartTime() {
 		return startTime;
 	}
-	
+
 	public Payment getPayment() {
 		return payment;
 	}
@@ -136,17 +137,18 @@ public class Booking {
 	public BookingStatus getStatus() {
 		return status;
 	}
-	
+
 	public String getDuration() {
 		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
 		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
 		return startTime.format(startFormatter) + " - " + endTime.format(endFormatter);
 	}
-	
+
 	@Override
-    public String toString() {
+	public String toString() {
 		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
 		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
-        return "Lot " + parkingSpace.getLot().getName() + " | " + startTime.format(startFormatter) + " - " + endTime.format(endFormatter);
-    }
+		return "Lot " + parkingSpace.getLot().getName() + " | " + startTime.format(startFormatter) + " - "
+				+ endTime.format(endFormatter);
+	}
 }

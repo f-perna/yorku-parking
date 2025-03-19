@@ -13,18 +13,20 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import controllers.ClientController;
+import controllers.ControllerFactory;
 import controllers.NavigationController;
-import models.parking.ParkingSystem;
 
 public class LoginPage extends JPanel {
-
-	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
+	private ClientController clientController;
 	private JTextField emailField;
 	private JPasswordField passwordField;
 	private JLabel statusLabel;
 	private JCheckBox managerCheckBox;
 
 	public LoginPage(JFrame parent) {
+		this.clientController = ControllerFactory.getInstance().getClientController();
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 5, 5, 5);
@@ -86,14 +88,19 @@ public class LoginPage extends JPanel {
 
 	private void handleLogin(String email, String password, boolean isManager) {
 		if (isManager) {
-			
+			// Manager login logic will be handled separately
+			statusLabel.setText("Manager login not implemented yet");
 		} else {
-			if (parkingSystem.login(email, password)) {
-				ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
-				clientPage.refresh();
-				NavigationController.showPage("Client");
-			} else {
-				statusLabel.setText("Invalid credentials");
+			try {
+				if (clientController.login(email, password)) {
+					ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
+					clientPage.refresh();
+					NavigationController.showPage("Client");
+				} else {
+					statusLabel.setText("Invalid credentials");
+				}
+			} catch (IllegalArgumentException e) {
+				statusLabel.setText(e.getMessage());
 			}
 		}
 	}

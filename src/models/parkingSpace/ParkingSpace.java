@@ -1,6 +1,8 @@
-package models.parking;
+package models.parkingSpace;
 
 import java.util.UUID;
+
+import models.parkingLot.ParkingLot;
 
 public class ParkingSpace {
 	

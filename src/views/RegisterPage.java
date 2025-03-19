@@ -4,23 +4,25 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+
+import controllers.ClientController;
+import controllers.ControllerFactory;
 import controllers.NavigationController;
 import models.booking.Booking;
 import models.client.Client;
 import models.client.GenerateClientFactory;
-import models.parking.ParkingSystem;
 import models.client.Client.type;
 
 public class RegisterPage extends JPanel {
-	
-	private ParkingSystem parkingSystem = ParkingSystem.getInstance();
 	
     private JTextField nameField, emailField, licencePlateField;
     private JPasswordField passwordField;
     private JLabel statusLabel;
     private JComboBox<Client.type> type;
+    private ClientController clientController;
 
     public RegisterPage(JFrame parent) {
+    	clientController = ControllerFactory.getInstance().getClientController();
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -100,9 +102,7 @@ public class RegisterPage extends JPanel {
     }
 
 	private void handleRegister() {
-		boolean approved = (type.getSelectedItem() == Client.type.VISITOR) ? true : false;
-		Client newClient = GenerateClientFactory.getClientType(nameField.getText(), emailField.getText(), passwordField.getText(), (Client.type) type.getSelectedItem(), licencePlateField.getText(), approved);
-		parkingSystem.registerClient(newClient);
+		clientController.registerClient(nameField.getText(), emailField.getText(), passwordField.getText(), (Client.type) type.getSelectedItem(), licencePlateField.getText());
 		NavigationController.showPage("Login");
 	}
     

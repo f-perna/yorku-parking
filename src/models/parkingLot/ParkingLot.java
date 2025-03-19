@@ -1,10 +1,11 @@
-package models.parking;
+package models.parkingLot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import models.parking.ParkingSpace.ParkingStatus;
+import models.parkingSpace.ParkingSpace;
+import models.parkingSpace.ParkingSpace.ParkingStatus;
 
 public class ParkingLot {
 	
