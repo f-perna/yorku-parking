@@ -4,8 +4,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -99,7 +97,7 @@ public class CheckoutPage extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 7;
 		add(payButton, gbc);
-		payButton.addActionListener((ActionEvent e) -> handlePay());
+		payButton.addActionListener(_ -> handlePay());
 	}
 
 	public void refresh(Booking booking) {

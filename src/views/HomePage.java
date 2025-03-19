@@ -1,13 +1,8 @@
 package views;
 
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,6 +13,10 @@ import models.auth.AuthStateObserver;
 import models.auth.AuthenticationState;
 
 public class HomePage extends JPanel implements AuthStateObserver {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel buttonArea;
 	private JButton loginButton;
 	private JButton registerButton;
@@ -37,9 +36,9 @@ public class HomePage extends JPanel implements AuthStateObserver {
 		registerButton = new JButton("Register");
 		bookingsButton = new JButton("Go to Bookings");
 
-		loginButton.addActionListener((ActionEvent e) -> NavigationController.showPage("Login"));
-		registerButton.addActionListener((ActionEvent e) -> NavigationController.showPage("Register"));
-		bookingsButton.addActionListener((ActionEvent e) -> NavigationController.showPage("Client"));
+		loginButton.addActionListener(_ -> NavigationController.showPage("Login"));
+		registerButton.addActionListener(_ -> NavigationController.showPage("Register"));
+		bookingsButton.addActionListener(_ -> NavigationController.showPage("Client"));
 		loginButton.setFocusPainted(false);
 
 		add(label, gbc);

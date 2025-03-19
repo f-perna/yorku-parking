@@ -1,2 +1,5 @@
 paymentID, amount, status, paymentMethod
 ae283166-ee57-4e88-b411-ec559dc6e02f,5.0,PENDING,Debit
+13d10a4e-badb-4891-83be-fd93d297dc0e,10.0,PENDING,Debit
+14862ed8-708b-43a1-9b10-f366c10075c7,10.0,PENDING,Debit
+0752a73b-0fe4-482b-b698-b41e2bad9e17,10.0,PENDING,Mobile

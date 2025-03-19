@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import controllers.ClientController;
 import controllers.ControllerFactory;
 import controllers.NavigationController;
-import models.booking.Booking;
 import models.client.Client;
 import models.client.GenerateClientFactory;
 import models.client.Client.type;
@@ -97,8 +96,8 @@ public class RegisterPage extends JPanel {
         gbc.gridy = 8;
         add(goToLogin, gbc);
 
-        registerButton.addActionListener((ActionEvent e) -> handleRegister());
-        goToLogin.addActionListener((ActionEvent e) -> NavigationController.showPage("Login"));
+        registerButton.addActionListener(_ -> handleRegister());
+        goToLogin.addActionListener(_ -> NavigationController.showPage("Login"));
     }
 
 	private void handleRegister() {

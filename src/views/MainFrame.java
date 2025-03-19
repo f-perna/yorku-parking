@@ -8,7 +8,11 @@ import controllers.NavigationController;
 
 public class MainFrame extends JFrame {
 
-    private static CardLayout cardLayout;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private static CardLayout cardLayout;
     private static JPanel cardPanel;
 
     public MainFrame() {

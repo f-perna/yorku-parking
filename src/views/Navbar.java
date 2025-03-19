@@ -11,7 +11,11 @@ import models.auth.AuthStateObserver;
 import models.auth.AuthenticationState;
 
 public class Navbar extends JPanel implements AuthStateObserver {
-    private JButton logoutButton;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private JButton logoutButton;
 
     public Navbar(JFrame parent) {
         setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -21,10 +25,10 @@ public class Navbar extends JPanel implements AuthStateObserver {
         JButton homeButton = new JButton("Home");
         logoutButton = new JButton("Logout");
 
-        prevButton.addActionListener(e -> NavigationController.prevPage());
-        forwardButton.addActionListener(e -> NavigationController.forwardPage());
-        homeButton.addActionListener(e -> NavigationController.showPage("Home"));
-        logoutButton.addActionListener(e -> handleLogout());
+        prevButton.addActionListener(_ -> NavigationController.prevPage());
+        forwardButton.addActionListener(_ -> NavigationController.forwardPage());
+        homeButton.addActionListener(_ -> NavigationController.showPage("Home"));
+        logoutButton.addActionListener(_ -> handleLogout());
 
 //        add(prevButton);
 //        add(forwardButton);
