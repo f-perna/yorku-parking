@@ -1,2 +1,2 @@
 bookingID, clientEmail, parkingID, bookingStatus, startTime, endTime, deposit, finalAmount
-ff081258-43d1-4792-a467-497e982f4ee8,johndoe@gmail.com,2a0dae26-727b-45ed-bb3d-ce0aa0e5730a,CONFIRMED,2025-03-18T20:29:02.753705300,2025-03-18T23:29:02.753705300,5.0,15.0,0752a73b-0fe4-482b-b698-b41e2bad9e17
+567b7915-c549-43ef-9379-e778c27c0d3d,johndoe@gmail.com,2a0dae26-727b-45ed-bb3d-ce0aa0e5730a,CONFIRMED,2025-03-18T20:29:02.753705300,2025-03-18T23:29:02.753705300,5.0,15.0,0752a73b-0fe4-482b-b698-b41e2bad9e17

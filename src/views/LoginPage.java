@@ -60,7 +60,7 @@ public class LoginPage extends JPanel {
 		gbc.gridy = 3;
 		add(managerCheckBox, gbc);
 
-		managerCheckBox.addActionListener(_ -> {
+		managerCheckBox.addActionListener(e -> {
 			boolean isManager = managerCheckBox.isSelected();
 			titleLabel.setText(isManager ? "Manager Login" : "Login");
 			emailLabel.setText(isManager ? "Username:" : "Email:");
@@ -79,9 +79,9 @@ public class LoginPage extends JPanel {
 		JButton goToRegister = new JButton("Don't have an account? Click Here");
 		gbc.gridy = 6;
 		add(goToRegister, gbc);
-		goToRegister.addActionListener(_ -> NavigationController.showPage("Register"));
+		goToRegister.addActionListener(e -> NavigationController.showPage("Register"));
 
-		loginButton.addActionListener(_ -> handleLogin(emailField.getText(),
+		loginButton.addActionListener(e -> handleLogin(emailField.getText(),
 				new String(passwordField.getPassword()), managerCheckBox.isSelected()));
 	}
 

@@ -36,9 +36,9 @@ public class HomePage extends JPanel implements AuthStateObserver {
 		registerButton = new JButton("Register");
 		bookingsButton = new JButton("Go to Bookings");
 
-		loginButton.addActionListener(_ -> NavigationController.showPage("Login"));
-		registerButton.addActionListener(_ -> NavigationController.showPage("Register"));
-		bookingsButton.addActionListener(_ -> NavigationController.showPage("Client"));
+		loginButton.addActionListener(e -> NavigationController.showPage("Login"));
+		registerButton.addActionListener(e -> NavigationController.showPage("Register"));
+		bookingsButton.addActionListener(e -> NavigationController.showPage("Client"));
 		loginButton.setFocusPainted(false);
 
 		add(label, gbc);

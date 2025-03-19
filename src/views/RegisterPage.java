@@ -13,7 +13,7 @@ import models.client.GenerateClientFactory;
 import models.client.Client.type;
 
 public class RegisterPage extends JPanel {
-	
+
     private JTextField nameField, emailField, licencePlateField;
     private JPasswordField passwordField;
     private JLabel statusLabel;
@@ -21,7 +21,7 @@ public class RegisterPage extends JPanel {
     private ClientController clientController;
 
     public RegisterPage(JFrame parent) {
-    	clientController = ControllerFactory.getInstance().getClientController();
+        clientController = ControllerFactory.getInstance().getClientController();
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -59,28 +59,28 @@ public class RegisterPage extends JPanel {
         passwordField = new JPasswordField(15);
         gbc.gridx = 1;
         add(passwordField, gbc);
-        
+
         JLabel licencePlateLabel = new JLabel("Licence Plate:");
         gbc.gridx = 0;
         gbc.gridy = 4;
         add(licencePlateLabel, gbc);
-        
+
         licencePlateField = new JTextField(15);
         gbc.gridx = 1;
         add(licencePlateField, gbc);
-        
+
         JLabel typeLabel = new JLabel("Type:");
         gbc.gridx = 0;
         gbc.gridy = 5;
         add(typeLabel, gbc);
-        
+
         type = new JComboBox<>();
         for (Client.type clientType : Client.type.values()) {
-        	type.addItem(clientType);
+            type.addItem(clientType);
         }
         gbc.gridx = 1;
         add(type, gbc);
-        
+
         JButton registerButton = new JButton("Register");
         gbc.gridx = 1;
         gbc.gridy = 6;
@@ -96,14 +96,14 @@ public class RegisterPage extends JPanel {
         gbc.gridy = 8;
         add(goToLogin, gbc);
 
-        registerButton.addActionListener(_ -> handleRegister());
-        goToLogin.addActionListener(_ -> NavigationController.showPage("Login"));
+        registerButton.addActionListener(e -> handleRegister());
+        goToLogin.addActionListener(e -> NavigationController.showPage("Login"));
     }
 
-	private void handleRegister() {
-		clientController.registerClient(nameField.getText(), emailField.getText(), passwordField.getText(), (Client.type) type.getSelectedItem(), licencePlateField.getText());
-		NavigationController.showPage("Login");
-	}
-    
-    
+    private void handleRegister() {
+        clientController.registerClient(nameField.getText(), emailField.getText(), passwordField.getText(),
+                (Client.type) type.getSelectedItem(), licencePlateField.getText());
+        NavigationController.showPage("Login");
+    }
+
 }

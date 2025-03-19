@@ -39,6 +39,28 @@ public class BookingController {
 		return bookingModel.createBooking(parkingSpace, durationHours, client);
 	}
 
+	public boolean CheckIn(Booking booking) {
+		LocalDateTime startTime = booking.getStartTime();
+		System.out.println("Current booking status: " + booking.getStatus());
+		System.out.println("Current time: " + LocalDateTime.now());
+		System.out.println("Start time: " + startTime);
+
+		if (LocalDateTime.now().isAfter(startTime)) {
+			System.out.println("Time check passed, attempting to confirm booking");
+			try {
+				bookingModel.confirmBooking(booking);
+				System.out.println("Booking confirmed successfully");
+				return true;
+			} catch (Exception e) {
+				System.out.println("Error confirming booking: " + e.getMessage());
+				return false;
+			}
+		} else {
+			System.out.println("Cannot check in yet - too early");
+			return false;
+		}
+	}
+
 	public void cancelBooking(UUID bookingId) {
 		if (bookingId == null) {
 			throw new IllegalArgumentException("Booking ID cannot be null");

@@ -84,7 +84,7 @@ public class BookingPage extends JPanel {
 		JButton continueButton = new JButton("Continue");
 		gbc.gridx = 1;
 		add(continueButton, gbc);
-		continueButton.addActionListener(_ -> handleContinue());
+		continueButton.addActionListener(e -> handleContinue());
 	}
 
 	private void handleBack() {
