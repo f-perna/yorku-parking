@@ -173,6 +173,8 @@ public class CheckoutPage extends JPanel {
 
 			BookingController bookingController = ControllerFactory.getInstance().getBookingController();
 			bookingController.saveBooking(currentBooking);
+			
+			// FIX SPACE STATUS NOT UPDATED TO BOOKED
 
 			ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
 			clientPage.refresh();
