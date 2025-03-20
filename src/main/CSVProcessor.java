@@ -113,41 +113,41 @@ public final class CSVProcessor {
 		}
 	}
 
-	public static void setLotAndSpaceData(List<ParkingLot> parkingLots) {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(LOTS_CSV))) {
-			// Write header (assuming the CSV has a header row)
-			bw.write("name, id");
-			bw.newLine();
-
-			for (ParkingLot parkingLot : parkingLots) {
-				String line = String.join(CSV_DELIMITER, parkingLot.getName(), parkingLot.getID().toString());
-				bw.write(line);
-				bw.newLine();
-			}
-
-		} catch (IOException e) {
-			System.err.println("Error writing to CSV file: " + e.getMessage());
-		}
-
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(SPACES_CSV))) {
-			// Write header (assuming the CSV has a header row)
-			bw.write("id, lotID, status, name");
-			bw.newLine();
-
-			for (ParkingLot parkingLot : parkingLots) {
-				for (ParkingSpace parkingSpace : parkingLot.getParkingSpaces()) {
-					String line = String.join(CSV_DELIMITER, parkingSpace.getID().toString(),
-							parkingSpace.getLot().getID().toString(), parkingSpace.getStatus().toString(),
-							parkingSpace.getName());
-					bw.write(line);
-					bw.newLine();
-				}
-			}
-
-		} catch (IOException e) {
-			System.err.println("Error writing to CSV file: " + e.getMessage());
-		}
-	}
+//	public static void setLotAndSpaceData(List<ParkingLot> parkingLots) {
+//		try (BufferedWriter bw = new BufferedWriter(new FileWriter(LOTS_CSV))) {
+//			// Write header (assuming the CSV has a header row)
+//			bw.write("name, id");
+//			bw.newLine();
+//
+//			for (ParkingLot parkingLot : parkingLots) {
+//				String line = String.join(CSV_DELIMITER, parkingLot.getName(), parkingLot.getID().toString());
+//				bw.write(line);
+//				bw.newLine();
+//			}
+//
+//		} catch (IOException e) {
+//			System.err.println("Error writing to CSV file: " + e.getMessage());
+//		}
+//
+//		try (BufferedWriter bw = new BufferedWriter(new FileWriter(SPACES_CSV))) {
+//			// Write header (assuming the CSV has a header row)
+//			bw.write("id, lotID, status, name");
+//			bw.newLine();
+//
+//			for (ParkingLot parkingLot : parkingLots) {
+//				for (ParkingSpace parkingSpace : parkingLot.getParkingSpaces()) {
+//					String line = String.join(CSV_DELIMITER, parkingSpace.getID().toString(),
+//							parkingSpace.getLot().getID().toString(), parkingSpace.getStatus().toString(),
+//							parkingSpace.getName());
+//					bw.write(line);
+//					bw.newLine();
+//				}
+//			}
+//
+//		} catch (IOException e) {
+//			System.err.println("Error writing to CSV file: " + e.getMessage());
+//		}
+//	}
 
 	public static void setPaymentData(List<Payment> payments) {
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(PAYMENTS_CSV))) {
@@ -231,7 +231,6 @@ public final class CSVProcessor {
 					if (parkingLot != null) {
 						ParkingSpace space = new ParkingSpace(id, parkingLot, status, name);
 						spaces.add(space);
-						parkingLot.addParkingSpace(space);
 					}
 				} catch (Exception e) {
 					// Skip invalid entries silently

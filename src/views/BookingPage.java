@@ -6,6 +6,7 @@ import controllers.BookingController;
 import controllers.ControllerFactory;
 import controllers.NavigationController;
 import controllers.ParkingLotController;
+import controllers.ParkingSpaceController;
 import models.booking.Booking;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class BookingPage extends JPanel {
 	private BookingController bookingController;
 	private ParkingLotController parkingLotController;
+	private ParkingSpaceController parkingSpaceController;
 
 	private final String[] DURATIONS = { "1 Hour", "2 Hours", "3 Hours" };
 	private JComboBox<ParkingLot> lotComboBox;
@@ -30,6 +32,8 @@ public class BookingPage extends JPanel {
 	public BookingPage(JFrame parent) {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
 		this.parkingLotController = ControllerFactory.getInstance().getParkingLotController();
+		this.parkingSpaceController = ControllerFactory.getInstance().getParkingSpaceController();
+
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 5, 5, 5);
@@ -124,13 +128,11 @@ public class BookingPage extends JPanel {
 		spaceComboBox.removeAllItems();
 
 		ParkingLot selectedLot = (ParkingLot) lotComboBox.getSelectedItem();
-		if (selectedLot != null) {
-			List<ParkingSpace> parkingSpaces = selectedLot.getParkingSpaces();
 
-			for (ParkingSpace parkingSpace : parkingSpaces) {
-				if (parkingSpace.getStatus() == ParkingStatus.AVAILABLE) {
-					spaceComboBox.addItem(parkingSpace);
-				}
+		if (selectedLot != null) {
+			List<ParkingSpace> availableSpaces = parkingSpaceController.getAvailableSpaces(selectedLot);
+			for (ParkingSpace parkingSpace : availableSpaces) {
+				spaceComboBox.addItem(parkingSpace);
 			}
 		}
 	}

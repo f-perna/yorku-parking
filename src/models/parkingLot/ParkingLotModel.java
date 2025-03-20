@@ -1,10 +1,9 @@
-package models.parking;
+package models.parkingLot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import main.CSVProcessor;
-import models.parkingLot.ParkingLot;
 
 public class ParkingLotModel {
     private List<ParkingLot> parkingLots;
@@ -16,7 +15,7 @@ public class ParkingLotModel {
 
     private void loadFromDatabase() {
         parkingLots = CSVProcessor.readLotData();
-        CSVProcessor.readSpaceData(); // This populates spaces into the lots
+        CSVProcessor.readSpaceData();
     }
 
     public List<ParkingLot> getAllParkingLots() {
@@ -44,6 +43,6 @@ public class ParkingLotModel {
     }
 
     private void saveToDatabase() {
-        CSVProcessor.setLotAndSpaceData(parkingLots);
+       // CSVProcessor.setLotAndSpaceData(parkingLots);
     }
 }

@@ -5,7 +5,7 @@ import java.util.UUID;
 import models.auth.AuthenticationState;
 import models.client.Client;
 import models.parkingLot.ParkingLot;
-import models.parking.ParkingLotModel;
+import models.parkingLot.ParkingLotModel;
 
 public class ParkingLotController {
     private ParkingLotModel parkingLotModel;

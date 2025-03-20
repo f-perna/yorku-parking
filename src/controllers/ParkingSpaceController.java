@@ -6,7 +6,7 @@ import models.auth.AuthenticationState;
 import models.client.Client;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.parking.ParkingSpaceModel;
+import models.parkingSpace.ParkingSpaceModel;
 import models.parkingSpace.ParkingSpace.ParkingStatus;
 
 public class ParkingSpaceController {

@@ -3,8 +3,8 @@ package controllers;
 import models.auth.AuthenticationState;
 import models.booking.BookingModel;
 import models.client.ClientModel;
-import models.parking.ParkingLotModel;
-import models.parking.ParkingSpaceModel;
+import models.parkingLot.ParkingLotModel;
+import models.parkingSpace.ParkingSpaceModel;
 import models.payment.PaymentModel;
 
 public class ControllerFactory {

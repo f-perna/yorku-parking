@@ -97,7 +97,7 @@ public class CheckoutPage extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 7;
 		add(payButton, gbc);
-		payButton.addActionListener(_ -> handlePay());
+		payButton.addActionListener(e -> handlePay());
 	}
 
 	public void refresh(Booking booking) {
