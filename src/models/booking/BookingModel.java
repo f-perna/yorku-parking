@@ -26,12 +26,12 @@ public class BookingModel {
 		}
 
 		Booking newBooking = new Booking(parkingSpace, durationAmount, client);
-		bookings.add(newBooking);
-		parkingSpace.setStatus(ParkingStatus.BOOKED);
-
-		// Save to database
-		CSVProcessor.setBookingData(bookings);
 		return newBooking;
+	}
+
+	public void persistBooking(Booking booking) {
+		bookings.add(booking);
+		CSVProcessor.setBookingData(bookings);
 	}
 
 	public List<Booking> getBookingsForClient(Client client) {
@@ -77,4 +77,8 @@ public class BookingModel {
 	public List<Booking> getAllBookings() {
 		return new ArrayList<>(bookings);
 	}
+
+	// public void deleteBooking(Booking booking) {
+	// bookings.remove(booking);
+	// }
 }

@@ -70,6 +70,7 @@ public class LoginPage extends JPanel {
 		gbc.gridx = 1;
 		gbc.gridy = 4;
 		add(loginButton, gbc);
+		parent.getRootPane().setDefaultButton(loginButton);
 
 		statusLabel = new JLabel(" ");
 		statusLabel.setForeground(Color.RED);
@@ -87,8 +88,7 @@ public class LoginPage extends JPanel {
 
 	private void handleLogin(String email, String password, boolean isManager) {
 		if (isManager) {
-			// Manager login logic will be handled separately
-			statusLabel.setText("Manager login not implemented yet");
+			ErrorDialog.show(this, "Manager Login", "Manager login not implemented yet");
 		} else {
 			try {
 				if (clientController.login(email, password)) {
@@ -96,10 +96,10 @@ public class LoginPage extends JPanel {
 					clientPage.refresh();
 					NavigationController.showPage("Client");
 				} else {
-					statusLabel.setText("Invalid credentials");
+					ErrorDialog.show(this, "Invalid credentials");
 				}
 			} catch (IllegalArgumentException e) {
-				statusLabel.setText(e.getMessage());
+				ErrorDialog.show(this, e.getMessage());
 			}
 		}
 	}

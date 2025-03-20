@@ -39,6 +39,13 @@ public class BookingController {
 		return bookingModel.createBooking(parkingSpace, durationHours, client);
 	}
 
+	public void saveBooking(Booking booking) {
+		if (booking == null) {
+			throw new IllegalArgumentException("Booking cannot be null");
+		}
+		bookingModel.persistBooking(booking);
+	}
+
 	public boolean CheckIn(Booking booking) {
 		LocalDateTime startTime = booking.getStartTime();
 		System.out.println("Current booking status: " + booking.getStatus());
@@ -97,4 +104,7 @@ public class BookingController {
 		}
 		return bookingModel.getBookingById(bookingId);
 	}
+
+	// public boolean deleteBooking(Booking booking) {
+	// }
 }
