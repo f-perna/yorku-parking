@@ -11,64 +11,62 @@ import models.auth.AuthStateObserver;
 import models.auth.AuthenticationState;
 
 public class Navbar extends JPanel implements AuthStateObserver {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-    private JButton logoutButton;
 
-    public Navbar(JFrame parent) {
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+	private static final long serialVersionUID = 1L;
+	private JButton logoutButton;
 
-        JButton prevButton = new JButton("<");
-        JButton forwardButton = new JButton(">");
-        JButton homeButton = new JButton("Home");
-        logoutButton = new JButton("Logout");
+	public Navbar(JFrame parent) {
+		setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        prevButton.addActionListener(e -> NavigationController.prevPage());
-        forwardButton.addActionListener(e -> NavigationController.forwardPage());
-        homeButton.addActionListener(e -> NavigationController.showPage("Home"));
-        logoutButton.addActionListener(e -> handleLogout());
+		JButton prevButton = new JButton("<");
+		JButton forwardButton = new JButton(">");
+		JButton homeButton = new JButton("Home");
+		logoutButton = new JButton("Logout");
 
-        // add(prevButton);
-        // add(forwardButton);
-        add(homeButton);
+		prevButton.addActionListener(e -> NavigationController.prevPage());
+		forwardButton.addActionListener(e -> NavigationController.forwardPage());
+		homeButton.addActionListener(e -> NavigationController.showPage("Home"));
+		logoutButton.addActionListener(e -> handleLogout());
 
-        // Register as observer
-        AuthenticationState.getInstance().addObserver(this);
+		// add(prevButton);
+		// add(forwardButton);
+		add(homeButton);
 
-        // Initialize UI state
-        updateLogoutButtonVisibility(AuthenticationState.getInstance().isLoggedIn());
-    }
+		// Register as observer
+		AuthenticationState.getInstance().addObserver(this);
 
-    private void handleLogout() {
-        AuthenticationState.getInstance().setLoggedInClient(null);
-        NavigationController.showPage("Home");
-    }
+		// Initialize UI state
+		updateLogoutButtonVisibility(AuthenticationState.getInstance().isLoggedIn());
+	}
 
-    @Override
-    public void onAuthStateChanged(boolean isLoggedIn) {
-        updateLogoutButtonVisibility(isLoggedIn);
-    }
+	private void handleLogout() {
+		AuthenticationState.getInstance().setLoggedInClient(null);
+		NavigationController.showPage("Home");
+	}
 
-    private void updateLogoutButtonVisibility(boolean isLoggedIn) {
-        if (isLoggedIn) {
-            if (!isLogoutButtonAdded()) {
-                add(logoutButton);
-            }
-        } else {
-            remove(logoutButton);
-        }
-        revalidate();
-        repaint();
-    }
+	@Override
+	public void onAuthStateChanged(boolean isLoggedIn) {
+		updateLogoutButtonVisibility(isLoggedIn);
+	}
 
-    private boolean isLogoutButtonAdded() {
-        for (java.awt.Component component : getComponents()) {
-            if (component == logoutButton) {
-                return true;
-            }
-        }
-        return false;
-    }
+	private void updateLogoutButtonVisibility(boolean isLoggedIn) {
+		if (isLoggedIn) {
+			if (!isLogoutButtonAdded()) {
+				add(logoutButton);
+			}
+		} else {
+			remove(logoutButton);
+		}
+		revalidate();
+		repaint();
+	}
+
+	private boolean isLogoutButtonAdded() {
+		for (java.awt.Component component : getComponents()) {
+			if (component == logoutButton) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

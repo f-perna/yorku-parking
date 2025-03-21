@@ -7,42 +7,39 @@ import main.CSVProcessor;
 import models.booking.Booking;
 
 public class PaymentModel {
-    private List<Payment> payments;
+	private List<Payment> payments;
 
-    public PaymentModel() {
-        this.payments = new ArrayList<>();
-        loadFromDatabase();
-    }
+	public PaymentModel() {
+		this.payments = new ArrayList<>();
+		loadFromDatabase();
+	}
 
-    private void loadFromDatabase() {
-        payments = CSVProcessor.readPaymentsData();
-    }
+	private void loadFromDatabase() {
+		payments = CSVProcessor.readPaymentsData();
+	}
 
-    public Payment createPayment(double amount, String paymentMethod, Booking booking) {
-        Payment newPayment = new Payment(
-                UUID.randomUUID(),
-                amount,
-                Payment.generateMethod(paymentMethod),
-                Payment.PaymentStatus.PENDING);
+	public Payment createPayment(double amount, String paymentMethod, Booking booking) {
+		Payment newPayment = new Payment(UUID.randomUUID(), amount, Payment.generateMethod(paymentMethod),
+				Payment.PaymentStatus.PENDING);
 
-        payments.add(newPayment);
-        booking.setPayment(newPayment);
+		payments.add(newPayment);
+		booking.setPayment(newPayment);
 
-        // Save to database
-        CSVProcessor.setPaymentData(payments);
-        return newPayment;
-    }
+		// Save to database
+		CSVProcessor.setPaymentData(payments);
+		return newPayment;
+	}
 
-    public Payment getPaymentById(UUID paymentId) {
-        for (Payment payment : payments) {
-            if (payment.getPaymentID().equals(paymentId)) {
-                return payment;
-            }
-        }
-        return null;
-    }
+	public Payment getPaymentById(UUID paymentId) {
+		for (Payment payment : payments) {
+			if (payment.getPaymentID().equals(paymentId)) {
+				return payment;
+			}
+		}
+		return null;
+	}
 
-    public List<Payment> getAllPayments() {
-        return new ArrayList<>(payments);
-    }
+	public List<Payment> getAllPayments() {
+		return new ArrayList<>(payments);
+	}
 }

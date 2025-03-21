@@ -6,86 +6,49 @@ import models.auth.AuthenticationState;
 import models.client.Client;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.parkingSpace.ParkingSpaceModel;
 import models.parkingSpace.ParkingSpace.ParkingStatus;
+import services.ParkingSpaceService;
 
 public class ParkingSpaceController {
-    private ParkingSpaceModel parkingSpaceModel;
+	private ParkingSpaceService parkingSpaceService;
+	private AuthenticationState authState;
 
-    public ParkingSpaceController(ParkingSpaceModel parkingSpaceModel) {
-        this.parkingSpaceModel = parkingSpaceModel;
-    }
+	public ParkingSpaceController(ParkingSpaceService parkingSpaceService) {
+		this.parkingSpaceService = parkingSpaceService;
+		this.authState = AuthenticationState.getInstance();
+	}
 
-    public List<ParkingSpace> getAvailableSpaces(ParkingLot lot) {
-        if (lot == null) {
-            throw new IllegalArgumentException("Parking lot cannot be null");
-        }
+	public List<ParkingSpace> getAvailableSpaces(ParkingLot lot) {
+		return parkingSpaceService.getAvailableSpaces(lot);
+	}
 
-        return parkingSpaceModel.getAvailableSpaces(lot);
-    }
+	public void addParkingSpace(ParkingLot lot, String spaceName) {
+		Client client = authState.getLoggedInClient();
+		if (client == null) {
+			throw new IllegalStateException("User must be logged in to add parking spaces");
+		}
 
-    public void addParkingSpace(ParkingLot lot, String spaceName) {
-        // Input validation
-        if (lot == null) {
-            throw new IllegalArgumentException("Lot cannot be null");
-        }
-        if (spaceName == null || spaceName.trim().isEmpty()) {
-            throw new IllegalArgumentException("Space name cannot be empty");
-        }
+		parkingSpaceService.addParkingSpace(lot, spaceName, client);
+	}
 
-        // Check if user is manager
-        Client client = AuthenticationState.getInstance().getLoggedInClient();
-        if (client == null || client.getType() != Client.type.FACULTY) {
-            throw new IllegalStateException("Only faculty members can add parking spaces");
-        }
+	public void setSpaceStatus(UUID spaceId, ParkingStatus newStatus) {
+		Client client = authState.getLoggedInClient();
+		if (client == null) {
+			throw new IllegalStateException("User must be logged in to modify parking space status");
+		}
 
-        parkingSpaceModel.addParkingSpace(lot, spaceName.trim());
-    }
+		parkingSpaceService.setSpaceStatus(spaceId, newStatus, client);
+	}
 
-    public void setSpaceStatus(UUID spaceId, ParkingStatus newStatus) {
-        // Input validation
-        if (spaceId == null) {
-            throw new IllegalArgumentException("Space ID cannot be null");
-        }
-        if (newStatus == null) {
-            throw new IllegalArgumentException("Status cannot be null");
-        }
+	public ParkingSpace getParkingSpaceById(UUID spaceId) {
+		return parkingSpaceService.getParkingSpaceById(spaceId);
+	}
 
-        // Check if user is manager
-        Client client = AuthenticationState.getInstance().getLoggedInClient();
-        if (client == null || client.getType() != Client.type.FACULTY) {
-            throw new IllegalStateException("Only faculty members can modify parking space status");
-        }
+	public List<ParkingSpace> getSpacesForLot(UUID lotId) {
+		return parkingSpaceService.getSpacesForLot(lotId);
+	}
 
-        ParkingSpace space = parkingSpaceModel.getParkingSpaceById(spaceId);
-        if (space == null) {
-            throw new IllegalArgumentException("Parking space not found");
-        }
-
-        parkingSpaceModel.updateParkingSpaceStatus(space, newStatus);
-    }
-
-    public ParkingSpace getParkingSpaceById(UUID spaceId) {
-        if (spaceId == null) {
-            throw new IllegalArgumentException("Space ID cannot be null");
-        }
-
-        ParkingSpace space = parkingSpaceModel.getParkingSpaceById(spaceId);
-        if (space == null) {
-            throw new IllegalArgumentException("Parking space not found");
-        }
-
-        return space;
-    }
-
-    public List<ParkingSpace> getSpacesForLot(UUID lotId) {
-        if (lotId == null) {
-            throw new IllegalArgumentException("Lot ID cannot be null");
-        }
-        return parkingSpaceModel.getSpacesForLot(lotId);
-    }
-
-    public List<ParkingSpace> getAllSpaces() {
-        return parkingSpaceModel.getAllSpaces();
-    }
+	public List<ParkingSpace> getAllSpaces() {
+		return parkingSpaceService.getAllSpaces();
+	}
 }

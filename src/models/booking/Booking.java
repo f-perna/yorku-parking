@@ -76,6 +76,18 @@ public class Booking {
 		this.endTime = endTime;
 	}
 
+	public void extendDuration(int additionalHours) {
+		if (additionalHours <= 0) {
+			throw new IllegalArgumentException("Additional hours must be positive");
+		}
+
+		LocalDateTime oldEndTime = this.endTime;
+		this.endTime = this.endTime.plusHours(additionalHours);
+		this.finalPaymentAmount = this.calculatePrice();
+
+		System.out.println("Booking " + bookingId + " extended from " + oldEndTime + " to " + this.endTime);
+	}
+
 	public long calculateHours() {
 		long minutes = Duration.between(startTime, endTime).toMinutes();
 		return (minutes + 59) / 60;
@@ -94,7 +106,7 @@ public class Booking {
 	public void noShow() {
 		if (this.status == BookingStatus.CONFIRMED) {
 			this.status = BookingStatus.NO_SHOW;
-//			this.depositRefunded = false;
+			// this.depositRefunded = false;
 			System.out.println("Client no-show for booking " + bookingId);
 			System.out.println("Deposit of $" + deposit + " not refunded.");
 		} else {

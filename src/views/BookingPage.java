@@ -130,7 +130,6 @@ public class BookingPage extends JPanel {
 
 	private void handleContinue() {
 		try {
-			// Validate selections
 			if (lotComboBox.getSelectedItem() == null) {
 				ErrorDialog.show(this, "Booking Error", "Please select a parking lot");
 				return;

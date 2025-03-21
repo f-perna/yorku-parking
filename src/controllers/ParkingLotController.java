@@ -5,65 +5,40 @@ import java.util.UUID;
 import models.auth.AuthenticationState;
 import models.client.Client;
 import models.parkingLot.ParkingLot;
-import models.parkingLot.ParkingLotModel;
+import services.ParkingLotService;
 
 public class ParkingLotController {
-    private ParkingLotModel parkingLotModel;
+	private ParkingLotService parkingLotService;
+	private AuthenticationState authState;
 
-    public ParkingLotController(ParkingLotModel parkingLotModel) {
-        this.parkingLotModel = parkingLotModel;
-    }
+	public ParkingLotController(ParkingLotService parkingLotService) {
+		this.parkingLotService = parkingLotService;
+		this.authState = AuthenticationState.getInstance();
+	}
 
-    public List<ParkingLot> getAllParkingLots() {
-        return parkingLotModel.getAllParkingLots();
-    }
+	public List<ParkingLot> getAllParkingLots() {
+		return parkingLotService.getAllParkingLots();
+	}
 
-    public void addParkingLot(String name) {
-        // Input validation
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Lot name cannot be empty");
-        }
+	public void addParkingLot(String name) {
+		Client client = authState.getLoggedInClient();
+		if (client == null) {
+			throw new IllegalStateException("User must be logged in to add parking lots");
+		}
 
-        // Check if user is manager
-        Client client = AuthenticationState.getInstance().getLoggedInClient();
-        if (client == null || client.getType() != Client.type.FACULTY) {
-            throw new IllegalStateException("Only faculty members can add parking lots");
-        }
+		parkingLotService.addParkingLot(name, client);
+	}
 
-        parkingLotModel.addParkingLot(name.trim());
-    }
+	public ParkingLot getParkingLotById(UUID lotId) {
+		return parkingLotService.getParkingLotById(lotId);
+	}
 
-    public ParkingLot getParkingLotById(UUID lotId) {
-        if (lotId == null) {
-            throw new IllegalArgumentException("Lot ID cannot be null");
-        }
+	public void removeParkingLot(UUID lotId) {
+		Client client = authState.getLoggedInClient();
+		if (client == null) {
+			throw new IllegalStateException("User must be logged in to remove parking lots");
+		}
 
-        ParkingLot lot = parkingLotModel.getParkingLotById(lotId);
-        if (lot == null) {
-            throw new IllegalArgumentException("Parking lot not found");
-        }
-
-        return lot;
-    }
-
-    public void removeParkingLot(UUID lotId) {
-        // Input validation
-        if (lotId == null) {
-            throw new IllegalArgumentException("Lot ID cannot be null");
-        }
-
-        // Check if user is manager
-        Client client = AuthenticationState.getInstance().getLoggedInClient();
-        if (client == null || client.getType() != Client.type.FACULTY) {
-            throw new IllegalStateException("Only faculty members can remove parking lots");
-        }
-
-        // Verify lot exists
-        ParkingLot lot = parkingLotModel.getParkingLotById(lotId);
-        if (lot == null) {
-            throw new IllegalArgumentException("Parking lot not found");
-        }
-
-        parkingLotModel.removeParkingLot(lotId);
-    }
+		parkingLotService.removeParkingLot(lotId, client);
+	}
 }

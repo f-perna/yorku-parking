@@ -19,7 +19,6 @@ import javax.swing.SwingConstants;
 import controllers.NavigationController;
 import controllers.PaymentController;
 import controllers.ControllerFactory;
-import controllers.BookingController;
 import models.booking.Booking;
 
 public class CheckoutPage extends JPanel {
@@ -38,7 +37,6 @@ public class CheckoutPage extends JPanel {
 		gbc.insets = new Insets(10, 15, 10, 15);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 
-		// Title Section
 		JLabel titleLabel = new JLabel("Checkout", SwingConstants.CENTER);
 		titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
 		gbc.gridx = 0;
@@ -47,42 +45,48 @@ public class CheckoutPage extends JPanel {
 		gbc.insets = new Insets(20, 15, 30, 15);
 		add(titleLabel, gbc);
 
-		// Booking Details Panel
 		JPanel bookingDetailsPanel = new JPanel(new GridBagLayout());
-		bookingDetailsPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createLineBorder(Color.GRAY), "Booking Details"));
+		bookingDetailsPanel.setBorder(
+				BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Booking Details"));
 
 		GridBagConstraints detailsGbc = new GridBagConstraints();
 		detailsGbc.insets = new Insets(5, 10, 5, 10);
 		detailsGbc.anchor = GridBagConstraints.WEST;
 
-		// Lot Details
 		addLabelAndValue(bookingDetailsPanel, "Parking Lot:", lotValueLabel = new JLabel(), detailsGbc, 0);
 		addLabelAndValue(bookingDetailsPanel, "Space Number:", spaceValueLabel = new JLabel(), detailsGbc, 1);
 		addLabelAndValue(bookingDetailsPanel, "Duration:", durationValueLabel = new JLabel(), detailsGbc, 2);
 
-		// Add booking details panel to main layout
 		gbc.gridy = 1;
 		gbc.insets = new Insets(10, 15, 20, 15);
 		add(bookingDetailsPanel, gbc);
 
 		// Payment Panel
 		JPanel paymentPanel = new JPanel(new GridBagLayout());
-		paymentPanel.setBorder(BorderFactory.createTitledBorder(
-				BorderFactory.createLineBorder(Color.GRAY), "Payment Information"));
+		paymentPanel.setBorder(
+				BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Payment Information"));
 
 		GridBagConstraints paymentGbc = new GridBagConstraints();
 		paymentGbc.insets = new Insets(5, 10, 5, 10);
 		paymentGbc.anchor = GridBagConstraints.WEST;
 
-		// Payment Details
 		addLabelAndValue(paymentPanel, "Deposit Required:", depositValueLabel = new JLabel(), paymentGbc, 0);
-		addLabelAndValue(paymentPanel, "Total Due at Checkout:", totalValueLabel = new JLabel(), paymentGbc, 1);
+		addLabelAndValue(paymentPanel, "Estimated Total (Final payment at checkout):", totalValueLabel = new JLabel(),
+				paymentGbc, 1);
 
-		// Payment Method
-		JLabel paymentMethodLabel = new JLabel("Payment Method:");
+		JLabel depositNoteLabel = new JLabel(
+				"<html>Note: Only the deposit amount will be charged now.<br>Final payment will be calculated at checkout based on actual usage.</html>");
+		depositNoteLabel.setForeground(new Color(100, 100, 100));
+		depositNoteLabel.setFont(new Font("Arial", Font.ITALIC, 11));
 		paymentGbc.gridx = 0;
 		paymentGbc.gridy = 2;
+		paymentGbc.gridwidth = 2;
+		paymentPanel.add(depositNoteLabel, paymentGbc);
+		paymentGbc.gridwidth = 1;
+
+		JLabel paymentMethodLabel = new JLabel("Payment Method:");
+		paymentGbc.gridx = 0;
+		paymentGbc.gridy = 3;
 		paymentPanel.add(paymentMethodLabel, paymentGbc);
 
 		paymentComboBox = new JComboBox<>(METHODS);
@@ -90,11 +94,9 @@ public class CheckoutPage extends JPanel {
 		paymentGbc.gridx = 1;
 		paymentPanel.add(paymentComboBox, paymentGbc);
 
-		// Add payment panel to main layout
 		gbc.gridy = 2;
 		add(paymentPanel, gbc);
 
-		// Buttons Panel
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridBagLayout());
 		GridBagConstraints buttonGbc = new GridBagConstraints();
@@ -105,27 +107,22 @@ public class CheckoutPage extends JPanel {
 		buttonGbc.gridx = 0;
 		buttonPanel.add(backButton, buttonGbc);
 
-		JButton payButton = new JButton("Pay Now");
-		payButton.setPreferredSize(new Dimension(100, 30));
+		JButton payButton = new JButton("Pay Deposit");
+		payButton.setPreferredSize(new Dimension(120, 30));
 		buttonGbc.gridx = 1;
 		buttonPanel.add(payButton, buttonGbc);
 
-		// Add buttons panel to main layout
 		gbc.gridy = 3;
 		gbc.insets = new Insets(30, 15, 20, 15);
 		add(buttonPanel, gbc);
 
-		// Add action listeners
 		backButton.addActionListener(e -> handleBack());
 		payButton.addActionListener(e -> handlePay());
 
-		// Style the labels
-		styleValueLabels(lotValueLabel, spaceValueLabel, durationValueLabel,
-				depositValueLabel, totalValueLabel);
+		styleValueLabels(lotValueLabel, spaceValueLabel, durationValueLabel, depositValueLabel, totalValueLabel);
 	}
 
-	private void addLabelAndValue(JPanel panel, String labelText, JLabel valueLabel,
-			GridBagConstraints gbc, int row) {
+	private void addLabelAndValue(JPanel panel, String labelText, JLabel valueLabel, GridBagConstraints gbc, int row) {
 		gbc.gridx = 0;
 		gbc.gridy = row;
 		panel.add(new JLabel(labelText), gbc);
@@ -171,10 +168,9 @@ public class CheckoutPage extends JPanel {
 
 			paymentController.processPayment(currentBooking, (String) paymentComboBox.getSelectedItem());
 
-			BookingController bookingController = ControllerFactory.getInstance().getBookingController();
-			bookingController.saveBooking(currentBooking);
-			
-			// FIX SPACE STATUS NOT UPDATED TO BOOKED
+			SuccessDialog.show(this, "Deposit Payment Successful",
+					"Deposit has been processed successfully. Your parking space is now reserved. "
+							+ "Final payment will be collected at checkout.");
 
 			ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
 			clientPage.refresh();

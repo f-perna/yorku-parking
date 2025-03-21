@@ -21,16 +21,23 @@ public class BookingModel {
 	}
 
 	public Booking createBooking(ParkingSpace parkingSpace, int durationAmount, Client client) {
-		if (parkingSpace.getStatus() != ParkingStatus.AVAILABLE) {
-			throw new IllegalStateException("Parking space is not available");
-		}
-
 		Booking newBooking = new Booking(parkingSpace, durationAmount, client);
 		return newBooking;
 	}
 
 	public void persistBooking(Booking booking) {
-		bookings.add(booking);
+		boolean found = false;
+		for (Booking b : bookings) {
+			if (b.getBookingId().equals(booking.getBookingId())) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			bookings.add(booking);
+		}
+
 		CSVProcessor.setBookingData(bookings);
 	}
 
@@ -61,8 +68,7 @@ public class BookingModel {
 		}
 
 		booking.cancelBooking();
-		booking.getParkingSpace().setStatus(ParkingStatus.AVAILABLE);
-		CSVProcessor.setBookingData(bookings);
+		persistBooking(booking);
 	}
 
 	public void confirmBooking(Booking booking) {
@@ -71,7 +77,7 @@ public class BookingModel {
 		}
 
 		booking.confirmBooking();
-		CSVProcessor.setBookingData(bookings);
+		persistBooking(booking);
 	}
 
 	public List<Booking> getAllBookings() {

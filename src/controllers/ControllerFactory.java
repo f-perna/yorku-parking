@@ -1,17 +1,15 @@
 package controllers;
 
-import models.auth.AuthenticationState;
-import models.booking.BookingModel;
-import models.client.ClientModel;
-import models.parkingLot.ParkingLotModel;
-import models.parkingSpace.ParkingSpaceModel;
-import models.payment.PaymentModel;
+import services.BookingService;
+import services.ClientService;
+import services.ParkingLotService;
+import services.ParkingSpaceService;
+import services.PaymentService;
+import services.ServiceFactory;
 
 public class ControllerFactory {
 
 	private static ControllerFactory instance;
-
-	private AuthenticationState authState;
 
 	private BookingController bookingController;
 	private ClientController clientController;
@@ -20,19 +18,19 @@ public class ControllerFactory {
 	private PaymentController paymentController;
 
 	private ControllerFactory() {
-		this.authState = AuthenticationState.getInstance();
+		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 
-		BookingModel bookingModel = new BookingModel();
-		ClientModel clientModel = new ClientModel();
-		ParkingLotModel parkingLotModel = new ParkingLotModel();
-		ParkingSpaceModel parkingSpaceModel = new ParkingSpaceModel();
-		PaymentModel paymentModel = new PaymentModel();
+		BookingService bookingService = serviceFactory.getBookingService();
+		ClientService clientService = serviceFactory.getClientService();
+		ParkingLotService parkingLotService = serviceFactory.getParkingLotService();
+		ParkingSpaceService parkingSpaceService = serviceFactory.getParkingSpaceService();
+		PaymentService paymentService = serviceFactory.getPaymentService();
 
-		this.bookingController = new BookingController(bookingModel);
-		this.clientController = new ClientController(clientModel);
-		this.parkingLotController = new ParkingLotController(parkingLotModel);
-		this.parkingSpaceController = new ParkingSpaceController(parkingSpaceModel);
-		this.paymentController = new PaymentController(paymentModel, authState);
+		this.bookingController = new BookingController(bookingService);
+		this.clientController = new ClientController(clientService);
+		this.parkingLotController = new ParkingLotController(parkingLotService);
+		this.parkingSpaceController = new ParkingSpaceController(parkingSpaceService);
+		this.paymentController = new PaymentController(paymentService, bookingService);
 	}
 
 	public static synchronized ControllerFactory getInstance() {
