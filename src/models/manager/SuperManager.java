@@ -1,18 +1,35 @@
-// For file SuperManager.java
 package models.manager;
 
-public class SuperManager extends Manager {
+import java.util.UUID;
 
-	public SuperManager(String username, String password) {
-		super(username, password);
+public class SuperManager {
+	private static SuperManager instance;
+	private String username;
+	private String password;
+	private UUID id;
+
+	private SuperManager(String username, String password) {
+		this.username = username;
+		this.password = password;
+		this.id = UUID.randomUUID();
 	}
 
-	public Manager createManager(String username, String password) {
-		return null;
-	}
-	
-	public void removeManager(String username) {
-		
+	public static synchronized SuperManager getInstance() {
+		if (instance == null) {
+			instance = new SuperManager("superadmin", "SuperSecurePassword123!");
+		}
+		return instance;
 	}
 
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public UUID getId() {
+		return id;
+	}
 }

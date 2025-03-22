@@ -34,15 +34,15 @@ public class ParkingLotModel {
     public void addParkingLot(String name) {
         ParkingLot newLot = new ParkingLot(name, UUID.randomUUID());
         parkingLots.add(newLot);
-        saveToDatabase();
+        saveLots();
     }
 
     public void removeParkingLot(UUID id) {
         parkingLots.removeIf(lot -> lot.getID().equals(id));
-        saveToDatabase();
+        saveLots();
     }
 
-    private void saveToDatabase() {
-       // CSVProcessor.setLotAndSpaceData(parkingLots);
+    private void saveLots() {
+        // CSVProcessor.setLotAndSpaceData(parkingLots);
     }
 }

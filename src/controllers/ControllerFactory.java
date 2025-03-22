@@ -2,6 +2,7 @@ package controllers;
 
 import services.BookingService;
 import services.ClientService;
+import services.ManagerService;
 import services.ParkingLotService;
 import services.ParkingSpaceService;
 import services.PaymentService;
@@ -16,18 +17,21 @@ public class ControllerFactory {
 	private ParkingLotController parkingLotController;
 	private ParkingSpaceController parkingSpaceController;
 	private PaymentController paymentController;
+	private ManagerController managerController;
 
 	private ControllerFactory() {
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 
 		BookingService bookingService = serviceFactory.getBookingService();
 		ClientService clientService = serviceFactory.getClientService();
+		ManagerService managerService = serviceFactory.getManagerService();
 		ParkingLotService parkingLotService = serviceFactory.getParkingLotService();
 		ParkingSpaceService parkingSpaceService = serviceFactory.getParkingSpaceService();
 		PaymentService paymentService = serviceFactory.getPaymentService();
 
 		this.bookingController = new BookingController(bookingService);
 		this.clientController = new ClientController(clientService);
+		this.managerController = new ManagerController(managerService);
 		this.parkingLotController = new ParkingLotController(parkingLotService);
 		this.parkingSpaceController = new ParkingSpaceController(parkingSpaceService);
 		this.paymentController = new PaymentController(paymentService, bookingService);
@@ -46,6 +50,10 @@ public class ControllerFactory {
 
 	public ClientController getClientController() {
 		return clientController;
+	}
+
+	public ManagerController getManagerController() {
+		return managerController;
 	}
 
 	public ParkingLotController getParkingLotController() {

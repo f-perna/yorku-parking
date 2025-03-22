@@ -42,13 +42,13 @@ public class ParkingSpaceModel {
 		System.out.println("ParkingSpaceModel: Updating space " + space.getID() + " status from " + space.getStatus()
 				+ " to " + newStatus);
 		space.setStatus(newStatus);
-		saveToDatabase();
+		saveSpaces();
 	}
 
 	public void addParkingSpace(ParkingLot lot, String name) {
 		ParkingSpace newSpace = new ParkingSpace(UUID.randomUUID(), lot, ParkingStatus.AVAILABLE, name);
 		parkingSpaces.add(newSpace);
-		saveToDatabase();
+		saveSpaces();
 	}
 
 	public List<ParkingSpace> getAllSpaces() {
@@ -65,7 +65,7 @@ public class ParkingSpaceModel {
 		return lotSpaces;
 	}
 
-	private void saveToDatabase() {
+	private void saveSpaces() {
 		System.out.println("ParkingSpaceModel: Saving " + parkingSpaces.size() + " spaces to database");
 		CSVProcessor.setSpaceData(parkingSpaces);
 		System.out.println("ParkingSpaceModel: Database save completed");

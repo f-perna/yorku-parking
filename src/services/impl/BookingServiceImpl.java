@@ -53,7 +53,7 @@ public class BookingServiceImpl implements BookingService {
 			parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(), ParkingStatus.BOOKED);
 		}
 
-		bookingModel.persistBooking(booking);
+		bookingModel.saveBooking(booking);
 	}
 
 	@Override
@@ -113,19 +113,14 @@ public class BookingServiceImpl implements BookingService {
 		System.out.println(
 				"BookingServiceImpl: Updated space status to AVAILABLE for space " + booking.getParkingSpace().getID());
 
-		bookingModel.persistBooking(booking);
+		bookingModel.saveBooking(booking);
 		System.out.println("BookingServiceImpl: Saved booking changes");
 	}
 
 	@Override
-	public void cancelBooking(UUID bookingId, Client client) {
-		if (bookingId == null) {
-			throw new IllegalArgumentException("Booking ID cannot be null");
-		}
-
-		Booking booking = bookingModel.getBookingById(bookingId);
+	public void cancelBooking(Booking booking, Client client) {
 		if (booking == null) {
-			throw new IllegalArgumentException("Booking not found");
+			throw new IllegalArgumentException("Booking ID cannot be null");
 		}
 
 		if (client == null || !booking.getClient().equals(client)) {
@@ -183,7 +178,7 @@ public class BookingServiceImpl implements BookingService {
 		try {
 			booking.extendDuration(additionalHours);
 
-			bookingModel.persistBooking(booking);
+			bookingModel.saveBooking(booking);
 
 			System.out.println(
 					"BookingService: Extended booking " + booking.getBookingId() + " by " + additionalHours + " hours");

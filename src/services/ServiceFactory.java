@@ -7,6 +7,7 @@ import models.parkingSpace.ParkingSpaceModel;
 import models.payment.PaymentModel;
 import services.impl.BookingServiceImpl;
 import services.impl.ClientServiceImpl;
+import services.impl.ManagerServiceImpl;
 import services.impl.ParkingLotServiceImpl;
 import services.impl.ParkingSpaceServiceImpl;
 import services.impl.PaymentServiceImpl;
@@ -16,6 +17,7 @@ public class ServiceFactory {
 
 	private BookingService bookingService;
 	private ClientService clientService;
+	private ManagerService managerService;
 	private ParkingLotService parkingLotService;
 	private ParkingSpaceService parkingSpaceService;
 	private PaymentService paymentService;
@@ -29,6 +31,7 @@ public class ServiceFactory {
 
 		this.bookingService = new BookingServiceImpl(bookingModel, parkingSpaceModel);
 		this.clientService = new ClientServiceImpl(clientModel);
+		this.managerService = new ManagerServiceImpl();
 		this.parkingLotService = new ParkingLotServiceImpl(parkingLotModel);
 		this.parkingSpaceService = new ParkingSpaceServiceImpl(parkingSpaceModel);
 
@@ -48,6 +51,10 @@ public class ServiceFactory {
 
 	public ClientService getClientService() {
 		return clientService;
+	}
+
+	public ManagerService getManagerService() {
+		return managerService;
 	}
 
 	public ParkingLotService getParkingLotService() {

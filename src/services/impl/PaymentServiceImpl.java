@@ -97,4 +97,13 @@ public class PaymentServiceImpl implements PaymentService {
 		}
 		return paymentModel.getPaymentById(paymentId);
 	}
+
+	@Override
+	public void savePayment(Payment payment) {
+		if (payment == null) {
+			throw new IllegalArgumentException("Payment cannot be null");
+		}
+
+		paymentModel.savePayments();
+	}
 }

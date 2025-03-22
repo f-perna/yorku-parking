@@ -26,8 +26,12 @@ public class PaymentModel {
 		booking.setPayment(newPayment);
 
 		// Save to database
-		CSVProcessor.setPaymentData(payments);
+		savePayments();
 		return newPayment;
+	}
+
+	public void savePayments() {
+		CSVProcessor.setPaymentData(payments);
 	}
 
 	public Payment getPaymentById(UUID paymentId) {

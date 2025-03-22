@@ -62,13 +62,13 @@ public class BookingController {
 		return bookingService.checkIn(booking);
 	}
 
-	public void cancelBooking(UUID bookingId) {
+	public void cancelBooking(Booking booking) {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
 			throw new IllegalStateException("User must be logged in to cancel a booking");
 		}
 
-		bookingService.cancelBooking(bookingId, client);
+		bookingService.cancelBooking(booking, client);
 	}
 
 	public List<Booking> getBookingsForClient() {

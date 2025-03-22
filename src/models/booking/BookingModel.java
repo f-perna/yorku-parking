@@ -25,7 +25,7 @@ public class BookingModel {
 		return newBooking;
 	}
 
-	public void persistBooking(Booking booking) {
+	public void saveBooking(Booking booking) {
 		boolean found = false;
 		for (Booking b : bookings) {
 			if (b.getBookingId().equals(booking.getBookingId())) {
@@ -68,7 +68,7 @@ public class BookingModel {
 		}
 
 		booking.cancelBooking();
-		persistBooking(booking);
+		saveBooking(booking);
 	}
 
 	public void confirmBooking(Booking booking) {
@@ -77,7 +77,7 @@ public class BookingModel {
 		}
 
 		booking.confirmBooking();
-		persistBooking(booking);
+		saveBooking(booking);
 	}
 
 	public List<Booking> getAllBookings() {

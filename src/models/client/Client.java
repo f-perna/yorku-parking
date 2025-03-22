@@ -37,22 +37,6 @@ public abstract class Client {
 		return email != null ? email.hashCode() : 0;
 	}
 
-	public void bookParkingSpace() {
-
-	}
-
-	public void cancelParking() {
-
-	}
-
-	public void extendParkingTime() {
-
-	}
-
-	public void makePayment() {
-
-	}
-
 	public String getLicencePlate() {
 		return licensePlate;
 	}
@@ -81,18 +65,8 @@ public abstract class Client {
 		this.email = email;
 	}
 
-	public void setDeposit(double deposit) {
-		// TODO Auto-genegd method stub
-
-	}
-
 	public int getRate() {
 		return rate;
-	}
-
-	public boolean clientnoshow(int durationinhours) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	public type getType() {

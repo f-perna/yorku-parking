@@ -20,6 +20,14 @@ public class ParkingLot {
 	public UUID getID() {
 		return id;
 	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public void setID(UUID id) {
+		this.id = id;
+	}
 
 	@Override
 	public String toString() {

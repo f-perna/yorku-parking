@@ -18,6 +18,10 @@ public class ClientModel {
 
 	public void registerClient(Client client) {
 		clients.add(client);
+		saveClients();
+	}
+
+	public void saveClients() {
 		CSVProcessor.setClientData(clients);
 	}
 

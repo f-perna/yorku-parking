@@ -16,7 +16,7 @@ public interface BookingService {
 	void confirmBooking(Booking booking);
 	void completeBooking(Booking booking);
 	Booking extendBookingTime(Booking booking, int additionalHours, Client client);
-	void cancelBooking(UUID bookingId, Client client);
+	void cancelBooking(Booking booking, Client client);
 	List<Booking> getBookingsForClient(Client client);
 	Booking getBookingById(UUID bookingId);
 }
