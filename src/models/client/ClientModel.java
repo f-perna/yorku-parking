@@ -27,12 +27,10 @@ public class ClientModel {
 
 	public Client authenticateClient(String email, String password) {
 		for (Client client : clients) {
-			String clientEmail = client.getEmail();
-			String clientPassword = client.getPassword();
-
-			if (email.equals(clientEmail) && password.equals(clientPassword)) {
+			if (client.authenticate(email, password)) {
 				return client;
 			}
+			;
 		}
 		return null;
 	}

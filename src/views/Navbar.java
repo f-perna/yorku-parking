@@ -6,6 +6,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import controllers.AuthController;
+import controllers.ControllerFactory;
 import controllers.NavigationController;
 import models.auth.AuthStateObserver;
 import models.auth.AuthenticationState;
@@ -14,9 +16,11 @@ public class Navbar extends JPanel implements AuthStateObserver {
 
 	private static final long serialVersionUID = 1L;
 	private JButton logoutButton;
+	private AuthController authController;
 
 	public Navbar(JFrame parent) {
 		setLayout(new FlowLayout(FlowLayout.LEFT));
+		this.authController = ControllerFactory.getInstance().getAuthController();
 
 		JButton prevButton = new JButton("<");
 		JButton forwardButton = new JButton(">");
@@ -40,8 +44,13 @@ public class Navbar extends JPanel implements AuthStateObserver {
 	}
 
 	private void handleLogout() {
-		AuthenticationState.getInstance().setLoggedInClient(null);
-		NavigationController.showPage("Home");
+		try {
+			authController.logout();
+			NavigationController.showPage("Home");
+		} catch (IllegalStateException e) {
+			// Handle case where no user is logged in
+			System.err.println("Logout error: " + e.getMessage());
+		}
 	}
 
 	@Override

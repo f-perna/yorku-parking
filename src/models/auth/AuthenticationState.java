@@ -5,71 +5,85 @@ import java.util.List;
 
 import models.client.Client;
 import models.manager.Manager;
+import models.manager.SuperManager;
+import models.user.User;
 
 public class AuthenticationState {
-    private static AuthenticationState instance;
-    private List<AuthStateObserver> observers;
-    private Client loggedInClient;
-    private Manager loggedInManager;
+	private static AuthenticationState instance;
+	private List<AuthStateObserver> observers;
+	private User loggedInUser;
 
-    private AuthenticationState() {
-        observers = new ArrayList<>();
-    }
+	private AuthenticationState() {
+		observers = new ArrayList<>();
+	}
 
-    public static synchronized AuthenticationState getInstance() {
-        if (instance == null) {
-            instance = new AuthenticationState();
-        }
-        return instance;
-    }
+	public static synchronized AuthenticationState getInstance() {
+		if (instance == null) {
+			instance = new AuthenticationState();
+		}
+		return instance;
+	}
 
-    public void addObserver(AuthStateObserver observer) {
-        observers.add(observer);
-    }
+	public void addObserver(AuthStateObserver observer) {
+		observers.add(observer);
+	}
 
-    public void removeObserver(AuthStateObserver observer) {
-        observers.remove(observer);
-    }
+	public void removeObserver(AuthStateObserver observer) {
+		observers.remove(observer);
+	}
 
-    public Client getLoggedInClient() {
-        return loggedInClient;
-    }
+	public User getLoggedInUser() {
+		return loggedInUser;
+	}
 
-    public Manager getLoggedInManager() {
-        return loggedInManager;
-    }
+	public Client getLoggedInClient() {
+		if (isClientLoggedIn() == false) {
+			return null;
+		}
 
-    public void setLoggedInClient(Client client) {
-        this.loggedInClient = client;
-        this.loggedInManager = null; // Clear manager when client logs in
-        notifyObservers();
-    }
+		return (Client) loggedInUser;
+	}
 
-    public void setLoggedInManager(Manager manager) {
-        this.loggedInManager = manager;
-        this.loggedInClient = null; // Clear client when manager logs in
-        notifyObservers();
-    }
+	public Manager getLoggedInManager() {
+		if (isManagerLoggedIn() == false) {
+			return null;
+		}
 
-    public boolean isLoggedIn() {
-        return loggedInClient != null || loggedInManager != null;
-    }
+		return (Manager) loggedInUser;
+	}
 
-    public boolean isClientLoggedIn() {
-        return loggedInClient != null;
-    }
+	public SuperManager getLoggedInSuperManager() {
+		if (isSuperManagerLoggedIn() == false) {
+			return null;
+		}
 
-    public boolean isManagerLoggedIn() {
-        return loggedInManager != null;
-    }
+		return (SuperManager) loggedInUser;
+	}
 
-    public boolean isSuperManagerLoggedIn() {
-        return loggedInManager != null && loggedInManager.isSuperManager();
-    }
+	public void setLoggedInUser(User user) {
+		this.loggedInUser = user;
+		notifyObservers();
+	}
 
-    private void notifyObservers() {
-        for (AuthStateObserver observer : observers) {
-            observer.onAuthStateChanged(isLoggedIn());
-        }
-    }
+	public boolean isLoggedIn() {
+		return loggedInUser != null;
+	}
+
+	public boolean isClientLoggedIn() {
+		return loggedInUser instanceof Client;
+	}
+
+	public boolean isManagerLoggedIn() {
+		return loggedInUser instanceof Manager;
+	}
+
+	public boolean isSuperManagerLoggedIn() {
+		return loggedInUser instanceof SuperManager;
+	}
+
+	private void notifyObservers() {
+		for (AuthStateObserver observer : observers) {
+			observer.onAuthStateChanged(isLoggedIn());
+		}
+	}
 }

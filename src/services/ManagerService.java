@@ -2,30 +2,90 @@ package services;
 
 import java.util.List;
 
+import models.auth.AuthenticationState;
 import models.manager.Manager;
-import models.parkingLot.ParkingLot;
+import models.manager.ManagerModel;
 
-public interface ManagerService {
+public class ManagerService {
+    private ManagerModel managerModel;
+    private AuthenticationState authState;
 
-	boolean loginManager(String username, String password);
+    public ManagerService(ManagerModel managerModel) {
+        this.managerModel = managerModel;
+        this.authState = AuthenticationState.getInstance();
+    }
 
-	Manager getManagerByUsername(String username);
+    public boolean login(String email, String password) {
+        if (email == null || password == null) {
+            return false;
+        }
 
-	List<Manager> getAllManagers();
+        email = email.toLowerCase().trim();
 
-	void addParkingLot(ParkingLot parkingLot);
+        Manager manager = managerModel.authenticateManager(email, password);
+        if (manager != null) {
+            authState.setLoggedInUser(manager);
+            return true;
+        }
+        return false;
+    }
 
-	void removeParkingLot(ParkingLot parkingLot);
-	// void enableParkingLot(ParkingLot parkingLot);
-	// void disableParkingLot(ParkingLot parkingLot);
-	// void addParkingSpace(ParkingLot parkingLot, String spaceName);
-	// void removeParkingSpace(ParkingSpace parkingSpace);
-	// void enableParkingSpace(ParkingSpace parkingSpace);
-	// void disableParkingSpace(ParkingSpace parkingSpace);
+    public List<Manager> getAllManagers() {
+        if (!authState.isSuperManagerLoggedIn()) {
+            throw new IllegalStateException("Only super managers can view all managers");
+        }
 
-	boolean managerLogin(String username, String password, boolean isSuperManager);
+        return managerModel.getAllManagers();
+    }
 
-	Manager getLoggedInManager();
+    public Manager getManagerByEmail(String email) {
+        if (!authState.isSuperManagerLoggedIn()) {
+            throw new IllegalStateException("Only super managers can view manager details");
+        }
 
-	void logout();
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
+
+        return managerModel.getManagerByEmail(email.toLowerCase().trim());
+    }
+
+    public boolean addManager(String email, String password) {
+        if (!authState.isSuperManagerLoggedIn()) {
+            throw new IllegalStateException("Only super managers can add new managers");
+        }
+
+        if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
+        if (password == null || password.length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters");
+        }
+
+        email = email.toLowerCase().trim();
+        Manager manager = new Manager(email, password);
+
+        return managerModel.addManager(manager);
+    }
+
+    public boolean removeManager(String email) {
+        if (!authState.isSuperManagerLoggedIn()) {
+            throw new IllegalStateException("Only super managers can remove managers");
+        }
+
+        if (email == null) {
+            throw new IllegalArgumentException("Email cannot be null");
+        }
+
+        return managerModel.removeManager(email.toLowerCase().trim());
+    }
+
+    public boolean logout() {
+        if (authState.isManagerLoggedIn() || authState.isSuperManagerLoggedIn()) {
+            authState.setLoggedInUser(null);
+            return true;
+        }
+        return false;
+    }
 }

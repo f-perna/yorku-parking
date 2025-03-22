@@ -2,6 +2,7 @@ package controllers;
 
 import models.client.Client;
 import services.ClientService;
+import java.util.List;
 
 public class ClientController {
 	private ClientService clientService;
@@ -15,15 +16,15 @@ public class ClientController {
 		return clientService.registerClient(name, email, password, clientType, licensePlate);
 	}
 
-	public boolean login(String email, String password) {
-		return clientService.login(email, password);
+	public List<Client> getAllClients() {
+		return clientService.getAllClients();
 	}
 
-	public Client getLoggedInClient() {
-		return clientService.getLoggedInClient();
+	public Client getClientByEmail(String email) {
+		return clientService.getClientByEmail(email);
 	}
 
-	public void logout() {
-		clientService.logout();
+	public boolean approveClient(String email, boolean approved) {
+		return clientService.approveClient(email, approved);
 	}
 }

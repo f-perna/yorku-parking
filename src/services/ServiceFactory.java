@@ -2,15 +2,10 @@ package services;
 
 import models.booking.BookingModel;
 import models.client.ClientModel;
+import models.manager.ManagerModel;
 import models.parkingLot.ParkingLotModel;
 import models.parkingSpace.ParkingSpaceModel;
 import models.payment.PaymentModel;
-import services.impl.BookingServiceImpl;
-import services.impl.ClientServiceImpl;
-import services.impl.ManagerServiceImpl;
-import services.impl.ParkingLotServiceImpl;
-import services.impl.ParkingSpaceServiceImpl;
-import services.impl.PaymentServiceImpl;
 
 public class ServiceFactory {
 	private static ServiceFactory instance;
@@ -25,17 +20,18 @@ public class ServiceFactory {
 	private ServiceFactory() {
 		BookingModel bookingModel = new BookingModel();
 		ClientModel clientModel = new ClientModel();
+		ManagerModel managerModel = new ManagerModel();
 		ParkingLotModel parkingLotModel = new ParkingLotModel();
 		ParkingSpaceModel parkingSpaceModel = new ParkingSpaceModel();
 		PaymentModel paymentModel = new PaymentModel();
 
-		this.bookingService = new BookingServiceImpl(bookingModel, parkingSpaceModel);
-		this.clientService = new ClientServiceImpl(clientModel);
-		this.managerService = new ManagerServiceImpl();
-		this.parkingLotService = new ParkingLotServiceImpl(parkingLotModel);
-		this.parkingSpaceService = new ParkingSpaceServiceImpl(parkingSpaceModel);
+		this.bookingService = new BookingService(bookingModel, parkingSpaceModel);
+		this.clientService = new ClientService(clientModel);
+		this.managerService = new ManagerService(managerModel);
+		this.parkingLotService = new ParkingLotService(parkingLotModel);
+		this.parkingSpaceService = new ParkingSpaceService(parkingSpaceModel);
 
-		this.paymentService = new PaymentServiceImpl(paymentModel, this.bookingService);
+		this.paymentService = new PaymentService(paymentModel, this.bookingService);
 	}
 
 	public static synchronized ServiceFactory getInstance() {

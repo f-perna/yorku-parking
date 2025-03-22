@@ -1,54 +1,30 @@
 package models.manager;
 
-import java.util.UUID;
+import java.io.Serializable;
+import models.user.User;
 
-public class Manager {
-	protected UUID id;
-	protected String username;
+public class Manager implements User, Serializable {
+	private static final long serialVersionUID = 1L;
+	protected String email;
 	protected String password;
-	private ManagerType type;
 
-	public static enum ManagerType {
-		MANAGER, SUPER_MANAGER
-	}
-
-	public Manager(UUID id, String username, String password, ManagerType type) {
-		this.username = username;
+	public Manager(String email, String password) {
+		this.email = email;
 		this.password = password;
-		this.id = id;
-		this.type = type;
 	}
 
-	public UUID getID() {
-		return id;
+	@Override
+	public String getEmail() {
+		return email;
 	}
 
-	public String getUsername() {
-		return username;
+	@Override
+	public boolean authenticate(String email, String password) {
+		return this.email.equals(email) && this.password.equals(password);
 	}
 
 	public String getPassword() {
 		return password;
-	}
-
-	public ManagerType getType() {
-		return type;
-	}
-
-	public boolean isSuperManager() {
-		return type == ManagerType.SUPER_MANAGER;
-	}
-
-	public void setID(UUID id) {
-		this.id = id;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	@Override
@@ -58,11 +34,11 @@ public class Manager {
 		if (obj == null || getClass() != obj.getClass())
 			return false;
 		Manager other = (Manager) obj;
-		return username != null && username.equals(other.username);
+		return email != null && email.equals(other.email);
 	}
 
 	@Override
 	public int hashCode() {
-		return username != null ? username.hashCode() : 0;
+		return email != null ? email.hashCode() : 0;
 	}
 }

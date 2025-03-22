@@ -18,6 +18,7 @@ public class ControllerFactory {
 	private ParkingSpaceController parkingSpaceController;
 	private PaymentController paymentController;
 	private ManagerController managerController;
+	private AuthController authController;
 
 	private ControllerFactory() {
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
@@ -35,6 +36,7 @@ public class ControllerFactory {
 		this.parkingLotController = new ParkingLotController(parkingLotService);
 		this.parkingSpaceController = new ParkingSpaceController(parkingSpaceService);
 		this.paymentController = new PaymentController(paymentService, bookingService);
+		this.authController = new AuthController(clientService, managerService);
 	}
 
 	public static synchronized ControllerFactory getInstance() {
@@ -66,6 +68,10 @@ public class ControllerFactory {
 
 	public PaymentController getPaymentController() {
 		return paymentController;
+	}
+
+	public AuthController getAuthController() {
+		return authController;
 	}
 
 }

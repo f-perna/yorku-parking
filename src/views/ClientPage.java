@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.JOptionPane;
 
+import controllers.AuthController;
 import controllers.BookingController;
 import controllers.ClientController;
 import controllers.ControllerFactory;
@@ -27,6 +28,7 @@ import models.client.Client;
 public class ClientPage extends JPanel {
 	private BookingController bookingController;
 	private ClientController clientController;
+	private AuthController authController;
 
 	private JComboBox<Booking> bookingsList;
 	private JLabel welcomeMessage;
@@ -37,6 +39,7 @@ public class ClientPage extends JPanel {
 	public ClientPage(JFrame parent) {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
 		this.clientController = ControllerFactory.getInstance().getClientController();
+		this.authController = ControllerFactory.getInstance().getAuthController();
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -221,7 +224,7 @@ public class ClientPage extends JPanel {
 
 	public void refresh() {
 		try {
-			Client loggedInClient = clientController.getLoggedInClient();
+			Client loggedInClient = authController.getLoggedInClient();
 			if (loggedInClient == null) {
 				NavigationController.showPage("Login");
 				return;

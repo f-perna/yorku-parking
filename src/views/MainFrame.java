@@ -9,10 +9,10 @@ import controllers.NavigationController;
 public class MainFrame extends JFrame {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private static CardLayout cardLayout;
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private static CardLayout cardLayout;
     private static JPanel cardPanel;
 
     public MainFrame() {
@@ -38,6 +38,8 @@ public class MainFrame extends JFrame {
         NavigationController.addPage("Client", new ClientPage(this));
         NavigationController.addPage("Booking", new BookingPage(this));
         NavigationController.addPage("Checkout", new CheckoutPage(this));
+
+        NavigationController.addPage("ManagerDashboard", new ManagerDashboard(this));
 
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(cardPanel, BorderLayout.CENTER);

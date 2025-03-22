@@ -18,14 +18,13 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import controllers.ClientController;
-import controllers.ManagerController;
+import controllers.AuthController;
 import controllers.ControllerFactory;
 import controllers.NavigationController;
 
 public class LoginPage extends JPanel {
-	private ClientController clientController;
-	private ManagerController managerController;
+	private AuthController authController;
+
 	private JTextField emailField;
 	private JPasswordField passwordField;
 	private JLabel statusLabel;
@@ -35,8 +34,7 @@ public class LoginPage extends JPanel {
 	private ButtonGroup loginTypeGroup;
 
 	public LoginPage(JFrame parent) {
-		this.clientController = ControllerFactory.getInstance().getClientController();
-		this.managerController = ControllerFactory.getInstance().getManagerController();
+		this.authController = ControllerFactory.getInstance().getAuthController();
 		setLayout(new BorderLayout());
 
 		// Create form panel that will contain all form components
@@ -167,38 +165,26 @@ public class LoginPage extends JPanel {
 				loginType = "superManager";
 			}
 
-			handleLogin(emailField.getText(),
-					new String(passwordField.getPassword()), loginType);
+			handleLogin(emailField.getText(), new String(passwordField.getPassword()), loginType);
 		});
 	}
 
 	private void handleLogin(String username, String password, String loginType) {
 		try {
-			boolean success = false;
+			boolean success = authController.login(username, password, loginType);
 
-			if (loginType.equals("manager")) {
-				success = managerController.managerLogin(username, password, false);
-				if (success) {
-					NavigationController.showPage("Manager");
-				} else {
-					ErrorDialog.show(this, "Invalid manager credentials");
-				}
-			} else if (loginType.equals("superManager")) {
-				success = managerController.managerLogin(username, password, true);
-				if (success) {
+			if (success) {
+				if (loginType.equals("manager")) {
+					NavigationController.showPage("ManagerDashboard");
+				} else if (loginType.equals("superManager")) {
 					NavigationController.showPage("SuperManager");
 				} else {
-					ErrorDialog.show(this, "Invalid super manager credentials");
-				}
-			} else {
-				success = clientController.login(username, password);
-				if (success) {
 					ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
 					clientPage.refresh();
 					NavigationController.showPage("Client");
-				} else {
-					ErrorDialog.show(this, "Invalid client credentials");
 				}
+			} else {
+				ErrorDialog.show(this, "Invalid " + loginType + " credentials");
 			}
 		} catch (IllegalArgumentException e) {
 			ErrorDialog.show(this, e.getMessage());
