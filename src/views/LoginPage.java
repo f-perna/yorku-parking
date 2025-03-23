@@ -186,8 +186,12 @@ public class LoginPage extends JPanel {
 			} else {
 				ErrorDialog.show(this, "Invalid " + loginType + " credentials");
 			}
+		} catch (models.ParkingSystemException e) {
+			ErrorDialog.show(this, e.getMessage());
 		} catch (IllegalArgumentException e) {
 			ErrorDialog.show(this, e.getMessage());
+		} catch (Exception e) {
+			ErrorDialog.show(this, "An unexpected error occurred: " + e.getMessage());
 		}
 	}
 }

@@ -13,12 +13,12 @@ import repositories.ParkingSpaceRepository;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 
 public class BookingService {
-	private BookingRepository bookingModel;
-	private ParkingSpaceRepository parkingSpaceModel;
+	private BookingRepository bookingRepository;
+	private ParkingSpaceRepository parkingSpaceRepository;
 
-	public BookingService(BookingRepository bookingModel, ParkingSpaceRepository parkingSpaceModel) {
-		this.bookingModel = bookingModel;
-		this.parkingSpaceModel = parkingSpaceModel;
+	public BookingService(BookingRepository bookingRepository, ParkingSpaceRepository parkingSpaceRepository) {
+		this.bookingRepository = bookingRepository;
+		this.parkingSpaceRepository = parkingSpaceRepository;
 	}
 
 	public Booking createBooking(ParkingSpace parkingSpace, int durationHours, Client client) {
@@ -39,7 +39,7 @@ public class BookingService {
 			throw new IllegalStateException("Parking space is not available");
 		}
 
-		return bookingModel.createBooking(parkingSpace, durationHours, client);
+		return bookingRepository.createBooking(parkingSpace, durationHours, client);
 	}
 
 	public void confirmBooking(Booking booking, Payment payment) {
@@ -63,11 +63,11 @@ public class BookingService {
 			throw new IllegalStateException("Payment must be successfuly made.");
 		}
 
-		ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
 				ParkingSpaceStatus.BOOKED);
 		booking.setParkingSpace(updatedSpace);
 
-		bookingModel.confirmBooking(booking);
+		bookingRepository.confirmBooking(booking);
 	}
 
 	public void completeBooking(Booking booking, Payment payment) {
@@ -91,13 +91,13 @@ public class BookingService {
 			throw new IllegalStateException("Payment must be successfully made.");
 		}
 
-		ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
 				ParkingSpaceStatus.AVAILABLE);
 
 		// Update the booking with the updated space
 		booking.setParkingSpace(updatedSpace);
 
-		bookingModel.completeBooking(booking);
+		bookingRepository.completeBooking(booking);
 	}
 
 	public boolean checkIn(Booking booking) {
@@ -110,8 +110,8 @@ public class BookingService {
 		if (now.isAfter(earliestCheckIn) && now.isBefore(latestCheckIn) || now.isEqual(earliestCheckIn)
 				|| now.isEqual(latestCheckIn)) {
 			try {
-				bookingModel.checkInBooking(booking);
-				ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+				bookingRepository.checkInBooking(booking);
+				ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
 						ParkingSpaceStatus.OCCUPIED);
 				booking.setParkingSpace(updatedSpace);
 				return true;
@@ -123,10 +123,10 @@ public class BookingService {
 			throw new IllegalArgumentException(
 					"Checkout period is not open yet! Please try again at least 5 minutes before your booking.");
 		} else {
-			ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+			ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
 					ParkingSpaceStatus.AVAILABLE);
 			booking.setParkingSpace(updatedSpace);
-			bookingModel.noShowBooking(booking);
+			bookingRepository.noShowBooking(booking);
 			throw new IllegalArgumentException("Checkout period has expired.");
 		}
 	}
@@ -135,14 +135,14 @@ public class BookingService {
 		if (client == null) {
 			throw new IllegalStateException("Client cannot be null");
 		}
-		return bookingModel.getBookingsForClient(client);
+		return bookingRepository.getBookingsForClient(client);
 	}
 
 	public Booking getBookingById(UUID bookingId) {
 		if (bookingId == null) {
 			throw new IllegalArgumentException("Booking ID cannot be null");
 		}
-		return bookingModel.getBookingById(bookingId);
+		return bookingRepository.getBookingById(bookingId);
 	}
 
 	public Booking extendBookingTime(Booking booking, int additionalHours, Client client) {

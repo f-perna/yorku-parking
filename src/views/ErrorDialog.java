@@ -17,4 +17,10 @@ public class ErrorDialog {
 			JOptionPane.showMessageDialog(parentComponent, message, title, JOptionPane.ERROR_MESSAGE);
 		});
 	}
+
+	public static void showException(Component parentComponent, Exception e) {
+		SwingUtilities.invokeLater(() -> {
+			JOptionPane.showMessageDialog(parentComponent, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		});
+	}
 }

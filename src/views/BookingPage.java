@@ -7,6 +7,7 @@ import controllers.ControllerFactory;
 import controllers.NavigationController;
 import controllers.ParkingLotController;
 import controllers.ParkingSpaceController;
+import controllers.PaymentController;
 import models.booking.Booking;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
@@ -22,6 +23,7 @@ public class BookingPage extends JPanel {
 	private BookingController bookingController;
 	private ParkingLotController parkingLotController;
 	private ParkingSpaceController parkingSpaceController;
+	private PaymentController paymentController;
 
 	private final String[] DURATIONS = { "1 Hour", "2 Hours", "3 Hours" };
 	private JComboBox<ParkingLot> lotComboBox;
@@ -32,10 +34,10 @@ public class BookingPage extends JPanel {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
 		this.parkingLotController = ControllerFactory.getInstance().getParkingLotController();
 		this.parkingSpaceController = ControllerFactory.getInstance().getParkingSpaceController();
+		this.paymentController = ControllerFactory.getInstance().getPaymentController();
 
-		
 		System.out.println("LOTS " + this.parkingLotController.getAllParkingLots().size());
-		
+
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 10, 5, 10);
@@ -235,6 +237,29 @@ public class BookingPage extends JPanel {
 			durationComboBox.setSelectedItem(null);
 		} catch (Exception e) {
 			ErrorDialog.show(this, "Error", "Could not prepare booking extension: " + e.getMessage());
+		}
+	}
+
+	private void handleBookingCreation(int durationHours) {
+		try {
+			ParkingSpace selectedSpace = (ParkingSpace) spaceComboBox.getSelectedItem();
+			if (selectedSpace == null) {
+				ErrorDialog.show(this, "Please select a parking space");
+				return;
+			}
+
+			Booking booking = bookingController.createBooking(selectedSpace, durationHours);
+			paymentController.processDepositPayment(booking, "Credit Card");
+
+			SuccessDialog.show(this, "Booking Confirmed",
+					"Your booking has been confirmed. Booking ID: " + booking.getBookingID());
+
+			NavigationController.showPage("Client");
+
+		} catch (models.ParkingSystemException e) {
+			ErrorDialog.show(this, e.getMessage());
+		} catch (Exception e) {
+			ErrorDialog.show(this, "Unexpected error", "An unexpected error occurred: " + e.getMessage());
 		}
 	}
 }

@@ -3,3 +3,5 @@ id,bookingID,amount,status,method,type
 4a5a6233-c17c-45bc-bd78-71a0e535fdf9,40171b28-cb07-48d2-a0db-d98f65248ba1,5.0,PAID,Credit,FINAL
 d0621c73-53af-4a2b-bccd-83af14dbc64a,87d101f8-8eb1-4aab-a377-868163109efa,5.0,PAID,Cash,DEPOSIT
 418ea223-6eef-4b28-8371-9af620e7c6a6,87d101f8-8eb1-4aab-a377-868163109efa,5.0,PAID,Credit,FINAL
+274a0ae7-b88c-4454-aaec-43bdf78e851d,4b433d94-3343-430c-ae9f-b7aa268ba94d,5.0,PAID,Debit,DEPOSIT
+e4bd16eb-f8d2-468b-82b1-0895d91e5377,4b433d94-3343-430c-ae9f-b7aa268ba94d,10.0,PAID,Cash,FINAL

@@ -21,8 +21,13 @@ public class ControllerFactory {
 	private AuthController authController;
 
 	private ControllerFactory() {
+		initializeControllers();
+	}
+
+	private void initializeControllers() {
 		ServiceFactory serviceFactory = ServiceFactory.getInstance();
 
+		// Get all required services
 		BookingService bookingService = serviceFactory.getBookingService();
 		ClientService clientService = serviceFactory.getClientService();
 		ManagerService managerService = serviceFactory.getManagerService();
@@ -30,12 +35,15 @@ public class ControllerFactory {
 		ParkingSpaceService parkingSpaceService = serviceFactory.getParkingSpaceService();
 		PaymentService paymentService = serviceFactory.getPaymentService();
 
+		// Create controllers with their required dependencies
 		this.bookingController = new BookingController(bookingService);
 		this.clientController = new ClientController(clientService);
-		this.managerController = new ManagerController(managerService, parkingLotService, parkingSpaceService);
 		this.parkingLotController = new ParkingLotController(parkingLotService);
 		this.parkingSpaceController = new ParkingSpaceController(parkingSpaceService);
 		this.paymentController = new PaymentController(paymentService);
+
+		// Create controllers that depend on multiple services
+		this.managerController = new ManagerController(managerService, parkingLotService, parkingSpaceService);
 		this.authController = new AuthController(clientService, managerService);
 	}
 
@@ -73,5 +81,4 @@ public class ControllerFactory {
 	public AuthController getAuthController() {
 		return authController;
 	}
-
 }

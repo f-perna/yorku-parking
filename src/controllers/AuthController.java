@@ -1,5 +1,7 @@
 package controllers;
 
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.auth.AuthenticationState;
 import models.client.Client;
 import models.manager.Manager;
@@ -20,23 +22,23 @@ public class AuthController {
 
 	public boolean login(String email, String password, String userType) {
 		if (email == null || password == null || userType == null) {
-			return false;
+			throw new ParkingSystemException("Email, password, and user type cannot be null", ErrorType.VALIDATION);
 		}
 
 		boolean success = false;
 
 		switch (userType.toLowerCase()) {
-		case "client":
-			success = clientService.login(email, password);
-			break;
-		case "manager":
-			success = managerService.login(email, password);
-			break;
-//		case "superManager":
-//			success = managerService.managerLogin(email, password);
-//			break;
-		default:
-			return false;
+			case "client":
+				success = clientService.login(email, password);
+				break;
+			case "manager":
+				success = managerService.login(email, password);
+				break;
+			// case "superManager":
+			// success = managerService.managerLogin(email, password);
+			// break;
+			default:
+				throw new ParkingSystemException("Invalid user type: " + userType, ErrorType.VALIDATION);
 		}
 
 		return success;
@@ -44,7 +46,7 @@ public class AuthController {
 
 	public void logout() {
 		if (!authState.isLoggedIn()) {
-			throw new IllegalStateException("No user is currently logged in");
+			throw new ParkingSystemException("No user is currently logged in", ErrorType.AUTHENTICATION);
 		}
 
 		authState.setLoggedInUser(null);

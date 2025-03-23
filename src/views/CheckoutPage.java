@@ -75,7 +75,7 @@ public class CheckoutPage extends JPanel {
 				paymentGbc, 1);
 
 		JLabel depositNoteLabel = new JLabel(
-				"<html>Note: Only the deposit amount will be charged now.<br>Final payment will be calculated at checkout based on actual usage.</html>");
+				"<html>Note: Only the deposit amount will be charged now.<br>The deposit will be deducted from the final price.</html>");
 		depositNoteLabel.setForeground(new Color(100, 100, 100));
 		depositNoteLabel.setFont(new Font("Arial", Font.ITALIC, 11));
 		paymentGbc.gridx = 0;

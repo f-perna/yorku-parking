@@ -2,6 +2,8 @@ package controllers;
 
 import java.util.UUID;
 import java.util.List;
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.auth.AuthenticationState;
 import models.booking.Booking;
 import models.client.Client;
@@ -21,11 +23,11 @@ public class PaymentController {
 	public Payment processDepositPayment(Booking booking, String paymentMethod) {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
-			throw new IllegalStateException("User must be logged in to process payment");
+			throw new ParkingSystemException("User must be logged in to process payment", ErrorType.AUTHENTICATION);
 		}
 
 		if (!booking.getClient().equals(client)) {
-			throw new IllegalStateException("Cannot complete another user's booking");
+			throw new ParkingSystemException("Cannot complete another user's booking", ErrorType.AUTHORIZATION);
 		}
 
 		return paymentService.processDepositPayment(booking, paymentMethod, client);
@@ -34,11 +36,11 @@ public class PaymentController {
 	public Payment processFinalPayment(Booking booking, String paymentMethod) {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
-			throw new IllegalStateException("User must be logged in to process payment");
+			throw new ParkingSystemException("User must be logged in to process payment", ErrorType.AUTHENTICATION);
 		}
 
 		if (!booking.getClient().equals(client)) {
-			throw new IllegalStateException("Cannot complete another user's booking");
+			throw new ParkingSystemException("Cannot complete another user's booking", ErrorType.AUTHORIZATION);
 		}
 
 		return paymentService.processFinalPayment(booking, paymentMethod, client);
@@ -51,11 +53,12 @@ public class PaymentController {
 	public List<Payment> getPaymentsForBooking(Booking booking) {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
-			throw new IllegalStateException("User must be logged in to view payments");
+			throw new ParkingSystemException("User must be logged in to view payments", ErrorType.AUTHENTICATION);
 		}
 
 		if (!booking.getClient().equals(client)) {
-			throw new IllegalStateException("Cannot view payments for another user's booking");
+			throw new ParkingSystemException("Cannot view payments for another user's booking",
+					ErrorType.AUTHORIZATION);
 		}
 
 		return paymentService.getPaymentsForBooking(booking);

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import main.BookingCSVProcessor;
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.booking.Booking;
 import models.booking.Booking.BookingStatus;
 import models.client.Client;
@@ -49,14 +51,13 @@ public class BookingRepository {
 				return booking;
 			}
 		}
-		return null;
+		throw new ParkingSystemException("Booking not found with ID: " + bookingId, ErrorType.DATA_ACCESS);
 	}
 
-
-	
 	public void noShowBooking(Booking booking) {
 		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new IllegalStateException("Only confirmed bookings can be considered no shows.");
+			throw new ParkingSystemException("Only confirmed bookings can be considered no shows.",
+					ErrorType.BUSINESS_LOGIC);
 		}
 		booking.noShow();
 		saveBookings();
@@ -65,7 +66,7 @@ public class BookingRepository {
 	// after paying deposit
 	public void confirmBooking(Booking booking) {
 		if (booking.getStatus() != Booking.BookingStatus.PENDING) {
-			throw new IllegalStateException("Only pending bookings can be confirmed");
+			throw new ParkingSystemException("Only pending bookings can be confirmed", ErrorType.BUSINESS_LOGIC);
 		}
 
 		booking.confirmBooking();
@@ -76,7 +77,7 @@ public class BookingRepository {
 	// after checking out
 	public void completeBooking(Booking booking) {
 		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
-			throw new IllegalStateException("Only checked in bookings can be completed.");
+			throw new ParkingSystemException("Only checked in bookings can be completed.", ErrorType.BUSINESS_LOGIC);
 		}
 
 		booking.completeBooking();
@@ -85,7 +86,7 @@ public class BookingRepository {
 
 	public void checkInBooking(Booking booking) {
 		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new IllegalStateException("Only confirmed bookings can be checked-in");
+			throw new ParkingSystemException("Only confirmed bookings can be checked-in", ErrorType.BUSINESS_LOGIC);
 		}
 		booking.checkIn();
 		saveBookings();
@@ -98,7 +99,7 @@ public class BookingRepository {
 				return booking;
 			}
 		}
-		return null;
+		throw new ParkingSystemException("Booking not found with ID: " + bookingID, ErrorType.DATA_ACCESS);
 	}
 
 	public List<Booking> getAllBookings() {
