@@ -9,7 +9,8 @@ import models.booking.BookingModel;
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpaceModel;
-import models.parkingSpace.ParkingSpace.ParkingStatus;
+import models.payment.Payment;
+import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 
 public class BookingService {
 	private BookingModel bookingModel;
@@ -34,48 +35,14 @@ public class BookingService {
 			throw new IllegalStateException("Client must be approved to make a booking");
 		}
 
-		if (parkingSpace.getStatus() != ParkingStatus.AVAILABLE) {
+		if (parkingSpace.getStatus() != ParkingSpaceStatus.AVAILABLE) {
 			throw new IllegalStateException("Parking space is not available");
 		}
 
 		return bookingModel.createBooking(parkingSpace, durationHours, client);
 	}
 
-	public void saveBooking(Booking booking) {
-		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
-		}
-
-		if (booking.getStatus() == Booking.BookingStatus.CONFIRMED) {
-			parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(), ParkingStatus.BOOKED);
-		}
-
-		bookingModel.saveBooking(booking);
-	}
-
-	public boolean checkIn(Booking booking) {
-		LocalDateTime startTime = booking.getStartTime();
-		System.out.println("Current booking status: " + booking.getStatus());
-		System.out.println("Current time: " + LocalDateTime.now());
-		System.out.println("Start time: " + startTime);
-
-		if (LocalDateTime.now().isAfter(startTime)) {
-			System.out.println("Time check passed, attempting to confirm booking");
-			try {
-				confirmBooking(booking);
-				System.out.println("Booking confirmed successfully");
-				return true;
-			} catch (Exception e) {
-				System.out.println("Error confirming booking: " + e.getMessage());
-				return false;
-			}
-		} else {
-			System.out.println("Cannot check in yet - too early");
-			return false;
-		}
-	}
-
-	public void confirmBooking(Booking booking) {
+	public void confirmBooking(Booking booking, Payment payment) {
 		if (booking == null) {
 			throw new IllegalArgumentException("Booking cannot be null");
 		}
@@ -84,31 +51,81 @@ public class BookingService {
 			throw new IllegalStateException("Only pending bookings can be confirmed");
 		}
 
-		parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(), ParkingStatus.OCCUPIED);
+		if (payment == null) {
+			throw new IllegalArgumentException("Payment cannot be null");
+		}
+
+		if (!payment.getBooking().equals(booking)) {
+			throw new IllegalArgumentException("The payment must correspond to the booking.");
+		}
+
+		if (payment.getStatus() != Payment.PaymentStatus.PAID) {
+			throw new IllegalStateException("Payment must be successfuly made.");
+		}
+
+		ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+				ParkingSpaceStatus.BOOKED);
+		booking.setParkingSpace(updatedSpace);
 
 		bookingModel.confirmBooking(booking);
 	}
 
-	public void completeBooking(Booking booking) {
+	public void completeBooking(Booking booking, Payment payment) {
 		if (booking == null) {
 			throw new IllegalArgumentException("Booking cannot be null");
 		}
 
-		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new IllegalStateException("Only confirmed bookings can be completed");
+		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
+			throw new IllegalStateException("Only checked in bookings can be paid for.");
 		}
 
-		System.out.println("BookingServiceImpl: Completing booking " + booking.getBookingId());
-		System.out.println("BookingServiceImpl: Current space status: " + booking.getParkingSpace().getStatus());
+		if (payment == null) {
+			throw new IllegalArgumentException("Payment cannot be null");
+		}
 
-		booking.updateStatus(Booking.BookingStatus.COMPLETED);
+		if (!payment.getBooking().equals(booking)) {
+			throw new IllegalArgumentException("The payment must correspond to the booking.");
+		}
 
-		parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(), ParkingStatus.AVAILABLE);
-		System.out.println(
-				"BookingServiceImpl: Updated space status to AVAILABLE for space " + booking.getParkingSpace().getID());
+		if (payment.getStatus() != Payment.PaymentStatus.PAID) {
+			throw new IllegalStateException("Payment must be successfully made.");
+		}
 
-		bookingModel.saveBooking(booking);
-		System.out.println("BookingServiceImpl: Saved booking changes");
+		ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+				ParkingSpaceStatus.AVAILABLE);
+
+		// Update the booking with the updated space
+		booking.setParkingSpace(updatedSpace);
+
+		bookingModel.completeBooking(booking);
+	}
+
+	public boolean checkIn(Booking booking) {
+		LocalDateTime startTime = booking.getStartTime();
+		LocalDateTime now = LocalDateTime.now();
+
+		LocalDateTime earliestCheckIn = startTime.minusMinutes(5);
+		LocalDateTime latestCheckIn = startTime.plusHours(1);
+
+		if (now.isAfter(earliestCheckIn) && now.isBefore(latestCheckIn) || now.isEqual(earliestCheckIn)
+				|| now.isEqual(latestCheckIn)) {
+			try {
+				bookingModel.checkInBooking(booking);
+				ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+						ParkingSpaceStatus.OCCUPIED);
+				booking.setParkingSpace(updatedSpace);
+				return true;
+			} catch (Exception e) {
+				System.out.println("Error confirming booking: " + e.getMessage());
+				return false;
+			}
+		} else if (now.isBefore(earliestCheckIn)) {
+			System.out.println("Cannot check in yet - too early (check-in opens 5 minutes before start time)");
+			return false;
+		} else {
+			System.out.println("Check-in period has expired (closes 1 hour after start time)");
+			return false;
+		}
 	}
 
 	public void cancelBooking(Booking booking, Client client) {
@@ -126,7 +143,9 @@ public class BookingService {
 
 		bookingModel.cancelBooking(booking);
 
-		parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(), ParkingStatus.AVAILABLE);
+		ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+				ParkingSpaceStatus.AVAILABLE);
+		booking.setParkingSpace(updatedSpace);
 	}
 
 	public List<Booking> getBookingsForClient(Client client) {
@@ -168,10 +187,8 @@ public class BookingService {
 		try {
 			booking.extendDuration(additionalHours);
 
-			bookingModel.saveBooking(booking);
-
 			System.out.println(
-					"BookingService: Extended booking " + booking.getBookingId() + " by " + additionalHours + " hours");
+					"BookingService: Extended booking " + booking.getBookingID() + " by " + additionalHours + " hours");
 			return booking;
 		} catch (Exception e) {
 			System.err.println("Error extending booking time: " + e.getMessage());

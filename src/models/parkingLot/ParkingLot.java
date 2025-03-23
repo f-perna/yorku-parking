@@ -6,11 +6,18 @@ public class ParkingLot {
 
 	private String name;
 	private UUID id;
-	// add status
+	private boolean enabled = true;
 
-	public ParkingLot(String name, UUID id) {
+	public ParkingLot(String name) {
+		this.id = UUID.randomUUID();
+		this.name = name;
+	}
+
+	// Constructor to retrieve data from bookings.csv
+	public ParkingLot(String name, UUID id, boolean enabled) {
 		this.name = name;
 		this.id = id;
+		this.enabled = enabled;
 	}
 
 	public String getName() {
@@ -20,13 +27,17 @@ public class ParkingLot {
 	public UUID getID() {
 		return id;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public void setID(UUID id) {
-		this.id = id;
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	@Override

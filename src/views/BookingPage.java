@@ -33,6 +33,9 @@ public class BookingPage extends JPanel {
 		this.parkingLotController = ControllerFactory.getInstance().getParkingLotController();
 		this.parkingSpaceController = ControllerFactory.getInstance().getParkingSpaceController();
 
+		
+		System.out.println("LOTS " + this.parkingLotController.getAllParkingLots().size());
+		
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 10, 5, 10);

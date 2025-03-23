@@ -32,10 +32,10 @@ public class ControllerFactory {
 
 		this.bookingController = new BookingController(bookingService);
 		this.clientController = new ClientController(clientService);
-		this.managerController = new ManagerController(managerService);
+		this.managerController = new ManagerController(managerService, parkingLotService, parkingSpaceService);
 		this.parkingLotController = new ParkingLotController(parkingLotService);
 		this.parkingSpaceController = new ParkingSpaceController(parkingSpaceService);
-		this.paymentController = new PaymentController(paymentService, bookingService);
+		this.paymentController = new PaymentController(paymentService);
 		this.authController = new AuthController(clientService, managerService);
 	}
 

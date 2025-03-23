@@ -18,6 +18,7 @@ public class ServiceFactory {
 	private PaymentService paymentService;
 
 	private ServiceFactory() {
+		// Create models
 		BookingModel bookingModel = new BookingModel();
 		ClientModel clientModel = new ClientModel();
 		ManagerModel managerModel = new ManagerModel();
@@ -25,13 +26,16 @@ public class ServiceFactory {
 		ParkingSpaceModel parkingSpaceModel = new ParkingSpaceModel();
 		PaymentModel paymentModel = new PaymentModel();
 
+		// Create services
 		this.bookingService = new BookingService(bookingModel, parkingSpaceModel);
 		this.clientService = new ClientService(clientModel);
 		this.managerService = new ManagerService(managerModel);
 		this.parkingLotService = new ParkingLotService(parkingLotModel);
 		this.parkingSpaceService = new ParkingSpaceService(parkingSpaceModel);
-
 		this.paymentService = new PaymentService(paymentModel, this.bookingService);
+
+		// Set dependencies between services after all are created
+		this.parkingLotService.setDependencies(this.parkingSpaceService);
 	}
 
 	public static synchronized ServiceFactory getInstance() {

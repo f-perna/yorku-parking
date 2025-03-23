@@ -6,7 +6,7 @@ import models.auth.AuthenticationState;
 import models.client.Client;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.parkingSpace.ParkingSpace.ParkingStatus;
+import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 import services.ParkingSpaceService;
 
 public class ParkingSpaceController {
@@ -28,10 +28,10 @@ public class ParkingSpaceController {
 			throw new IllegalStateException("User must be logged in to add parking spaces");
 		}
 
-		parkingSpaceService.addParkingSpace(lot, spaceName, client);
+		parkingSpaceService.addParkingSpace(lot, spaceName);
 	}
 
-	public void setSpaceStatus(UUID spaceId, ParkingStatus newStatus) {
+	public void setSpaceStatus(UUID spaceId, ParkingSpaceStatus newStatus) {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
 			throw new IllegalStateException("User must be logged in to modify parking space status");

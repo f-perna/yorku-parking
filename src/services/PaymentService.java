@@ -5,6 +5,7 @@ import java.util.UUID;
 import models.booking.Booking;
 import models.client.Client;
 import models.payment.Payment;
+import models.payment.Payment.PaymentType;
 import models.payment.PaymentModel;
 
 public class PaymentService {
@@ -16,7 +17,7 @@ public class PaymentService {
 		this.bookingService = bookingService;
 	}
 
-	public Payment processPayment(Booking booking, String paymentMethod, Client client) {
+	public Payment processDepositPayment(Booking booking, String paymentMethod, Client client) {
 		if (booking == null) {
 			throw new IllegalArgumentException("Booking cannot be null");
 		}
@@ -32,21 +33,19 @@ public class PaymentService {
 			throw new IllegalStateException("Can only process payment for pending bookings");
 		}
 
-		double amount = booking.getDeposit();
+		// create payment
+		Payment payment = paymentModel.createDepositPayment(booking, paymentMethod);
 
-		Payment payment = paymentModel.createPayment(amount, paymentMethod, booking);
+		// process payment
+		paymentModel.processPayment(payment);
 
-		payment.processPayment();
-
-		if (payment.getStatus() == Payment.PaymentStatus.COMPLETED) {
-			bookingService.confirmBooking(booking);
-
-			bookingService.saveBooking(booking);
+		// update booking
+		if (payment.getStatus() == Payment.PaymentStatus.PAID) {
+			bookingService.confirmBooking(booking, payment);
+			return payment;
 		} else {
 			throw new IllegalStateException("Payment processing failed");
 		}
-
-		return payment;
 	}
 
 	public Payment processFinalPayment(Booking booking, String paymentMethod, Client client) {
@@ -61,43 +60,37 @@ public class PaymentService {
 			throw new IllegalStateException("Cannot process payment for another user's booking");
 		}
 
-		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new IllegalStateException("Can only process final payment for confirmed bookings");
+		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
+			throw new IllegalStateException("Can only process final payment for checked in bookings");
 		}
 
-		double finalAmount = booking.calculatePrice() - booking.getDeposit();
+		// Find and refund the deposit payment
+		Payment depositPayment = paymentModel.refundDepositPayment(booking);
 
-		if (finalAmount <= 0) {
-			System.out.println("No additional payment needed - deposit covers the cost");
-			bookingService.completeBooking(booking);
-			return booking.getPayment();
-		}
+		double finalAmount = booking.calculatePrice(); // Total amount without subtracting deposit
+		double depositPaid = depositPayment.getAmount();
+		double remainingAmount = finalAmount - depositPaid;
 
-		Payment payment = paymentModel.createPayment(finalAmount, paymentMethod, booking);
+		// create payment
+		Payment payment = paymentModel.createFinalPayment(remainingAmount, booking, paymentMethod);
 
-		payment.processPayment();
+		// process payment
+		paymentModel.processPayment(payment);
 
-		if (payment.getStatus() == Payment.PaymentStatus.COMPLETED) {
-			bookingService.completeBooking(booking);
+		// update booking
+		if (payment.getStatus() == Payment.PaymentStatus.PAID) {
+			bookingService.completeBooking(booking, payment);
+			return payment;
 		} else {
-			throw new IllegalStateException("Final payment processing failed");
+			throw new IllegalStateException("Payment processing failed");
 		}
-
-		return payment;
 	}
 
-	public Payment getPaymentById(UUID paymentId) {
-		if (paymentId == null) {
+	public Payment getPaymentById(UUID paymentID) {
+		if (paymentID == null) {
 			throw new IllegalArgumentException("Payment ID cannot be null");
 		}
-		return paymentModel.getPaymentById(paymentId);
+		return paymentModel.getPaymentByID(paymentID);
 	}
 
-	public void savePayment(Payment payment) {
-		if (payment == null) {
-			throw new IllegalArgumentException("Payment cannot be null");
-		}
-
-		paymentModel.savePayments();
-	}
 }

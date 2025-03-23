@@ -3,9 +3,10 @@ package models.parkingSpace;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import main.CSVProcessor;
+import main.ParkingSpaceCSVProcessor;
 import models.parkingLot.ParkingLot;
-import models.parkingSpace.ParkingSpace.ParkingStatus;
+import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
+import models.payment.Payment;
 
 public class ParkingSpaceModel {
 	private List<ParkingSpace> parkingSpaces;
@@ -16,7 +17,7 @@ public class ParkingSpaceModel {
 	}
 
 	private void loadFromDatabase() {
-		parkingSpaces = CSVProcessor.readSpaceData();
+		parkingSpaces = ParkingSpaceCSVProcessor.readSpaceData();
 	}
 
 	public ParkingSpace getParkingSpaceById(UUID id) {
@@ -31,24 +32,41 @@ public class ParkingSpaceModel {
 	public List<ParkingSpace> getAvailableSpaces(ParkingLot lot) {
 		List<ParkingSpace> availableSpaces = new ArrayList<>();
 		for (ParkingSpace space : parkingSpaces) {
-			if (space.getLot().equals(lot) && space.getStatus() == ParkingStatus.AVAILABLE) {
+			if (space.getLot().equals(lot) && space.getStatus() == ParkingSpaceStatus.AVAILABLE) {
 				availableSpaces.add(space);
 			}
 		}
 		return availableSpaces;
 	}
 
-	public void updateParkingSpaceStatus(ParkingSpace space, ParkingStatus newStatus) {
+	public ParkingSpace updateParkingSpaceStatus(ParkingSpace space, ParkingSpaceStatus newStatus) {
 		System.out.println("ParkingSpaceModel: Updating space " + space.getID() + " status from " + space.getStatus()
 				+ " to " + newStatus);
-		space.setStatus(newStatus);
+
+		ParkingSpace storedSpace = getParkingSpaceByID(space.getID());
+		if (storedSpace == null) {
+			throw new IllegalArgumentException("Parking space with ID " + space.getID() + " does not exist.");
+		}
+
+		storedSpace.setStatus(newStatus);
 		saveSpaces();
+
+		return storedSpace;
 	}
 
 	public void addParkingSpace(ParkingLot lot, String name) {
-		ParkingSpace newSpace = new ParkingSpace(UUID.randomUUID(), lot, ParkingStatus.AVAILABLE, name);
+		ParkingSpace newSpace = new ParkingSpace(UUID.randomUUID(), lot, ParkingSpaceStatus.AVAILABLE, name);
 		parkingSpaces.add(newSpace);
 		saveSpaces();
+	}
+
+	public ParkingSpace getParkingSpaceByID(UUID parkingSpaceID) {
+		for (ParkingSpace parkingSpace : parkingSpaces) {
+			if (parkingSpace.getID().equals(parkingSpaceID)) {
+				return parkingSpace;
+			}
+		}
+		return null;
 	}
 
 	public List<ParkingSpace> getAllSpaces() {
@@ -66,8 +84,6 @@ public class ParkingSpaceModel {
 	}
 
 	private void saveSpaces() {
-		System.out.println("ParkingSpaceModel: Saving " + parkingSpaces.size() + " spaces to database");
-		CSVProcessor.setSpaceData(parkingSpaces);
-		System.out.println("ParkingSpaceModel: Database save completed");
+		ParkingSpaceCSVProcessor.setSpaceData(parkingSpaces);
 	}
 }

@@ -2,7 +2,7 @@ package models.client;
 
 import java.util.ArrayList;
 import java.util.List;
-import main.CSVProcessor;
+import main.ClientCSVProcessor;
 
 public class ClientModel {
 	private List<Client> clients;
@@ -13,7 +13,7 @@ public class ClientModel {
 	}
 
 	private void loadFromDatabase() {
-		clients = CSVProcessor.readClientData();
+		clients = ClientCSVProcessor.readClientData();
 	}
 
 	public void registerClient(Client client) {
@@ -22,7 +22,7 @@ public class ClientModel {
 	}
 
 	public void saveClients() {
-		CSVProcessor.setClientData(clients);
+		ClientCSVProcessor.setClientData(clients);
 	}
 
 	public Client authenticateClient(String email, String password) {

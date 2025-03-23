@@ -23,8 +23,4 @@ public class ClientController {
 	public Client getClientByEmail(String email) {
 		return clientService.getClientByEmail(email);
 	}
-
-	public boolean approveClient(String email, boolean approved) {
-		return clientService.approveClient(email, approved);
-	}
 }

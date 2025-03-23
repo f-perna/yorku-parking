@@ -307,7 +307,7 @@ public class ClientPage extends JPanel {
 				durationValue.setText(selectedBooking.getDuration());
 				statusValue.setText(selectedBooking.getStatus().toString());
 				depositValue.setText(Double.toString(selectedBooking.getDeposit()));
-				totalValue.setText(Double.toString(selectedBooking.calculatePrice()));
+				totalValue.setText(Double.toString(selectedBooking.finalPrice()));
 			} catch (Exception e) {
 				ErrorDialog.show(this, "Error", "Could not load booking details: " + e.getMessage());
 				return;
@@ -327,10 +327,15 @@ public class ClientPage extends JPanel {
 			totalValue.setVisible(true);
 
 			if (selectedBooking.getStatus() == Booking.BookingStatus.PENDING) {
-				checkinButton.setVisible(true);
+				checkinButton.setVisible(false);
 				checkoutButton.setVisible(false);
 				extendTimeButton.setVisible(false);
+				// show pay deposit button
 			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CONFIRMED) {
+				checkinButton.setVisible(true);
+				checkoutButton.setVisible(false);
+				extendTimeButton.setVisible(true);
+			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CHECKED_IN) {
 				checkinButton.setVisible(false);
 				checkoutButton.setVisible(true);
 				extendTimeButton.setVisible(true);

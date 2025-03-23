@@ -38,13 +38,6 @@ public class BookingController {
 		return bookingService.createBooking(parkingSpace, durationHours, client);
 	}
 
-	public void saveBooking(Booking booking) {
-		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
-		}
-		bookingService.saveBooking(booking);
-	}
-
 	public boolean checkIn(Booking booking) {
 		if (booking == null) {
 			throw new IllegalArgumentException("Booking cannot be null");

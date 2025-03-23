@@ -33,12 +33,4 @@ public class ParkingLotController {
 		return parkingLotService.getParkingLotById(lotId);
 	}
 
-	public void removeParkingLot(UUID lotId) {
-		Client client = authState.getLoggedInClient();
-		if (client == null) {
-			throw new IllegalStateException("User must be logged in to remove parking lots");
-		}
-
-		parkingLotService.removeParkingLot(lotId, client);
-	}
 }

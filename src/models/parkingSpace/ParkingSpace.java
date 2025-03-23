@@ -6,16 +6,23 @@ import models.parkingLot.ParkingLot;
 
 public class ParkingSpace {
 
-	public static enum ParkingStatus {
-		OCCUPIED, AVAILABLE, BOOKED, MAINTENANCE
+	public static enum ParkingSpaceStatus {
+		OCCUPIED, AVAILABLE, BOOKED, DISABLED
 	}
 
 	private UUID id;
 	private ParkingLot parkingLot;
-	private ParkingStatus status;
+	private ParkingSpaceStatus status;
 	private String name;
 
-	public ParkingSpace(UUID id, ParkingLot parkingLot, ParkingStatus status, String name) {
+	public ParkingSpace(ParkingLot parkingLot, String name) {
+		this.id = UUID.randomUUID();
+		this.parkingLot = parkingLot;
+		this.name = name;
+	}
+	
+	// Constructor to retrieve data from ParkingSpaces.csv
+	public ParkingSpace(UUID id, ParkingLot parkingLot, ParkingSpaceStatus status, String name) {
 		this.parkingLot = parkingLot;
 		this.id = id;
 		this.status = status;
@@ -30,7 +37,7 @@ public class ParkingSpace {
 		return parkingLot;
 	}
 
-	public ParkingStatus getStatus() {
+	public ParkingSpaceStatus getStatus() {
 		return status;
 	}
 
@@ -38,7 +45,7 @@ public class ParkingSpace {
 		return name;
 	}
 
-	public void setStatus(ParkingStatus parkingStatus) {
+	public void setStatus(ParkingSpaceStatus parkingStatus) {
 		this.status = parkingStatus;
 	}
 

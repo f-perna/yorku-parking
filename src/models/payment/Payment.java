@@ -2,53 +2,89 @@ package models.payment;
 
 import java.util.UUID;
 
+import models.booking.Booking;
+
 public class Payment {
-	private UUID paymentID;
+	private UUID id;
+	private Booking booking;
 	private double amount;
-  	public PaymentStatus status;
-	public PaymentMethod paymentMethod;
+	private PaymentStatus status = PaymentStatus.PENDING;
+	private PaymentMethod method;
+	private PaymentType type;
 
 	public static enum PaymentStatus {
-		PENDING, COMPLETED, FAILED, REFUNDED;
-	}
-	
-	public Payment(UUID paymentID, double amount, PaymentMethod method, PaymentStatus status) {
-		this.paymentID = paymentID;
-		this.amount = amount;
-		this.paymentMethod = method;
-		this.status = status;
+		PENDING, PAID, FAILED, REFUNDED;
 	}
 
-	public void setPaymentMethod(PaymentMethod paymentMethod) {
-		this.paymentMethod = paymentMethod;
+	public static enum PaymentType {
+		DEPOSIT, FINAL
+	}
+
+	public Payment(double amount, Booking booking, PaymentMethod method, PaymentType type) {
+		this.id = UUID.randomUUID();
+		this.booking = booking;
+		this.amount = amount;
+		this.method = method;
+		this.type = type;
+	}
+
+	// Constructor to retrieve data from payments.csv
+	public Payment(UUID id, Booking booking, double amount, PaymentMethod method, PaymentStatus status,
+			PaymentType type) {
+		this.id = id;
+		this.booking = booking;
+		this.amount = amount;
+		this.method = method;
+		this.status = status;
+		this.type = type;
+	}
+
+	public void setPaymentMethod(PaymentMethod method) {
+		this.method = method;
+	}
+
+	public void setPaymentType(PaymentType type) {
+		this.type = type;
+	}
+
+	public Booking getBooking() {
+		return booking;
+	}
+
+	public PaymentType getPaymentType() {
+		return type;
 	}
 
 	// process payment using the selected strategy
-	public boolean processPayment() {
+	public void processPayment() {
 		if (status == PaymentStatus.PENDING) {
-			if (paymentMethod.processPayment(amount)) {
+			if (method.processPayment(amount)) {
 				// payment process
-				status = PaymentStatus.COMPLETED;
+				status = PaymentStatus.PAID;
 				System.out.println("Payment processed successfully.");
-				return true;
+				return;
+			} else {
+				throw new IllegalArgumentException("Payment failed. Please try a different payment method.");
 			}
 		}
-		return false;	
+		throw new IllegalArgumentException("Cannot process payment of a payment that is not pending.");
 	}
 
-  	public void refundDeposit(){
-  		if (status == PaymentStatus.COMPLETED) {
+	public boolean refundDeposit() {
+		if (status == PaymentStatus.PAID && type == PaymentType.DEPOSIT) {
 			status = PaymentStatus.REFUNDED;
-			System.out.println("Deposit refunded.");
+			return true;
 		}
-  	}
+
+		return false;
+	}
 
 	public PaymentStatus getStatus() {
 		return status;
 	}
 
 	public UUID getPaymentID() {
-		return paymentID;
+		return id;
 	}
 
 	public double getAmount() {
@@ -56,9 +92,9 @@ public class Payment {
 	}
 
 	public PaymentMethod getMethod() {
-		return paymentMethod;
+		return method;
 	}
-	
+
 	public static PaymentMethod generateMethod(String method) {
 		if (method.equals("Debit")) {
 			return new Debit();

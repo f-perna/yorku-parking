@@ -151,7 +151,7 @@ public class CheckoutPage extends JPanel {
 			spaceValueLabel.setText(booking.getParkingSpace().getName());
 			durationValueLabel.setText(booking.getDuration());
 			depositValueLabel.setText(currencyFormat.format(booking.getDeposit()));
-			totalValueLabel.setText(currencyFormat.format(booking.calculatePrice()));
+			totalValueLabel.setText(currencyFormat.format(booking.finalPrice()));
 
 			paymentComboBox.setSelectedIndex(0);
 		} catch (Exception e) {
@@ -159,6 +159,7 @@ public class CheckoutPage extends JPanel {
 		}
 	}
 
+	// paying deposit
 	private void handlePay() {
 		try {
 			if (paymentComboBox.getSelectedItem() == null) {
@@ -166,7 +167,7 @@ public class CheckoutPage extends JPanel {
 				return;
 			}
 
-			paymentController.processPayment(currentBooking, (String) paymentComboBox.getSelectedItem());
+			paymentController.processDepositPayment(currentBooking, (String) paymentComboBox.getSelectedItem());
 
 			SuccessDialog.show(this, "Deposit Payment Successful",
 					"Deposit has been processed successfully. Your parking space is now reserved. "
