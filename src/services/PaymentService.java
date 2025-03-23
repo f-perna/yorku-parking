@@ -1,5 +1,6 @@
 package services;
 
+import java.util.List;
 import java.util.UUID;
 
 import models.booking.Booking;
@@ -93,4 +94,10 @@ public class PaymentService {
 		return paymentModel.getPaymentByID(paymentID);
 	}
 
+	public List<Payment> getPaymentsForBooking(Booking booking) {
+		if (booking == null) {
+			throw new IllegalArgumentException("Booking cannot be null");
+		}
+		return paymentModel.getPaymentsForBooking(booking);
+	}
 }

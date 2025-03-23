@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Dimension;
+import java.awt.Component;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -15,6 +17,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.JOptionPane;
+import javax.swing.JList;
+import javax.swing.DefaultListModel;
+import javax.swing.JScrollPane;
+import javax.swing.DefaultListCellRenderer;
 
 import controllers.AuthController;
 import controllers.BookingController;
@@ -24,22 +30,27 @@ import controllers.NavigationController;
 import controllers.PaymentController;
 import models.booking.Booking;
 import models.client.Client;
+import models.payment.Payment;
 
 public class ClientPage extends JPanel {
 	private BookingController bookingController;
 	private ClientController clientController;
 	private AuthController authController;
+	private PaymentController paymentController;
 
 	private JComboBox<Booking> bookingsList;
 	private JLabel welcomeMessage;
 	private JLabel bookingLabel, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue, depositLabel,
-			depositValue, statusLabel, statusValue, totalLabel, totalValue, errorLabel;
+			depositValue, statusLabel, statusValue, totalLabel, totalValue, errorLabel, paymentsLabel;
 	private JButton checkinButton, checkoutButton, deleteButton, extendTimeButton;
+	private JList<Payment> paymentsList;
+	private DefaultListModel<Payment> paymentsListModel;
 
 	public ClientPage(JFrame parent) {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
 		this.clientController = ControllerFactory.getInstance().getClientController();
 		this.authController = ControllerFactory.getInstance().getAuthController();
+		this.paymentController = ControllerFactory.getInstance().getPaymentController();
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -156,6 +167,24 @@ public class ClientPage extends JPanel {
 		add(totalValue, gbc);
 		totalValue.setVisible(false);
 
+		// Add payments section
+		paymentsLabel = new JLabel("Payments: ");
+		gbc.gridx = 0;
+		gbc.gridy = 9;
+		gbc.anchor = GridBagConstraints.EAST;
+		add(paymentsLabel, gbc);
+		paymentsLabel.setVisible(false);
+
+		paymentsListModel = new DefaultListModel<>();
+		paymentsList = new JList<>(paymentsListModel);
+		paymentsList.setCellRenderer(new PaymentListCellRenderer());
+		JScrollPane paymentsScrollPane = new JScrollPane(paymentsList);
+		paymentsScrollPane.setPreferredSize(new Dimension(300, 100));
+		gbc.gridx = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		add(paymentsScrollPane, gbc);
+		paymentsScrollPane.setVisible(false);
+
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
 		checkinButton = new JButton("Check-In");
 		checkoutButton = new JButton("Check-Out");
@@ -166,7 +195,7 @@ public class ClientPage extends JPanel {
 		buttonPanel.add(extendTimeButton);
 
 		gbc.gridx = 0;
-		gbc.gridy = 9;
+		gbc.gridy = 10;
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(15, 10, 15, 10);
 		add(buttonPanel, gbc);
@@ -185,7 +214,7 @@ public class ClientPage extends JPanel {
 		errorLabel = new JLabel();
 		errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		gbc.gridx = 0;
-		gbc.gridy = 10;
+		gbc.gridy = 11;
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(10, 10, 20, 10);
 		add(errorLabel, gbc);
@@ -252,6 +281,8 @@ public class ClientPage extends JPanel {
 				checkinButton.setVisible(false);
 				checkoutButton.setVisible(false);
 				extendTimeButton.setVisible(false);
+				paymentsLabel.setVisible(false);
+				paymentsList.setVisible(false);
 			} else {
 				bookingLabel.setVisible(true);
 				bookingsList.setVisible(true);
@@ -294,6 +325,8 @@ public class ClientPage extends JPanel {
 				statusValue.setVisible(false);
 				depositValue.setVisible(false);
 				totalValue.setVisible(false);
+				paymentsLabel.setVisible(false);
+				paymentsList.getParent().getParent().setVisible(false);
 
 				checkinButton.setVisible(false);
 				checkoutButton.setVisible(false);
@@ -308,6 +341,13 @@ public class ClientPage extends JPanel {
 				statusValue.setText(selectedBooking.getStatus().toString());
 				depositValue.setText(Double.toString(selectedBooking.getDeposit()));
 				totalValue.setText(Double.toString(selectedBooking.finalPrice()));
+
+				// Show payments
+				paymentsListModel.clear();
+				List<Payment> payments = paymentController.getPaymentsForBooking(selectedBooking);
+				for (Payment payment : payments) {
+					paymentsListModel.addElement(payment);
+				}
 			} catch (Exception e) {
 				ErrorDialog.show(this, "Error", "Could not load booking details: " + e.getMessage());
 				return;
@@ -325,6 +365,8 @@ public class ClientPage extends JPanel {
 			statusValue.setVisible(true);
 			depositValue.setVisible(true);
 			totalValue.setVisible(true);
+			paymentsLabel.setVisible(true);
+			paymentsList.getParent().getParent().setVisible(true);
 
 			if (selectedBooking.getStatus() == Booking.BookingStatus.PENDING) {
 				checkinButton.setVisible(false);
@@ -361,5 +403,23 @@ public class ClientPage extends JPanel {
 		if (CheckoutPopup.showDialog(this, selectedBooking)) {
 			refresh();
 		}
+	}
+}
+
+// Custom renderer for the payments list
+class PaymentListCellRenderer extends DefaultListCellRenderer {
+	@Override
+	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+			boolean cellHasFocus) {
+		Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+		if (value instanceof Payment) {
+			Payment payment = (Payment) value;
+			setText(String.format("%s: $%.2f - %s - %s",
+					payment.getPaymentType(),
+					payment.getAmount(),
+					payment.getMethod(),
+					payment.getStatus()));
+		}
+		return c;
 	}
 }

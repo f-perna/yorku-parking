@@ -85,4 +85,14 @@ public class PaymentModel {
 	public List<Payment> getAllPayments() {
 		return new ArrayList<>(payments);
 	}
+
+	public List<Payment> getPaymentsForBooking(Booking booking) {
+		List<Payment> bookingPayments = new ArrayList<>();
+		for (Payment payment : payments) {
+			if (payment.getBooking().equals(booking)) {
+				bookingPayments.add(payment);
+			}
+		}
+		return bookingPayments;
+	}
 }
