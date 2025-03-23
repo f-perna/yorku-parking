@@ -7,13 +7,13 @@ import models.booking.Booking;
 import models.client.Client;
 import models.payment.Payment;
 import models.payment.Payment.PaymentType;
-import models.payment.PaymentModel;
+import repositories.PaymentRepository;
 
 public class PaymentService {
-	private PaymentModel paymentModel;
+	private PaymentRepository paymentModel;
 	private BookingService bookingService;
 
-	public PaymentService(PaymentModel paymentModel, BookingService bookingService) {
+	public PaymentService(PaymentRepository paymentModel, BookingService bookingService) {
 		this.paymentModel = paymentModel;
 		this.bookingService = bookingService;
 	}

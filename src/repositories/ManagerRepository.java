@@ -1,4 +1,4 @@
-package models.manager;
+package repositories;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.ManagerCSVProcessor;
+import models.manager.Manager;
 
-public class ManagerModel implements Serializable {
+public class ManagerRepository implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private List<Manager> managers;
 	private static final String DATA_FILE = "data/managers.dat";
 
-	public ManagerModel() {
+	public ManagerRepository() {
 		this.managers = new ArrayList<>();
 		loadFromDatabase();
 	}

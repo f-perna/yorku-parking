@@ -1,16 +1,17 @@
-package models.payment;
+package repositories;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import main.PaymentCSVProcessor;
 import models.booking.Booking;
+import models.payment.Payment;
 import models.payment.Payment.PaymentType;
 
-public class PaymentModel {
+public class PaymentRepository {
 	private List<Payment> payments;
 
-	public PaymentModel() {
+	public PaymentRepository() {
 		this.payments = new ArrayList<>();
 		loadFromDatabase();
 	}

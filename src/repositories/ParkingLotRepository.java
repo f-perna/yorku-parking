@@ -1,14 +1,15 @@
-package models.parkingLot;
+package repositories;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import main.ParkingLotCSVProcessor;
+import models.parkingLot.ParkingLot;
 
-public class ParkingLotModel {
+public class ParkingLotRepository {
 	private List<ParkingLot> parkingLots;
 
-	public ParkingLotModel() {
+	public ParkingLotRepository() {
 		this.parkingLots = new ArrayList<>();
 		loadFromDatabase();
 	}

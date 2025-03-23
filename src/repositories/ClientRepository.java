@@ -1,13 +1,14 @@
-package models.client;
+package repositories;
 
 import java.util.ArrayList;
 import java.util.List;
 import main.ClientCSVProcessor;
+import models.client.Client;
 
-public class ClientModel {
+public class ClientRepository {
 	private List<Client> clients;
 
-	public ClientModel() {
+	public ClientRepository() {
 		this.clients = new ArrayList<>();
 		loadFromDatabase();
 	}

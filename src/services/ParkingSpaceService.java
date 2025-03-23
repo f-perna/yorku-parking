@@ -7,17 +7,17 @@ import models.client.Client;
 import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.parkingSpace.ParkingSpaceModel;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
+import repositories.ParkingSpaceRepository;
 
 public class ParkingSpaceService {
-	private ParkingSpaceModel parkingSpaceModel;
+	private ParkingSpaceRepository parkingSpaceModel;
 
-	public ParkingSpaceService(ParkingSpaceModel parkingSpaceModel) {
+	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceModel) {
 		this.parkingSpaceModel = parkingSpaceModel;
 	}
 
-	public ParkingSpaceModel getParkingSpaceModel() {
+	public ParkingSpaceRepository getParkingSpaceModel() {
 		return this.parkingSpaceModel;
 	}
 

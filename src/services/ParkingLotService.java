@@ -5,13 +5,13 @@ import java.util.UUID;
 
 import models.client.Client;
 import models.parkingLot.ParkingLot;
-import models.parkingLot.ParkingLotModel;
+import repositories.ParkingLotRepository;
 
 public class ParkingLotService {
-	private ParkingLotModel parkingLotModel;
+	private ParkingLotRepository parkingLotModel;
 	private ParkingSpaceService parkingSpaceService;
 
-	public ParkingLotService(ParkingLotModel parkingLotModel) {
+	public ParkingLotService(ParkingLotRepository parkingLotModel) {
 		this.parkingLotModel = parkingLotModel;
 		// Will be set in setDependencies to avoid circular dependency
 		this.parkingSpaceService = null;

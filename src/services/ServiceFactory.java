@@ -1,11 +1,11 @@
 package services;
 
-import models.booking.BookingModel;
-import models.client.ClientModel;
-import models.manager.ManagerModel;
-import models.parkingLot.ParkingLotModel;
-import models.parkingSpace.ParkingSpaceModel;
-import models.payment.PaymentModel;
+import repositories.BookingRepository;
+import repositories.ClientRepository;
+import repositories.ManagerRepository;
+import repositories.ParkingLotRepository;
+import repositories.ParkingSpaceRepository;
+import repositories.PaymentRepository;
 
 public class ServiceFactory {
 	private static ServiceFactory instance;
@@ -19,12 +19,12 @@ public class ServiceFactory {
 
 	private ServiceFactory() {
 		// Create models
-		BookingModel bookingModel = new BookingModel();
-		ClientModel clientModel = new ClientModel();
-		ManagerModel managerModel = new ManagerModel();
-		ParkingLotModel parkingLotModel = new ParkingLotModel();
-		ParkingSpaceModel parkingSpaceModel = new ParkingSpaceModel();
-		PaymentModel paymentModel = new PaymentModel();
+		BookingRepository bookingModel = new BookingRepository();
+		ClientRepository clientModel = new ClientRepository();
+		ManagerRepository managerModel = new ManagerRepository();
+		ParkingLotRepository parkingLotModel = new ParkingLotRepository();
+		ParkingSpaceRepository parkingSpaceModel = new ParkingSpaceRepository();
+		PaymentRepository paymentModel = new PaymentRepository();
 
 		// Create services
 		this.bookingService = new BookingService(bookingModel, parkingSpaceModel);

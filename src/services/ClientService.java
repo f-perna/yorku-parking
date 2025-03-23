@@ -2,15 +2,16 @@ package services;
 
 import models.auth.AuthenticationState;
 import models.client.Client;
-import models.client.ClientModel;
 import models.client.GenerateClientFactory;
+import repositories.ClientRepository;
+
 import java.util.List;
 
 public class ClientService {
-	private ClientModel clientModel;
+	private ClientRepository clientModel;
 	private AuthenticationState authState;
 
-	public ClientService(ClientModel clientModel) {
+	public ClientService(ClientRepository clientModel) {
 		this.clientModel = clientModel;
 		this.authState = AuthenticationState.getInstance();
 	}

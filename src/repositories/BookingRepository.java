@@ -1,18 +1,20 @@
-package models.booking;
+package repositories;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import main.BookingCSVProcessor;
+import models.booking.Booking;
+import models.booking.Booking.BookingStatus;
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 
-public class BookingModel {
+public class BookingRepository {
 	private List<Booking> bookings;
 
-	public BookingModel() {
+	public BookingRepository() {
 		this.bookings = new ArrayList<>();
 		loadFromDatabase();
 	}

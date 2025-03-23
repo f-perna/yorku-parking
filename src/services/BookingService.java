@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.UUID;
 
 import models.booking.Booking;
-import models.booking.BookingModel;
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
-import models.parkingSpace.ParkingSpaceModel;
 import models.payment.Payment;
+import repositories.BookingRepository;
+import repositories.ParkingSpaceRepository;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 
 public class BookingService {
-	private BookingModel bookingModel;
-	private ParkingSpaceModel parkingSpaceModel;
+	private BookingRepository bookingModel;
+	private ParkingSpaceRepository parkingSpaceModel;
 
-	public BookingService(BookingModel bookingModel, ParkingSpaceModel parkingSpaceModel) {
+	public BookingService(BookingRepository bookingModel, ParkingSpaceRepository parkingSpaceModel) {
 		this.bookingModel = bookingModel;
 		this.parkingSpaceModel = parkingSpaceModel;
 	}

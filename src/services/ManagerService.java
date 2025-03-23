@@ -4,13 +4,13 @@ import java.util.List;
 
 import models.auth.AuthenticationState;
 import models.manager.Manager;
-import models.manager.ManagerModel;
+import repositories.ManagerRepository;
 
 public class ManagerService {
-	private ManagerModel managerModel;
+	private ManagerRepository managerModel;
 	private AuthenticationState authState;
 
-	public ManagerService(ManagerModel managerModel) {
+	public ManagerService(ManagerRepository managerModel) {
 		this.managerModel = managerModel;
 		this.authState = AuthenticationState.getInstance();
 	}
