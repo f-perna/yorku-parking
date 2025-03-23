@@ -54,34 +54,6 @@ public class PaymentModel {
 		return null;
 	}
 
-	public Payment refundDepositPayment(Booking booking) {
-		Payment depositPayment = findDepositPayment(booking);
-		System.out.println(depositPayment);
-		if (depositPayment != null) {
-			boolean refunded = depositPayment.refundDeposit();
-			if (!refunded) {
-				throw new IllegalArgumentException("Could not refund deposit");
-			} else {
-				// Save the refund status
-				savePayments();
-				return depositPayment;
-			}
-		} else {
-			throw new IllegalArgumentException("Could not find deposit payment");
-		}
-
-	}
-
-	public Payment findDepositPayment(Booking booking) {
-		for (Payment payment : payments) {
-			if (payment.getBooking().equals(booking) && payment.getPaymentType() == PaymentType.DEPOSIT
-					&& payment.getStatus() == Payment.PaymentStatus.PAID) {
-				return payment;
-			}
-		}
-		return null;
-	}
-
 	public List<Payment> getAllPayments() {
 		return new ArrayList<>(payments);
 	}

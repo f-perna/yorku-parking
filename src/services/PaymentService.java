@@ -65,15 +65,9 @@ public class PaymentService {
 			throw new IllegalStateException("Can only process final payment for checked in bookings");
 		}
 
-		// Find and refund the deposit payment
-		Payment depositPayment = paymentModel.refundDepositPayment(booking);
+		double finalAmount = booking.deductedPrice();
 
-		double finalAmount = booking.calculatePrice(); // Total amount without subtracting deposit
-		double depositPaid = depositPayment.getAmount();
-		double remainingAmount = finalAmount - depositPaid;
-
-		// create payment
-		Payment payment = paymentModel.createFinalPayment(remainingAmount, booking, paymentMethod);
+		Payment payment = paymentModel.createFinalPayment(finalAmount, booking, paymentMethod);
 
 		// process payment
 		paymentModel.processPayment(payment);

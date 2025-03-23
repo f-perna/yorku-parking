@@ -13,7 +13,7 @@ public class Payment {
 	private PaymentType type;
 
 	public static enum PaymentStatus {
-		PENDING, PAID, FAILED, REFUNDED;
+		PENDING, PAID, FAILED;
 	}
 
 	public static enum PaymentType {
@@ -68,15 +68,6 @@ public class Payment {
 			}
 		}
 		throw new IllegalArgumentException("Cannot process payment of a payment that is not pending.");
-	}
-
-	public boolean refundDeposit() {
-		if (status == PaymentStatus.PAID && type == PaymentType.DEPOSIT) {
-			status = PaymentStatus.REFUNDED;
-			return true;
-		}
-
-		return false;
 	}
 
 	public PaymentStatus getStatus() {

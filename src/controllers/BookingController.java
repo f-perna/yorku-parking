@@ -55,15 +55,6 @@ public class BookingController {
 		return bookingService.checkIn(booking);
 	}
 
-	public void cancelBooking(Booking booking) {
-		Client client = authState.getLoggedInClient();
-		if (client == null) {
-			throw new IllegalStateException("User must be logged in to cancel a booking");
-		}
-
-		bookingService.cancelBooking(booking, client);
-	}
-
 	public List<Booking> getBookingsForClient() {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
@@ -71,13 +62,6 @@ public class BookingController {
 		}
 
 		return bookingService.getBookingsForClient(client);
-	}
-
-	public Booking getBookingById(UUID bookingId) {
-		if (bookingId == null) {
-			throw new IllegalArgumentException("Booking ID cannot be null");
-		}
-		return bookingService.getBookingById(bookingId);
 	}
 
 	public Booking extendBookingTime(Booking booking, int additionalHours) {
@@ -93,6 +77,4 @@ public class BookingController {
 		return bookingService.extendBookingTime(booking, additionalHours, client);
 	}
 
-	// public boolean deleteBooking(Booking booking) {
-	// }
 }

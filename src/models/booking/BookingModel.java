@@ -50,13 +50,13 @@ public class BookingModel {
 		return null;
 	}
 
-	public void cancelBooking(Booking booking) {
-		if (booking.getStatus() != Booking.BookingStatus.PENDING
-				&& booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new IllegalStateException("Booking cannot be cancelled in its current state");
-		}
 
-		booking.cancelBooking();
+	
+	public void noShowBooking(Booking booking) {
+		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
+			throw new IllegalStateException("Only confirmed bookings can be considered no shows.");
+		}
+		booking.noShow();
 		saveBookings();
 	}
 

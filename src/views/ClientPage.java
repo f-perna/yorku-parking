@@ -141,7 +141,7 @@ public class ClientPage extends JPanel {
 		add(statusValue, gbc);
 		statusValue.setVisible(false);
 
-		depositLabel = new JLabel("Deposit Paid: ");
+		depositLabel = new JLabel("Deposit Paid (refundable at checkout): ");
 		gbc.gridx = 0;
 		gbc.gridy = 7;
 		gbc.anchor = GridBagConstraints.EAST;
@@ -235,9 +235,11 @@ public class ClientPage extends JPanel {
 				refresh();
 			} else {
 				ErrorDialog.show(this, "Check In Failed", "Could not check in at this time. Please try again later.");
+				refresh();
 			}
 		} catch (Exception e) {
 			ErrorDialog.show(this, "Error", "An error occurred during check-in: " + e.getMessage());
+			refresh();
 		}
 	}
 
@@ -340,7 +342,7 @@ public class ClientPage extends JPanel {
 				durationValue.setText(selectedBooking.getDuration());
 				statusValue.setText(selectedBooking.getStatus().toString());
 				depositValue.setText(Double.toString(selectedBooking.getDeposit()));
-				totalValue.setText(Double.toString(selectedBooking.finalPrice()));
+				totalValue.setText(Double.toString(selectedBooking.deductedPrice()));
 
 				// Show payments
 				paymentsListModel.clear();
@@ -414,11 +416,8 @@ class PaymentListCellRenderer extends DefaultListCellRenderer {
 		Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		if (value instanceof Payment) {
 			Payment payment = (Payment) value;
-			setText(String.format("%s: $%.2f - %s - %s",
-					payment.getPaymentType(),
-					payment.getAmount(),
-					payment.getMethod(),
-					payment.getStatus()));
+			setText(String.format("%s: $%.2f - %s - %s", payment.getPaymentType(), payment.getAmount(),
+					payment.getMethod(), payment.getStatus()));
 		}
 		return c;
 	}

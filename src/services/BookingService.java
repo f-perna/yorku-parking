@@ -120,32 +120,15 @@ public class BookingService {
 				return false;
 			}
 		} else if (now.isBefore(earliestCheckIn)) {
-			System.out.println("Cannot check in yet - too early (check-in opens 5 minutes before start time)");
-			return false;
+			throw new IllegalArgumentException(
+					"Checkout period is not open yet! Please try again at least 5 minutes before your booking.");
 		} else {
-			System.out.println("Check-in period has expired (closes 1 hour after start time)");
-			return false;
+			ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
+					ParkingSpaceStatus.AVAILABLE);
+			booking.setParkingSpace(updatedSpace);
+			bookingModel.noShowBooking(booking);
+			throw new IllegalArgumentException("Checkout period has expired.");
 		}
-	}
-
-	public void cancelBooking(Booking booking, Client client) {
-		if (booking == null) {
-			throw new IllegalArgumentException("Booking ID cannot be null");
-		}
-
-		if (client == null || !booking.getClient().equals(client)) {
-			throw new IllegalStateException("Cannot cancel another user's booking");
-		}
-
-		if (booking.getStartTime().minusHours(1).isBefore(LocalDateTime.now())) {
-			throw new IllegalStateException("Bookings cannot be cancelled less than 1 hour before start time");
-		}
-
-		bookingModel.cancelBooking(booking);
-
-		ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(booking.getParkingSpace(),
-				ParkingSpaceStatus.AVAILABLE);
-		booking.setParkingSpace(updatedSpace);
 	}
 
 	public List<Booking> getBookingsForClient(Client client) {

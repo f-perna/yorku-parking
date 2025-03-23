@@ -151,7 +151,7 @@ public class CheckoutPage extends JPanel {
 			spaceValueLabel.setText(booking.getParkingSpace().getName());
 			durationValueLabel.setText(booking.getDuration());
 			depositValueLabel.setText(currencyFormat.format(booking.getDeposit()));
-			totalValueLabel.setText(currencyFormat.format(booking.finalPrice()));
+			totalValueLabel.setText(currencyFormat.format(booking.calculatePrice() - booking.getDeposit()));
 
 			paymentComboBox.setSelectedIndex(0);
 		} catch (Exception e) {

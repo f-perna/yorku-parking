@@ -82,12 +82,11 @@ public class Booking {
 	public double calculatePrice() {
 		return this.calculateHours() * this.client.getRate();
 	}
-	
-	public double finalPrice() {
+
+	public double deductedPrice() {
 		return this.calculatePrice() - this.deposit;
 	}
 
-	// update payment in this? ******************
 	public void payDeposit() {
 		this.deposit = this.client.getRate();
 		this.status = BookingStatus.CONFIRMED;
