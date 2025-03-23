@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 
 public class Booking {
 
@@ -69,7 +71,7 @@ public class Booking {
 
 	public void extendDuration(int additionalHours) {
 		if (additionalHours <= 0) {
-			throw new IllegalArgumentException("Additional hours must be positive");
+			throw new ParkingSystemException("Additional hours must be positive", ErrorType.VALIDATION);
 		}
 		this.endTime = this.endTime.plusHours(additionalHours);
 	}

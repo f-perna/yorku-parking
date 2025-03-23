@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.booking.Booking;
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
@@ -23,20 +25,20 @@ public class BookingService {
 
 	public Booking createBooking(ParkingSpace parkingSpace, int durationHours, Client client) {
 		if (parkingSpace == null) {
-			throw new IllegalArgumentException("Parking space cannot be null");
+			throw new ParkingSystemException("Parking space cannot be null", ErrorType.VALIDATION);
 		}
 		if (durationHours <= 0 || durationHours > 24) {
-			throw new IllegalArgumentException("Duration must be between 1 and 24 hours");
+			throw new ParkingSystemException("Duration must be between 1 and 24 hours", ErrorType.VALIDATION);
 		}
 		if (client == null) {
-			throw new IllegalStateException("User must be logged in to create a booking");
+			throw new ParkingSystemException("User must be logged in to create a booking", ErrorType.AUTHENTICATION);
 		}
 		if (!client.isApproved() && client.getType() != Client.type.VISITOR) {
-			throw new IllegalStateException("Client must be approved to make a booking");
+			throw new ParkingSystemException("Client must be approved to make a booking", ErrorType.AUTHORIZATION);
 		}
 
 		if (parkingSpace.getStatus() != ParkingSpaceStatus.AVAILABLE) {
-			throw new IllegalStateException("Parking space is not available");
+			throw new ParkingSystemException("Parking space is not available", ErrorType.BUSINESS_LOGIC);
 		}
 
 		return bookingRepository.createBooking(parkingSpace, durationHours, client);
@@ -44,23 +46,23 @@ public class BookingService {
 
 	public void confirmBooking(Booking booking, Payment payment) {
 		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
 
 		if (booking.getStatus() != Booking.BookingStatus.PENDING) {
-			throw new IllegalStateException("Only pending bookings can be confirmed");
+			throw new ParkingSystemException("Only pending bookings can be confirmed", ErrorType.BUSINESS_LOGIC);
 		}
 
 		if (payment == null) {
-			throw new IllegalArgumentException("Payment cannot be null");
+			throw new ParkingSystemException("Payment cannot be null", ErrorType.VALIDATION);
 		}
 
 		if (!payment.getBooking().equals(booking)) {
-			throw new IllegalArgumentException("The payment must correspond to the booking.");
+			throw new ParkingSystemException("The payment must correspond to the booking.", ErrorType.VALIDATION);
 		}
 
 		if (payment.getStatus() != Payment.PaymentStatus.PAID) {
-			throw new IllegalStateException("Payment must be successfuly made.");
+			throw new ParkingSystemException("Payment must be successfuly made.", ErrorType.BUSINESS_LOGIC);
 		}
 
 		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
@@ -72,23 +74,23 @@ public class BookingService {
 
 	public void completeBooking(Booking booking, Payment payment) {
 		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
 
 		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
-			throw new IllegalStateException("Only checked in bookings can be paid for.");
+			throw new ParkingSystemException("Only checked in bookings can be paid for.", ErrorType.BUSINESS_LOGIC);
 		}
 
 		if (payment == null) {
-			throw new IllegalArgumentException("Payment cannot be null");
+			throw new ParkingSystemException("Payment cannot be null", ErrorType.VALIDATION);
 		}
 
 		if (!payment.getBooking().equals(booking)) {
-			throw new IllegalArgumentException("The payment must correspond to the booking.");
+			throw new ParkingSystemException("The payment must correspond to the booking.", ErrorType.VALIDATION);
 		}
 
 		if (payment.getStatus() != Payment.PaymentStatus.PAID) {
-			throw new IllegalStateException("Payment must be successfully made.");
+			throw new ParkingSystemException("Payment must be successfully made.", ErrorType.BUSINESS_LOGIC);
 		}
 
 		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
@@ -120,51 +122,53 @@ public class BookingService {
 				return false;
 			}
 		} else if (now.isBefore(earliestCheckIn)) {
-			throw new IllegalArgumentException(
-					"Checkout period is not open yet! Please try again at least 5 minutes before your booking.");
+			throw new ParkingSystemException(
+					"Checkout period is not open yet! Please try again at least 5 minutes before your booking.",
+					ErrorType.BUSINESS_LOGIC);
 		} else {
 			ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
 					ParkingSpaceStatus.AVAILABLE);
 			booking.setParkingSpace(updatedSpace);
 			bookingRepository.noShowBooking(booking);
-			throw new IllegalArgumentException("Checkout period has expired.");
+			throw new ParkingSystemException("Checkout period has expired.", ErrorType.BUSINESS_LOGIC);
 		}
 	}
 
 	public List<Booking> getBookingsForClient(Client client) {
 		if (client == null) {
-			throw new IllegalStateException("Client cannot be null");
+			throw new ParkingSystemException("Client cannot be null", ErrorType.VALIDATION);
 		}
 		return bookingRepository.getBookingsForClient(client);
 	}
 
 	public Booking getBookingById(UUID bookingId) {
 		if (bookingId == null) {
-			throw new IllegalArgumentException("Booking ID cannot be null");
+			throw new ParkingSystemException("Booking ID cannot be null", ErrorType.VALIDATION);
 		}
 		return bookingRepository.getBookingById(bookingId);
 	}
 
 	public Booking extendBookingTime(Booking booking, int additionalHours, Client client) {
 		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
 
 		if (additionalHours <= 0 || additionalHours > 24) {
-			throw new IllegalArgumentException("Additional hours must be between 1 and 24");
+			throw new ParkingSystemException("Additional hours must be between 1 and 24", ErrorType.VALIDATION);
 		}
 
 		if (client == null) {
-			throw new IllegalStateException("Client cannot be null");
+			throw new ParkingSystemException("Client cannot be null", ErrorType.VALIDATION);
 		}
 
 		if (!booking.getClient().getEmail().equals(client.getEmail())) {
-			throw new IllegalStateException("Client does not own this booking");
+			throw new ParkingSystemException("Client does not own this booking", ErrorType.AUTHORIZATION);
 		}
 
 		if (booking.getStatus() != Booking.BookingStatus.PENDING
 				&& booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new IllegalStateException("Only pending or confirmed bookings can be extended");
+			throw new ParkingSystemException("Only pending or confirmed bookings can be extended",
+					ErrorType.BUSINESS_LOGIC);
 		}
 
 		try {
@@ -176,7 +180,8 @@ public class BookingService {
 		} catch (Exception e) {
 			System.err.println("Error extending booking time: " + e.getMessage());
 			e.printStackTrace();
-			throw new RuntimeException("Failed to extend booking time: " + e.getMessage(), e);
+			throw new ParkingSystemException("Failed to extend booking time: " + e.getMessage(), ErrorType.SYSTEM_ERROR,
+					e);
 		}
 	}
 }

@@ -3,6 +3,8 @@ package services;
 import java.util.List;
 import java.util.UUID;
 
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.auth.AuthenticationState;
 import models.client.Client;
 import models.parkingLot.ParkingLot;
@@ -39,11 +41,11 @@ public class ParkingLotService {
 
 	public void addParkingLot(String name, Client client) {
 		if (name == null || name.trim().isEmpty()) {
-			throw new IllegalArgumentException("Lot name cannot be empty");
+			throw new ParkingSystemException("Lot name cannot be empty", ErrorType.VALIDATION);
 		}
 
 		if (client == null || client.getType() != Client.type.FACULTY) {
-			throw new IllegalStateException("Only faculty members can add parking lots");
+			throw new ParkingSystemException("Only faculty members can add parking lots", ErrorType.AUTHORIZATION);
 		}
 
 		parkingLotModel.addParkingLot(name.trim());
@@ -51,11 +53,11 @@ public class ParkingLotService {
 
 	public void addParkingLot(String name) {
 		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Manager must be logged in to add parking lots");
+			throw new ParkingSystemException("Manager must be logged in to add parking lots", ErrorType.AUTHORIZATION);
 		}
 
 		if (name == null || name.trim().isEmpty()) {
-			throw new IllegalArgumentException("Lot name cannot be empty");
+			throw new ParkingSystemException("Lot name cannot be empty", ErrorType.VALIDATION);
 		}
 
 		// Add the parking lot
@@ -74,12 +76,12 @@ public class ParkingLotService {
 
 	public ParkingLot getParkingLotById(UUID lotId) {
 		if (lotId == null) {
-			throw new IllegalArgumentException("Lot ID cannot be null");
+			throw new ParkingSystemException("Lot ID cannot be null", ErrorType.VALIDATION);
 		}
 
 		ParkingLot lot = parkingLotModel.getParkingLotById(lotId);
 		if (lot == null) {
-			throw new IllegalArgumentException("Parking lot not found");
+			throw new ParkingSystemException("Parking lot not found", ErrorType.DATA_ACCESS);
 		}
 
 		return lot;
@@ -87,14 +89,16 @@ public class ParkingLotService {
 
 	public boolean enableParkingLot(ParkingLot parkingLot) {
 		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Manager must be logged in to enable parking lots");
+			throw new ParkingSystemException("Manager must be logged in to enable parking lots",
+					ErrorType.AUTHORIZATION);
 		}
 		return parkingLotModel.enableParkingLot(parkingLot);
 	}
 
 	public boolean disableParkingLot(ParkingLot parkingLot) {
 		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Manager must be logged in to disable parking lots");
+			throw new ParkingSystemException("Manager must be logged in to disable parking lots",
+					ErrorType.AUTHORIZATION);
 		}
 		return parkingLotModel.disableParkingLot(parkingLot);
 	}

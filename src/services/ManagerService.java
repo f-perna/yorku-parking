@@ -2,6 +2,8 @@ package services;
 
 import java.util.List;
 
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.auth.AuthenticationState;
 import models.manager.Manager;
 import repositories.ManagerRepository;
@@ -30,7 +32,7 @@ public class ManagerService {
 
 	public List<Manager> getAllManagers() {
 		if (!authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Only super managers can view all managers");
+			throw new ParkingSystemException("Only super managers can view all managers", ErrorType.AUTHORIZATION);
 		}
 
 		return managerModel.getAllManagers();
@@ -38,11 +40,11 @@ public class ManagerService {
 
 	public Manager getManagerByEmail(String email) {
 		if (!authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Only super managers can view manager details");
+			throw new ParkingSystemException("Only super managers can view manager details", ErrorType.AUTHORIZATION);
 		}
 
 		if (email == null) {
-			throw new IllegalArgumentException("Email cannot be null");
+			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
 		}
 
 		return managerModel.getManagerByEmail(email.toLowerCase().trim());
@@ -50,15 +52,15 @@ public class ManagerService {
 
 	public boolean addManager(String email, String password) {
 		if (!authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Only super managers can add new managers");
+			throw new ParkingSystemException("Only super managers can add new managers", ErrorType.AUTHORIZATION);
 		}
 
 		if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-			throw new IllegalArgumentException("Invalid email format");
+			throw new ParkingSystemException("Invalid email format", ErrorType.VALIDATION);
 		}
 
 		if (password == null || password.length() < 6) {
-			throw new IllegalArgumentException("Password must be at least 6 characters");
+			throw new ParkingSystemException("Password must be at least 6 characters", ErrorType.VALIDATION);
 		}
 
 		email = email.toLowerCase().trim();
@@ -69,11 +71,11 @@ public class ManagerService {
 
 	public boolean removeManager(String email) {
 		if (!authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Only super managers can remove managers");
+			throw new ParkingSystemException("Only super managers can remove managers", ErrorType.AUTHORIZATION);
 		}
 
 		if (email == null) {
-			throw new IllegalArgumentException("Email cannot be null");
+			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
 		}
 
 		return managerModel.removeManager(email.toLowerCase().trim());

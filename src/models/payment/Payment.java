@@ -3,6 +3,8 @@ package models.payment;
 import java.util.UUID;
 
 import models.booking.Booking;
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 
 public class Payment {
 	private UUID id;
@@ -56,18 +58,27 @@ public class Payment {
 	}
 
 	// process payment using the selected strategy
-	public void processPayment() {
-		if (status == PaymentStatus.PENDING) {
-			if (method.processPayment(amount)) {
-				// payment process
-				status = PaymentStatus.PAID;
-				System.out.println("Payment processed successfully.");
-				return;
-			} else {
-				throw new IllegalArgumentException("Payment failed. Please try a different payment method.");
-			}
+	public boolean processPayment() {
+		if (simulatedSuccess()) {
+			this.status = PaymentStatus.PAID;
+			return true;
+		} else {
+			throw new ParkingSystemException("Payment failed. Please try a different payment method.",
+					ErrorType.BUSINESS_LOGIC);
 		}
-		throw new IllegalArgumentException("Cannot process payment of a payment that is not pending.");
+	}
+
+	private boolean simulatedSuccess() {
+		if (this.status != PaymentStatus.PENDING) {
+			throw new ParkingSystemException("Cannot process payment of a payment that is not pending.",
+					ErrorType.BUSINESS_LOGIC);
+		}
+		if (method.processPayment(amount)) {
+			// payment process
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public PaymentStatus getStatus() {

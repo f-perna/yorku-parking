@@ -177,7 +177,9 @@ public class LoginPage extends JPanel {
 				if (loginType.equals("manager")) {
 					NavigationController.showPage("ManagerDashboard");
 				} else if (loginType.equals("superManager")) {
+					SuperManagerPage superManagerPage = (SuperManagerPage) NavigationController.getPage("SuperManager");
 					NavigationController.showPage("SuperManager");
+					superManagerPage.refresh();
 				} else {
 					ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
 					clientPage.refresh();

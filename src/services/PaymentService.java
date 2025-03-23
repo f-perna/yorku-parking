@@ -3,6 +3,8 @@ package services;
 import java.util.List;
 import java.util.UUID;
 
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.booking.Booking;
 import models.client.Client;
 import models.payment.Payment;
@@ -20,18 +22,19 @@ public class PaymentService {
 
 	public Payment processDepositPayment(Booking booking, String paymentMethod, Client client) {
 		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
 		if (paymentMethod == null || paymentMethod.trim().isEmpty()) {
-			throw new IllegalArgumentException("Payment method must be specified");
+			throw new ParkingSystemException("Payment method must be specified", ErrorType.VALIDATION);
 		}
 
 		if (client == null || !booking.getClient().equals(client)) {
-			throw new IllegalStateException("Cannot process payment for another user's booking");
+			throw new ParkingSystemException("Cannot process payment for another user's booking",
+					ErrorType.AUTHORIZATION);
 		}
 
 		if (booking.getStatus() != Booking.BookingStatus.PENDING) {
-			throw new IllegalStateException("Can only process payment for pending bookings");
+			throw new ParkingSystemException("Can only process payment for pending bookings", ErrorType.BUSINESS_LOGIC);
 		}
 
 		// create payment
@@ -45,24 +48,26 @@ public class PaymentService {
 			bookingService.confirmBooking(booking, payment);
 			return payment;
 		} else {
-			throw new IllegalStateException("Payment processing failed");
+			throw new ParkingSystemException("Payment processing failed", ErrorType.BUSINESS_LOGIC);
 		}
 	}
 
 	public Payment processFinalPayment(Booking booking, String paymentMethod, Client client) {
 		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
 		if (paymentMethod == null || paymentMethod.trim().isEmpty()) {
-			throw new IllegalArgumentException("Payment method must be specified");
+			throw new ParkingSystemException("Payment method must be specified", ErrorType.VALIDATION);
 		}
 
 		if (client == null || !booking.getClient().equals(client)) {
-			throw new IllegalStateException("Cannot process payment for another user's booking");
+			throw new ParkingSystemException("Cannot process payment for another user's booking",
+					ErrorType.AUTHORIZATION);
 		}
 
 		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
-			throw new IllegalStateException("Can only process final payment for checked in bookings");
+			throw new ParkingSystemException("Can only process final payment for checked in bookings",
+					ErrorType.BUSINESS_LOGIC);
 		}
 
 		double finalAmount = booking.deductedPrice();
@@ -77,20 +82,20 @@ public class PaymentService {
 			bookingService.completeBooking(booking, payment);
 			return payment;
 		} else {
-			throw new IllegalStateException("Payment processing failed");
+			throw new ParkingSystemException("Payment processing failed", ErrorType.BUSINESS_LOGIC);
 		}
 	}
 
 	public Payment getPaymentById(UUID paymentID) {
 		if (paymentID == null) {
-			throw new IllegalArgumentException("Payment ID cannot be null");
+			throw new ParkingSystemException("Payment ID cannot be null", ErrorType.VALIDATION);
 		}
 		return paymentModel.getPaymentByID(paymentID);
 	}
 
 	public List<Payment> getPaymentsForBooking(Booking booking) {
 		if (booking == null) {
-			throw new IllegalArgumentException("Booking cannot be null");
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
 		return paymentModel.getPaymentsForBooking(booking);
 	}

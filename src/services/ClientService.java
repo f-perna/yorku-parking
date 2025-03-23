@@ -1,5 +1,7 @@
 package services;
 
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.auth.AuthenticationState;
 import models.client.Client;
 import models.client.GenerateClientFactory;
@@ -19,16 +21,16 @@ public class ClientService {
 	public boolean registerClient(String name, String email, String password, Client.type clientType,
 			String licensePlate) {
 		if (name == null || name.trim().isEmpty()) {
-			throw new IllegalArgumentException("Name cannot be empty");
+			throw new ParkingSystemException("Name cannot be empty", ErrorType.VALIDATION);
 		}
 		if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-			throw new IllegalArgumentException("Invalid email format");
+			throw new ParkingSystemException("Invalid email format", ErrorType.VALIDATION);
 		}
 		if (password == null || password.length() < 6) {
-			throw new IllegalArgumentException("Password must be at least 6 characters");
+			throw new ParkingSystemException("Password must be at least 6 characters", ErrorType.VALIDATION);
 		}
 		if (licensePlate == null || !licensePlate.matches("^[A-Z0-9]{2,8}$")) {
-			throw new IllegalArgumentException("Invalid license plate format");
+			throw new ParkingSystemException("Invalid license plate format", ErrorType.VALIDATION);
 		}
 
 		if (clientModel.getClientByEmail(email) != null) {
@@ -65,7 +67,7 @@ public class ClientService {
 
 	public Client getClientByEmail(String email) {
 		if (email == null) {
-			throw new IllegalArgumentException("Email cannot be null");
+			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
 		}
 
 		return clientModel.getClientByEmail(email.toLowerCase().trim());
@@ -73,11 +75,11 @@ public class ClientService {
 
 	public boolean approveClient(String email, boolean approved) {
 		if (email == null) {
-			throw new IllegalArgumentException("Email cannot be null");
+			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
 		}
 
 		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
-			throw new IllegalStateException("Only managers can approve clients");
+			throw new ParkingSystemException("Only managers can approve clients", ErrorType.AUTHORIZATION);
 		}
 
 		Client client = clientModel.getClientByEmail(email.toLowerCase().trim());

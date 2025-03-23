@@ -67,15 +67,6 @@ public class ManagerRepository implements Serializable {
 	}
 
 	public void saveManagers() {
-		try {
-			File file = new File(DATA_FILE);
-			file.getParentFile().mkdirs();
-
-			try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
-				oos.writeObject(managers);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ManagerCSVProcessor.setManagerData(managers);
 	}
 }

@@ -16,6 +16,14 @@ public class SuperManagerController {
 		return superManagerService.addManager(email, password);
 	}
 
+	public boolean generateManagerAccount() {
+		return superManagerService.generateManagerAccount();
+	}
+
+	public Manager generateAndGetManagerAccount() {
+		return superManagerService.generateAndGetManagerAccount();
+	}
+
 	public boolean removeManager(String email) {
 		return superManagerService.removeManager(email);
 	}
