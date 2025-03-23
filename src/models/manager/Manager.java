@@ -3,10 +3,9 @@ package models.manager;
 import java.io.Serializable;
 import models.user.User;
 
-public class Manager implements User, Serializable {
-	private static final long serialVersionUID = 1L;
-	protected String email;
-	protected String password;
+public class Manager implements User {
+	private String email;
+	private String password;
 
 	public Manager(String email, String password) {
 		this.email = email;

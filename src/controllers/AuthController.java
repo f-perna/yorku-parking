@@ -5,18 +5,23 @@ import models.ParkingSystemException.ErrorType;
 import models.auth.AuthenticationState;
 import models.client.Client;
 import models.manager.Manager;
+import models.manager.SuperManager;
 import models.user.User;
 import services.ClientService;
 import services.ManagerService;
+import services.SuperManagerService;
 
 public class AuthController {
 	private ClientService clientService;
 	private ManagerService managerService;
+	private SuperManagerService superManagerService;
 	private AuthenticationState authState;
 
-	public AuthController(ClientService clientService, ManagerService managerService) {
+	public AuthController(ClientService clientService, ManagerService managerService,
+			SuperManagerService superManagerService) {
 		this.clientService = clientService;
 		this.managerService = managerService;
+		this.superManagerService = superManagerService;
 		this.authState = AuthenticationState.getInstance();
 	}
 
@@ -34,9 +39,9 @@ public class AuthController {
 			case "manager":
 				success = managerService.login(email, password);
 				break;
-			// case "superManager":
-			// success = managerService.managerLogin(email, password);
-			// break;
+			case "supermanager":
+				success = superManagerService.login(email, password);
+				break;
 			default:
 				throw new ParkingSystemException("Invalid user type: " + userType, ErrorType.VALIDATION);
 		}
@@ -62,6 +67,10 @@ public class AuthController {
 
 	public Manager getLoggedInManager() {
 		return authState.getLoggedInManager();
+	}
+
+	public SuperManager getLoggedInSuperManager() {
+		return authState.getLoggedInSuperManager();
 	}
 
 	public boolean isLoggedIn() {

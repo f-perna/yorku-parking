@@ -3,6 +3,7 @@ package services;
 import java.util.List;
 import java.util.UUID;
 
+import models.auth.AuthenticationState;
 import models.client.Client;
 import models.parkingLot.ParkingLot;
 import repositories.ParkingLotRepository;
@@ -10,11 +11,13 @@ import repositories.ParkingLotRepository;
 public class ParkingLotService {
 	private ParkingLotRepository parkingLotModel;
 	private ParkingSpaceService parkingSpaceService;
+	private AuthenticationState authState;
 
 	public ParkingLotService(ParkingLotRepository parkingLotModel) {
 		this.parkingLotModel = parkingLotModel;
 		// Will be set in setDependencies to avoid circular dependency
 		this.parkingSpaceService = null;
+		this.authState = AuthenticationState.getInstance();
 	}
 
 	// Used by ServiceFactory to inject dependencies after construction
@@ -47,6 +50,10 @@ public class ParkingLotService {
 	}
 
 	public void addParkingLot(String name) {
+		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+			throw new IllegalStateException("Manager must be logged in to add parking lots");
+		}
+
 		if (name == null || name.trim().isEmpty()) {
 			throw new IllegalArgumentException("Lot name cannot be empty");
 		}
@@ -79,10 +86,16 @@ public class ParkingLotService {
 	}
 
 	public boolean enableParkingLot(ParkingLot parkingLot) {
+		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+			throw new IllegalStateException("Manager must be logged in to enable parking lots");
+		}
 		return parkingLotModel.enableParkingLot(parkingLot);
 	}
 
 	public boolean disableParkingLot(ParkingLot parkingLot) {
+		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+			throw new IllegalStateException("Manager must be logged in to disable parking lots");
+		}
 		return parkingLotModel.disableParkingLot(parkingLot);
 	}
 }

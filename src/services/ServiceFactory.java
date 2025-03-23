@@ -17,6 +17,7 @@ public class ServiceFactory {
 	private ParkingLotService parkingLotService;
 	private ParkingSpaceService parkingSpaceService;
 	private PaymentService paymentService;
+	private SuperManagerService superManagerService;
 
 	private ServiceFactory() {
 		initializeServices();
@@ -35,6 +36,7 @@ public class ServiceFactory {
 		// Create services in the right order to handle dependencies
 		this.clientService = new ClientService(clientRepository);
 		this.managerService = new ManagerService(managerRepository);
+		this.superManagerService = new SuperManagerService(managerRepository);
 		this.parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository);
 		this.parkingLotService = new ParkingLotService(parkingLotRepository);
 
@@ -75,5 +77,9 @@ public class ServiceFactory {
 
 	public PaymentService getPaymentService() {
 		return paymentService;
+	}
+
+	public SuperManagerService getSuperManagerService() {
+		return superManagerService;
 	}
 }

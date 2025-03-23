@@ -2,18 +2,14 @@ package controllers;
 
 import java.util.List;
 import java.util.UUID;
-import models.auth.AuthenticationState;
-import models.client.Client;
 import models.parkingLot.ParkingLot;
 import services.ParkingLotService;
 
 public class ParkingLotController {
 	private ParkingLotService parkingLotService;
-	private AuthenticationState authState;
 
 	public ParkingLotController(ParkingLotService parkingLotService) {
 		this.parkingLotService = parkingLotService;
-		this.authState = AuthenticationState.getInstance();
 	}
 
 	public List<ParkingLot> getAllParkingLots() {
@@ -21,16 +17,10 @@ public class ParkingLotController {
 	}
 
 	public void addParkingLot(String name) {
-		Client client = authState.getLoggedInClient();
-		if (client == null) {
-			throw new IllegalStateException("User must be logged in to add parking lots");
-		}
-
-		parkingLotService.addParkingLot(name, client);
+		parkingLotService.addParkingLot(name);
 	}
 
 	public ParkingLot getParkingLotById(UUID lotId) {
 		return parkingLotService.getParkingLotById(lotId);
 	}
-
 }

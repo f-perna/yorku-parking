@@ -19,12 +19,12 @@ public class ManagerService {
 		email = email.toLowerCase().trim();
 
 		Manager manager = managerModel.authenticateManager(email, password);
-		
+
 		if (manager != null) {
 			authState.setLoggedInUser(manager);
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -80,7 +80,7 @@ public class ManagerService {
 	}
 
 	public boolean logout() {
-		if (authState.isManagerLoggedIn() || authState.isSuperManagerLoggedIn()) {
+		if (authState.isManagerLoggedIn()) {
 			authState.setLoggedInUser(null);
 			return true;
 		}

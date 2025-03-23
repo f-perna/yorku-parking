@@ -1,17 +1,15 @@
 package models.manager;
 
-import java.util.UUID;
+import models.user.User;
 
-public class SuperManager {
+public class SuperManager implements User {
 	private static SuperManager instance;
-	private String username;
+	private String email;
 	private String password;
-	private UUID id;
 
-	private SuperManager(String username, String password) {
-		this.username = username;
+	private SuperManager(String email, String password) {
+		this.email = email;
 		this.password = password;
-		this.id = UUID.randomUUID();
 	}
 
 	public static synchronized SuperManager getInstance() {
@@ -21,15 +19,18 @@ public class SuperManager {
 		return instance;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
+	@Override
 	public String getPassword() {
 		return password;
 	}
 
-	public UUID getId() {
-		return id;
+	@Override
+	public String getEmail() {
+		return email;
+	}
+
+	@Override
+	public boolean authenticate(String email, String password) {
+		return this.email.equals(email) && this.password.equals(password);
 	}
 }

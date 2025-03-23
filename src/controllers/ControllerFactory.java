@@ -7,6 +7,7 @@ import services.ParkingLotService;
 import services.ParkingSpaceService;
 import services.PaymentService;
 import services.ServiceFactory;
+import services.SuperManagerService;
 
 public class ControllerFactory {
 
@@ -19,6 +20,7 @@ public class ControllerFactory {
 	private PaymentController paymentController;
 	private ManagerController managerController;
 	private AuthController authController;
+	private SuperManagerController superManagerController;
 
 	private ControllerFactory() {
 		initializeControllers();
@@ -34,6 +36,7 @@ public class ControllerFactory {
 		ParkingLotService parkingLotService = serviceFactory.getParkingLotService();
 		ParkingSpaceService parkingSpaceService = serviceFactory.getParkingSpaceService();
 		PaymentService paymentService = serviceFactory.getPaymentService();
+		SuperManagerService superManagerService = serviceFactory.getSuperManagerService();
 
 		// Create controllers with their required dependencies
 		this.bookingController = new BookingController(bookingService);
@@ -44,7 +47,8 @@ public class ControllerFactory {
 
 		// Create controllers that depend on multiple services
 		this.managerController = new ManagerController(managerService, parkingLotService, parkingSpaceService);
-		this.authController = new AuthController(clientService, managerService);
+		this.authController = new AuthController(clientService, managerService, superManagerService);
+		this.superManagerController = new SuperManagerController(superManagerService);
 	}
 
 	public static synchronized ControllerFactory getInstance() {
@@ -80,5 +84,9 @@ public class ControllerFactory {
 
 	public AuthController getAuthController() {
 		return authController;
+	}
+
+	public SuperManagerController getSuperManagerController() {
+		return superManagerController;
 	}
 }
