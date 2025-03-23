@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
+import models.auth.AuthenticationState;
 import models.client.Client;
 import models.manager.Manager;
 import models.parkingLot.ParkingLot;
@@ -14,9 +15,11 @@ import repositories.ParkingSpaceRepository;
 
 public class ParkingSpaceService {
 	private ParkingSpaceRepository parkingSpaceModel;
+	private AuthenticationState authState;
 
 	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceModel) {
 		this.parkingSpaceModel = parkingSpaceModel;
+		this.authState = AuthenticationState.getInstance();
 	}
 
 	public ParkingSpaceRepository getParkingSpaceModel() {
@@ -79,42 +82,35 @@ public class ParkingSpaceService {
 		return updatedSpace;
 	}
 
-	// public void enableParkingSpace(ParkingSpace parkingSpace) {
-	// if (parkingSpace.getStatus() == ParkingSpaceStatus.DISABLED) {
-	// parkingSpaceModel.updateParkingSpaceStatus(parkingSpace.getID(),
-	// ParkingSpaceStatus.AVAILABLE);
-	// }
-	// }
-	//
-	// public void disableParkingSpace(ParkingSpace parkingSpace) {
-	// if (parkingSpace.getStatus() == ParkingSpaceStatus.AVAILABLE) {
-	// parkingSpaceModel.updateParkingSpaceStatus(parkingSpace,
-	// ParkingSpaceStatus.DISABLED);
-	// } else {
-	// throw new ParkingSystemException("Cannot disable a space that is currently "
-	// +
-	// parkingSpace.getStatus(), ErrorType.BUSINESS_LOGIC);
-	// }
-	// }
+	public ParkingSpace enableParkingSpace(ParkingSpace parkingSpace) {
+		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+			throw new ParkingSystemException("Only managers can enable parking spaces", ErrorType.AUTHORIZATION);
+		}
 
-	// public ParkingSpace enableParkingSpace(ParkingSpace parkingSpace) {
-	// if (parkingSpace.getStatus() == ParkingSpaceStatus.DISABLED) {
-	// return parkingSpaceModel.updateParkingSpaceStatus(parkingSpace,
-	// ParkingSpaceStatus.AVAILABLE);
-	// }
-	// return parkingSpace;
-	// }
-	//
-	// public ParkingSpace disableParkingSpace(ParkingSpace parkingSpace) {
-	// if (parkingSpace.getStatus() == ParkingSpaceStatus.AVAILABLE) {
-	// return parkingSpaceModel.updateParkingSpaceStatus(parkingSpace,
-	// ParkingSpaceStatus.DISABLED);
-	// } else {
-	// throw new ParkingSystemException("Cannot disable a space that is currently "
-	// +
-	// parkingSpace.getStatus(), ErrorType.BUSINESS_LOGIC);
-	// }
-	// }
+		if (parkingSpace == null) {
+			throw new ParkingSystemException("Parking space cannot be null", ErrorType.VALIDATION);
+		}
+		if (parkingSpace.getStatus() == ParkingSpaceStatus.DISABLED) {
+			return parkingSpaceModel.updateParkingSpaceStatus(parkingSpace, ParkingSpaceStatus.AVAILABLE);
+		}
+		return parkingSpace;
+	}
+
+	public ParkingSpace disableParkingSpace(ParkingSpace parkingSpace) {
+		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+			throw new ParkingSystemException("Only managers can disable parking spaces", ErrorType.AUTHORIZATION);
+		}
+
+		if (parkingSpace == null) {
+			throw new ParkingSystemException("Parking space cannot be null", ErrorType.VALIDATION);
+		}
+		if (parkingSpace.getStatus() == ParkingSpaceStatus.AVAILABLE) {
+			return parkingSpaceModel.updateParkingSpaceStatus(parkingSpace, ParkingSpaceStatus.DISABLED);
+		} else {
+			throw new ParkingSystemException("Cannot disable a space that is currently " +
+					parkingSpace.getStatus(), ErrorType.BUSINESS_LOGIC);
+		}
+	}
 
 	public ParkingSpace getParkingSpaceById(UUID spaceId) {
 		if (spaceId == null) {

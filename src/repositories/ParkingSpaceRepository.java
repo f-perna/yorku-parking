@@ -56,7 +56,7 @@ public class ParkingSpaceRepository {
 	}
 
 	public void addParkingSpace(ParkingLot lot, String name) {
-		ParkingSpace newSpace = new ParkingSpace(UUID.randomUUID(), lot, ParkingSpaceStatus.AVAILABLE, name);
+		ParkingSpace newSpace = new ParkingSpace(lot, name);
 		parkingSpaces.add(newSpace);
 		saveSpaces();
 	}

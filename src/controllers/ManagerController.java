@@ -45,13 +45,11 @@ public class ManagerController {
 		return parkingSpaceService.getSpacesForLot(lotId);
 	}
 
-	// public void enableParkingSpace(ParkingSpace parkingSpace) {
-	// authenticate();
-	// parkingSpaceService.enableParkingSpace(parkingSpace);
-	// }
-	//
-	// public void disableParkingSpaceForMaintenance(ParkingSpace parkingSpace) {
-	// authenticate();
-	// parkingSpaceService.disableParkingSpace(parkingSpace);
-	// }
+	public ParkingSpace enableParkingSpace(ParkingSpace parkingSpace) {
+		return parkingSpaceService.enableParkingSpace(parkingSpace);
+	}
+
+	public ParkingSpace disableParkingSpace(ParkingSpace parkingSpace) {
+		return parkingSpaceService.disableParkingSpace(parkingSpace);
+	}
 }

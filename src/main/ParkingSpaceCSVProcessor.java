@@ -34,7 +34,7 @@ public class ParkingSpaceCSVProcessor extends CSVHelper {
 
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
-				if (data.length != 4) {
+				if (data.length != 5) {
 					continue; // Skip invalid lines silently
 				}
 
@@ -43,10 +43,11 @@ public class ParkingSpaceCSVProcessor extends CSVHelper {
 					UUID lotID = UUID.fromString(data[1]);
 					ParkingSpaceStatus status = ParkingSpaceStatus.valueOf(data[2]);
 					String name = data[3];
+					boolean enabled = Boolean.parseBoolean(data[4]);
 
 					ParkingLot parkingLot = lotMap.get(lotID);
 					if (parkingLot != null) {
-						ParkingSpace space = new ParkingSpace(id, parkingLot, status, name);
+						ParkingSpace space = new ParkingSpace(id, parkingLot, status, name, enabled);
 						spaces.add(space);
 					}
 				} catch (Exception e) {
