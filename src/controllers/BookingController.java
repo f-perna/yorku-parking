@@ -39,6 +39,23 @@ public class BookingController {
 
 		return bookingService.createBooking(parkingSpace, durationHours, client);
 	}
+	
+	public boolean cancel(Booking booking) {
+		if (booking == null) {
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
+		}
+
+		Client client = authState.getLoggedInClient();
+		if (client == null) {
+			throw new ParkingSystemException("User must be logged in to check in", ErrorType.AUTHENTICATION);
+		}
+
+		if (!booking.getClient().equals(client)) {
+			throw new ParkingSystemException("Cannot check in for another user's booking", ErrorType.AUTHORIZATION);
+		}
+
+		return bookingService.cancel(booking);
+	}
 
 	public boolean checkIn(Booking booking) {
 		if (booking == null) {

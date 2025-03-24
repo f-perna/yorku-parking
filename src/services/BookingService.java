@@ -106,6 +106,22 @@ public class BookingService {
 
 		bookingRepository.completeBooking(booking);
 	}
+	
+	public boolean cancel(Booking booking) {
+		LocalDateTime startTime = booking.getStartTime();
+		LocalDateTime now = LocalDateTime.now();
+		
+		ParkingSpace parkingSpace = booking.getParkingSpace();
+		
+		if (now.isBefore(startTime)) {
+			ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(parkingSpace,
+					ParkingSpaceStatus.AVAILABLE);
+			bookingRepository.cancelBooking(booking);
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	public boolean checkIn(Booking booking) {
 		LocalDateTime startTime = booking.getStartTime();

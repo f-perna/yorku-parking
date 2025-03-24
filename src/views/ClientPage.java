@@ -42,7 +42,7 @@ public class ClientPage extends JPanel {
 	private JLabel welcomeMessage;
 	private JLabel bookingLabel, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue, depositLabel,
 			depositValue, statusLabel, statusValue, totalLabel, totalValue, errorLabel, paymentsLabel;
-	private JButton checkinButton, checkoutButton, deleteButton, extendTimeButton;
+	private JButton checkinButton, checkoutButton, deleteButton, extendTimeButton, cancelButton;
 	private JList<Payment> paymentsList;
 	private DefaultListModel<Payment> paymentsListModel;
 
@@ -186,10 +186,12 @@ public class ClientPage extends JPanel {
 		paymentsScrollPane.setVisible(false);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+		cancelButton = new JButton("Cancel");
 		checkinButton = new JButton("Check-In");
 		checkoutButton = new JButton("Check-Out");
 		extendTimeButton = new JButton("Extend Time");
 
+		buttonPanel.add(cancelButton);
 		buttonPanel.add(checkinButton);
 		buttonPanel.add(checkoutButton);
 		buttonPanel.add(extendTimeButton);
@@ -200,13 +202,13 @@ public class ClientPage extends JPanel {
 		gbc.insets = new Insets(15, 10, 15, 10);
 		add(buttonPanel, gbc);
 
+		cancelButton.setVisible(false);
 		checkinButton.setVisible(false);
 		checkoutButton.setVisible(false);
-		// deleteButton.setVisible(false);
 		extendTimeButton.setVisible(false);
 
+		cancelButton.addActionListener(e -> handleCancel());
 		checkinButton.addActionListener(e -> handleCheckin());
-		// deleteButton.addActionListener(e -> handleDelete());
 		extendTimeButton.addActionListener(e -> handleExtendTime());
 
 		checkoutButton.addActionListener(e -> handleCheckout());
@@ -218,6 +220,29 @@ public class ClientPage extends JPanel {
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(10, 10, 20, 10);
 		add(errorLabel, gbc);
+	}
+
+	private void handleCancel() {
+		try {
+			Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
+			if (selectedBooking == null) {
+				ErrorDialog.show(this, "Error", "No booking selected");
+				return;
+			}
+
+			boolean cancelSuccessful = bookingController.cancel(selectedBooking);
+
+			if (cancelSuccessful) {
+				SuccessDialog.show(this, "Cancel Successful", "You have successfully canceled!");
+				refresh();
+			} else {
+				ErrorDialog.show(this, "Cancel Failed", "It is too late to cancel.");
+				refresh();
+			}
+		} catch (Exception e) {
+			ErrorDialog.show(this, "Error", "An error occurred during cancellation: " + e.getMessage());
+			refresh();
+		}
 	}
 
 	private void handleCheckin() {
@@ -285,6 +310,7 @@ public class ClientPage extends JPanel {
 				extendTimeButton.setVisible(false);
 				paymentsLabel.setVisible(false);
 				paymentsList.setVisible(false);
+				cancelButton.setVisible(false);
 			} else {
 				bookingLabel.setVisible(true);
 				bookingsList.setVisible(true);
@@ -330,6 +356,7 @@ public class ClientPage extends JPanel {
 				paymentsLabel.setVisible(false);
 				paymentsList.getParent().getParent().setVisible(false);
 
+				cancelButton.setVisible(false);
 				checkinButton.setVisible(false);
 				checkoutButton.setVisible(false);
 				extendTimeButton.setVisible(false);
@@ -371,19 +398,23 @@ public class ClientPage extends JPanel {
 			paymentsList.getParent().getParent().setVisible(true);
 
 			if (selectedBooking.getStatus() == Booking.BookingStatus.PENDING) {
+				cancelButton.setVisible(false);
 				checkinButton.setVisible(false);
 				checkoutButton.setVisible(false);
 				extendTimeButton.setVisible(false);
 				// show pay deposit button
 			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CONFIRMED) {
+				cancelButton.setVisible(true);
 				checkinButton.setVisible(true);
 				checkoutButton.setVisible(false);
 				extendTimeButton.setVisible(true);
 			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CHECKED_IN) {
+				cancelButton.setVisible(false);
 				checkinButton.setVisible(false);
 				checkoutButton.setVisible(true);
 				extendTimeButton.setVisible(true);
 			} else {
+				cancelButton.setVisible(false);
 				checkinButton.setVisible(false);
 				checkoutButton.setVisible(false);
 				extendTimeButton.setVisible(false);

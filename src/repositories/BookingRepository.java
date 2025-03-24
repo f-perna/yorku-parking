@@ -83,6 +83,14 @@ public class BookingRepository {
 		booking.completeBooking();
 		saveBookings();
 	}
+	
+	public void cancelBooking(Booking booking) {
+		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
+			throw new ParkingSystemException("Only confirmed bookings can be canceled", ErrorType.BUSINESS_LOGIC);
+		}
+		booking.cancelBooking();
+		saveBookings();
+	}
 
 	public void checkInBooking(Booking booking) {
 		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {

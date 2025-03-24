@@ -30,8 +30,7 @@ public class Booking {
 		this.client = client;
 		this.parkingSpace = parkingSpace;
 		this.status = BookingStatus.PENDING;
-		this.startTime = LocalDateTime.now(); // booking will start 30 minutes from the time it was
-												// placed.
+		this.startTime = LocalDateTime.now().plusMinutes(30); // booking will start 30 minutes from the time it was placed.
 		this.endTime = this.startTime.plusHours(durationAmount);
 		this.deposit = this.client.getRate();
 	}
