@@ -52,6 +52,7 @@ public class ParkingSpaceCSVProcessor extends CSVHelper {
 					}
 				} catch (Exception e) {
 					// Skip invalid entries silently
+					System.out.println("Error parsing space data: " + e.getMessage());
 					continue;
 				}
 			}
@@ -64,12 +65,16 @@ public class ParkingSpaceCSVProcessor extends CSVHelper {
 	public static void setSpaceData(List<ParkingSpace> spaces) {
 		try (BufferedWriter bw = getFileWriter(SPACES_CSV)) {
 			// Write header
-			bw.write("id,lotID,status,name");
+			bw.write("id,lotID,status,name,enabled");
 			bw.newLine();
 
 			for (ParkingSpace space : spaces) {
-				String line = String.join(CSV_DELIMITER, space.getID().toString(), space.getLot().getID().toString(),
-						space.getStatus().toString(), space.getName());
+				String line = String.join(CSV_DELIMITER,
+						space.getID().toString(),
+						space.getLot().getID().toString(),
+						space.getStatus().toString(),
+						space.getName(),
+						String.valueOf(space.isEnabled()));
 				bw.write(line);
 				bw.newLine();
 			}

@@ -119,12 +119,10 @@ public class LoginPage extends JPanel {
 
 		managerRadioButton.addActionListener(e -> {
 			titleLabel.setText("Manager Login");
-			emailLabel.setText("Username:");
 		});
 
 		superManagerRadioButton.addActionListener(e -> {
 			titleLabel.setText("Super Manager Login");
-			emailLabel.setText("Username:");
 		});
 
 		// Login button

@@ -14,16 +14,13 @@ import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 import repositories.ParkingSpaceRepository;
 
 public class ParkingSpaceService {
-	private ParkingSpaceRepository parkingSpaceModel;
+	private static final int MAX_SPACES_PER_LOT = 100;
+	private ParkingSpaceRepository parkingSpaceRepository;
 	private AuthenticationState authState;
 
-	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceModel) {
-		this.parkingSpaceModel = parkingSpaceModel;
+	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceRepository) {
+		this.parkingSpaceRepository = parkingSpaceRepository;
 		this.authState = AuthenticationState.getInstance();
-	}
-
-	public ParkingSpaceRepository getParkingSpaceModel() {
-		return this.parkingSpaceModel;
 	}
 
 	public List<ParkingSpace> getAvailableSpaces(ParkingLot lot) {
@@ -31,85 +28,67 @@ public class ParkingSpaceService {
 			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
 		}
 
-		return parkingSpaceModel.getAvailableSpaces(lot);
+		return parkingSpaceRepository.getAvailableSpaces(lot);
 	}
 
 	public void addParkingSpace(ParkingLot lot, String spaceName) {
-		if (lot == null) {
-			throw new ParkingSystemException("Lot cannot be null", ErrorType.VALIDATION);
-		}
-		if (spaceName == null || spaceName.trim().isEmpty()) {
-			throw new ParkingSystemException("Space name cannot be empty", ErrorType.VALIDATION);
-		}
-
-		parkingSpaceModel.addParkingSpace(lot, spaceName.trim());
-	}
-
-	public void addParkingSpace(ParkingLot lot, String spaceName, Manager manager) {
-		if (lot == null) {
-			throw new ParkingSystemException("Lot cannot be null", ErrorType.VALIDATION);
-		}
-		if (spaceName == null || spaceName.trim().isEmpty()) {
-			throw new ParkingSystemException("Space name cannot be empty", ErrorType.VALIDATION);
-		}
-
-		if (manager == null) {
+		if (!authState.isManagerLoggedIn()) {
 			throw new ParkingSystemException("Only managers can add parking spaces", ErrorType.AUTHORIZATION);
 		}
 
-		parkingSpaceModel.addParkingSpace(lot, spaceName.trim());
-	}
-
-	public ParkingSpace setSpaceStatus(UUID spaceId, ParkingSpaceStatus newStatus, Client client) {
-		if (spaceId == null) {
-			throw new ParkingSystemException("Space ID cannot be null", ErrorType.VALIDATION);
+		if (lot == null) {
+			throw new ParkingSystemException("Lot cannot be null", ErrorType.VALIDATION);
 		}
-		if (newStatus == null) {
-			throw new ParkingSystemException("Status cannot be null", ErrorType.VALIDATION);
+		if (spaceName == null || spaceName.trim().isEmpty()) {
+			throw new ParkingSystemException("Space name cannot be empty", ErrorType.VALIDATION);
 		}
 
-		if (client == null || client.getType() != Client.type.FACULTY) {
-			throw new ParkingSystemException("Only faculty members can modify parking space status",
-					ErrorType.AUTHORIZATION);
+		List<ParkingSpace> existingSpaces = parkingSpaceRepository.getSpacesForLot(lot.getID());
+		if (existingSpaces.size() >= MAX_SPACES_PER_LOT) {
+			throw new ParkingSystemException("Parking lot '" + lot.getName() + "' already has the maximum of "
+					+ MAX_SPACES_PER_LOT + " spaces allowed", ErrorType.BUSINESS_LOGIC);
 		}
 
-		ParkingSpace space = parkingSpaceModel.getParkingSpaceById(spaceId);
-		if (space == null) {
-			throw new ParkingSystemException("Parking space not found", ErrorType.DATA_ACCESS);
-		}
-
-		ParkingSpace updatedSpace = parkingSpaceModel.updateParkingSpaceStatus(space, newStatus);
-		return updatedSpace;
+		parkingSpaceRepository.addParkingSpace(lot, spaceName.trim());
 	}
 
 	public ParkingSpace enableParkingSpace(ParkingSpace parkingSpace) {
-		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+		if (!authState.isManagerLoggedIn()) {
 			throw new ParkingSystemException("Only managers can enable parking spaces", ErrorType.AUTHORIZATION);
 		}
 
 		if (parkingSpace == null) {
 			throw new ParkingSystemException("Parking space cannot be null", ErrorType.VALIDATION);
 		}
-		if (parkingSpace.getStatus() == ParkingSpaceStatus.DISABLED) {
-			return parkingSpaceModel.updateParkingSpaceStatus(parkingSpace, ParkingSpaceStatus.AVAILABLE);
+
+		ParkingSpace space = parkingSpaceRepository.getParkingSpaceById(parkingSpace.getID());
+
+		if (space.isEnabled()) {
+			throw new ParkingSystemException("Space is already enabled", ErrorType.BUSINESS_LOGIC);
 		}
-		return parkingSpace;
+
+		space.setEnabled(true);
+		return parkingSpaceRepository.updateParkingSpaceStatus(space, space.getStatus());
 	}
 
 	public ParkingSpace disableParkingSpace(ParkingSpace parkingSpace) {
-		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+		if (!authState.isManagerLoggedIn()) {
 			throw new ParkingSystemException("Only managers can disable parking spaces", ErrorType.AUTHORIZATION);
 		}
 
 		if (parkingSpace == null) {
 			throw new ParkingSystemException("Parking space cannot be null", ErrorType.VALIDATION);
 		}
-		if (parkingSpace.getStatus() == ParkingSpaceStatus.AVAILABLE) {
-			return parkingSpaceModel.updateParkingSpaceStatus(parkingSpace, ParkingSpaceStatus.DISABLED);
-		} else {
-			throw new ParkingSystemException("Cannot disable a space that is currently " +
-					parkingSpace.getStatus(), ErrorType.BUSINESS_LOGIC);
+
+		ParkingSpace space = parkingSpaceRepository.getParkingSpaceById(parkingSpace.getID());
+
+		if (!space.isEnabled()) {
+			throw new ParkingSystemException("Space is already disabled", ErrorType.BUSINESS_LOGIC);
 		}
+
+		space.setEnabled(false);
+
+		return parkingSpaceRepository.updateParkingSpaceStatus(space, space.getStatus());
 	}
 
 	public ParkingSpace getParkingSpaceById(UUID spaceId) {
@@ -117,7 +96,7 @@ public class ParkingSpaceService {
 			throw new ParkingSystemException("Space ID cannot be null", ErrorType.VALIDATION);
 		}
 
-		ParkingSpace space = parkingSpaceModel.getParkingSpaceById(spaceId);
+		ParkingSpace space = parkingSpaceRepository.getParkingSpaceById(spaceId);
 		if (space == null) {
 			throw new ParkingSystemException("Parking space not found", ErrorType.DATA_ACCESS);
 		}
@@ -129,10 +108,10 @@ public class ParkingSpaceService {
 		if (lotId == null) {
 			throw new ParkingSystemException("Lot ID cannot be null", ErrorType.VALIDATION);
 		}
-		return parkingSpaceModel.getSpacesForLot(lotId);
+		return parkingSpaceRepository.getSpacesForLot(lotId);
 	}
 
 	public List<ParkingSpace> getAllSpaces() {
-		return parkingSpaceModel.getAllSpaces();
+		return parkingSpaceRepository.getAllSpaces();
 	}
 }

@@ -39,18 +39,6 @@ public class ParkingLotService {
 		return parkingLotModel.getAllParkingLots();
 	}
 
-	public void addParkingLot(String name, Client client) {
-		if (name == null || name.trim().isEmpty()) {
-			throw new ParkingSystemException("Lot name cannot be empty", ErrorType.VALIDATION);
-		}
-
-		if (client == null || client.getType() != Client.type.FACULTY) {
-			throw new ParkingSystemException("Only faculty members can add parking lots", ErrorType.AUTHORIZATION);
-		}
-
-		parkingLotModel.addParkingLot(name.trim());
-	}
-
 	public void addParkingLot(String name) {
 		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
 			throw new ParkingSystemException("Manager must be logged in to add parking lots", ErrorType.AUTHORIZATION);

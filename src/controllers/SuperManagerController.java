@@ -12,14 +12,6 @@ public class SuperManagerController {
 		this.superManagerService = superManagerService;
 	}
 
-	public boolean addManager(String email, String password) {
-		return superManagerService.addManager(email, password);
-	}
-
-	public boolean generateManagerAccount() {
-		return superManagerService.generateManagerAccount();
-	}
-
 	public Manager generateAndGetManagerAccount() {
 		return superManagerService.generateAndGetManagerAccount();
 	}
@@ -32,7 +24,4 @@ public class SuperManagerController {
 		return superManagerService.getAllManagers();
 	}
 
-	public Manager getManagerByEmail(String email) {
-		return superManagerService.getManagerByEmail(email);
-	}
 }

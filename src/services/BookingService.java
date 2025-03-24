@@ -37,8 +37,8 @@ public class BookingService {
 			throw new ParkingSystemException("Client must be approved to make a booking", ErrorType.AUTHORIZATION);
 		}
 
-		if (parkingSpace.getStatus() != ParkingSpaceStatus.AVAILABLE) {
-			throw new ParkingSystemException("Parking space is not available", ErrorType.BUSINESS_LOGIC);
+		if (!parkingSpace.isBookable()) {
+			throw new ParkingSystemException("Parking space is not available for booking", ErrorType.BUSINESS_LOGIC);
 		}
 
 		return bookingRepository.createBooking(parkingSpace, durationHours, client);
@@ -93,7 +93,12 @@ public class BookingService {
 			throw new ParkingSystemException("Payment must be successfully made.", ErrorType.BUSINESS_LOGIC);
 		}
 
-		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
+		// Get current parking space and update its status to AVAILABLE
+		ParkingSpace parkingSpace = booking.getParkingSpace();
+		parkingSpace.checkOut();
+
+		// Update the space in the repository
+		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(parkingSpace,
 				ParkingSpaceStatus.AVAILABLE);
 
 		// Update the booking with the updated space
@@ -118,7 +123,6 @@ public class BookingService {
 				booking.setParkingSpace(updatedSpace);
 				return true;
 			} catch (Exception e) {
-				System.out.println("Error confirming booking: " + e.getMessage());
 				return false;
 			}
 		} else if (now.isBefore(earliestCheckIn)) {
@@ -166,16 +170,14 @@ public class BookingService {
 		}
 
 		if (booking.getStatus() != Booking.BookingStatus.PENDING
-				&& booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new ParkingSystemException("Only pending or confirmed bookings can be extended",
+				&& booking.getStatus() != Booking.BookingStatus.CONFIRMED
+				&& booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
+			throw new ParkingSystemException("Only pending, confirmed and checked-in bookings can be extended",
 					ErrorType.BUSINESS_LOGIC);
 		}
 
 		try {
 			booking.extendDuration(additionalHours);
-
-			System.out.println(
-					"BookingService: Extended booking " + booking.getBookingID() + " by " + additionalHours + " hours");
 			return booking;
 		} catch (Exception e) {
 			System.err.println("Error extending booking time: " + e.getMessage());

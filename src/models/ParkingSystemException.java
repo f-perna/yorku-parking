@@ -23,7 +23,7 @@ public class ParkingSystemException extends RuntimeException {
         this.errorType = ErrorType.SYSTEM_ERROR;
     }
 
-    public ParkingSystemException(String message, ErrorType errorType) {
+	public ParkingSystemException(String message, ErrorType errorType) {
         super(message);
         this.errorType = errorType;
     }

@@ -78,7 +78,7 @@ public class ClientService {
 			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
 		}
 
-		if (!authState.isManagerLoggedIn() && !authState.isSuperManagerLoggedIn()) {
+		if (!authState.isManagerLoggedIn()) {
 			throw new ParkingSystemException("Only managers can approve clients", ErrorType.AUTHORIZATION);
 		}
 

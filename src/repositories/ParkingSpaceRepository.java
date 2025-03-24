@@ -41,9 +41,6 @@ public class ParkingSpaceRepository {
 	}
 
 	public ParkingSpace updateParkingSpaceStatus(ParkingSpace space, ParkingSpaceStatus newStatus) {
-		System.out.println("ParkingSpaceModel: Updating space " + space.getID() + " status from " + space.getStatus()
-				+ " to " + newStatus);
-
 		ParkingSpace storedSpace = getParkingSpaceByID(space.getID());
 		if (storedSpace == null) {
 			throw new IllegalArgumentException("Parking space with ID " + space.getID() + " does not exist.");

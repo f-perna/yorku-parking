@@ -46,7 +46,8 @@ public class ControllerFactory {
 		this.paymentController = new PaymentController(paymentService);
 
 		// Create controllers that depend on multiple services
-		this.managerController = new ManagerController(managerService, parkingLotService, parkingSpaceService);
+		this.managerController = new ManagerController(managerService, parkingLotService, parkingSpaceService,
+				clientService);
 		this.authController = new AuthController(clientService, managerService, superManagerService);
 		this.superManagerController = new SuperManagerController(superManagerService);
 	}

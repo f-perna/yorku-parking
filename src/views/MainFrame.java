@@ -40,6 +40,7 @@ public class MainFrame extends JFrame {
         NavigationController.addPage("Checkout", new CheckoutPage(this));
 
         NavigationController.addPage("ManagerDashboard", new ManagerDashboard(this));
+        NavigationController.addPage("ParkingManagement", new ParkingManagementPage(this));
         NavigationController.addPage("SuperManager", new SuperManagerPage(this));
 
         getContentPane().setLayout(new BorderLayout());

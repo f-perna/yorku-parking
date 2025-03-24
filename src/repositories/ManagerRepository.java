@@ -1,24 +1,25 @@
 package repositories;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import main.ManagerCSVProcessor;
 import models.manager.Manager;
 
-public class ManagerRepository implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class ManagerRepository {
 	private List<Manager> managers;
-	private static final String DATA_FILE = "data/managers.dat";
 
 	public ManagerRepository() {
 		this.managers = new ArrayList<>();
 		loadFromDatabase();
+	}
+
+	private void loadFromDatabase() {
+		managers = ManagerCSVProcessor.readManagerData();
+	}
+
+	private void saveManagers() {
+		ManagerCSVProcessor.setManagerData(managers);
 	}
 
 	public List<Manager> getAllManagers() {
@@ -30,7 +31,13 @@ public class ManagerRepository implements Serializable {
 			return null;
 		}
 
-		return managers.stream().filter(manager -> email.equals(manager.getEmail())).findFirst().orElse(null);
+		for (Manager manager : managers) {
+			if (email.equals(manager.getEmail())) {
+				return manager;
+			}
+		}
+
+		return null;
 	}
 
 	public boolean addManager(Manager manager) {
@@ -60,13 +67,5 @@ public class ManagerRepository implements Serializable {
 			return manager;
 		}
 		return null;
-	}
-
-	private void loadFromDatabase() {
-		managers = ManagerCSVProcessor.readManagerData();
-	}
-
-	public void saveManagers() {
-		ManagerCSVProcessor.setManagerData(managers);
 	}
 }

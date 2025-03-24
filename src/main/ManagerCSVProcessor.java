@@ -14,7 +14,7 @@ import models.manager.Manager;
  * CSV processor for client operations
  */
 public class ManagerCSVProcessor extends CSVHelper {
-	private static final String MANAGERS_CSV = DATA_DIRECTORY + "manager.csv";
+	private static final String MANAGERS_CSV = DATA_DIRECTORY + "managers.csv";
 
 	public static List<Manager> readManagerData() {
 		List<Manager> managers = new ArrayList<>();
