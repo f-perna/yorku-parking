@@ -203,7 +203,16 @@ public class BookingService {
 					ErrorType.BUSINESS_LOGIC);
 		}
 
+		ParkingSpace parkingSpace = booking.getParkingSpace();
+
 		bookingRepository.cancelBooking(booking);
+
+		if (parkingSpace.getStatus() == ParkingSpaceStatus.BOOKED) {
+			ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(parkingSpace,
+					ParkingSpaceStatus.AVAILABLE);
+
+			booking.setParkingSpace(updatedSpace);
+		}
 	}
 
 	public boolean hasOverstayedBookings(Client client) {

@@ -104,4 +104,32 @@ public class PaymentRepository {
 		}
 		return bookingPayments;
 	}
+
+	public Payment createRefundPayment(Booking booking, String paymentMethod) {
+		if (booking == null) {
+			throw new models.ParkingSystemException("Booking cannot be null",
+					models.ParkingSystemException.ErrorType.VALIDATION);
+		}
+
+		// Validate booking ID to ensure it's properly set
+		if (booking.getBookingID() == null) {
+			throw new models.ParkingSystemException("Booking ID cannot be null",
+					models.ParkingSystemException.ErrorType.VALIDATION);
+		}
+
+		// Create a refund payment with the deposit amount (negative amount signifies
+		// refund)
+		Payment refundPayment = new Payment(-booking.getDeposit(), booking, Payment.generateMethod(paymentMethod),
+				PaymentType.REFUND);
+
+		// Verify that the payment has a valid booking before saving
+		if (refundPayment.getBooking() == null) {
+			throw new models.ParkingSystemException("Failed to associate booking with refund payment",
+					models.ParkingSystemException.ErrorType.SYSTEM_ERROR);
+		}
+
+		payments.add(refundPayment);
+		savePayments();
+		return refundPayment;
+	}
 }

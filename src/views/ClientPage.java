@@ -284,8 +284,7 @@ public class ClientPage extends JPanel {
 			parkingSensorController.simulateCarArrival(selectedBooking);
 
 			// Success message with more details
-			String message = "Your car has been detected at the parking space.\n" +
-					"Your booking is now checked in.";
+			String message = "Your car has been detected at the parking space.\n" + "Your booking is now checked in.";
 			JOptionPane.showMessageDialog(this, message, "Parking Successful", JOptionPane.INFORMATION_MESSAGE);
 
 			// Make sure to refresh the UI to show the updated status and buttons
@@ -320,24 +319,20 @@ public class ClientPage extends JPanel {
 			// Show extra warning for overstayed bookings
 			String overstayedWarning = isOverstayed
 					? "\n\nWARNING: Your booking was overstayed. In the future, please remove your car before your booking ends.\n"
-							+
-							"Repeated violations may result in additional fees or restrictions.\n"
+							+ "Repeated violations may result in additional fees or restrictions.\n"
 					: "";
 
 			// Show payment confirmation with amount details
 			String paymentMessage = String.format(
-					"Payment Details:%s\n\n" +
-							"Total parking fee: $%.2f\n" +
-							"Deposit already paid: $%.2f\n" +
-							"Remaining balance: $%.2f\n\n" +
-							"Please select a payment method to complete your booking:",
+					"Payment Details:%s\n\n" + "Total parking fee: $%.2f\n" + "Deposit already paid: $%.2f\n"
+							+ "Remaining balance: $%.2f\n\n"
+							+ "Please select a payment method to complete your booking:",
 					overstayedWarning, totalAmount, depositPaid, finalAmount);
 
 			// Simplify the payment method options
 			String[] paymentMethods = { "Credit", "Debit", "Cash", "Mobile" };
-			String selectedMethod = (String) JOptionPane.showInputDialog(this,
-					paymentMessage,
-					paymentTitle, JOptionPane.QUESTION_MESSAGE, null, paymentMethods, paymentMethods[0]);
+			String selectedMethod = (String) JOptionPane.showInputDialog(this, paymentMessage, paymentTitle,
+					JOptionPane.QUESTION_MESSAGE, null, paymentMethods, paymentMethods[0]);
 
 			if (selectedMethod != null) {
 				try {
@@ -358,13 +353,12 @@ public class ClientPage extends JPanel {
 				}
 			} else {
 				String warningMsg = isOverstayed
-						? "Your car has been removed but the booking is still active and marked as OVERSTAYED.\n" +
-								"You must complete checkout to be able to make new bookings."
-						: "Your car has been removed but the booking is still active.\n" +
-								"Please complete payment to finish your booking.";
+						? "Your car has been removed but the booking is still active and marked as OVERSTAYED.\n"
+								+ "You must complete checkout to be able to make new bookings."
+						: "Your car has been removed but the booking is still active.\n"
+								+ "Please complete payment to finish your booking.";
 
-				JOptionPane.showMessageDialog(this, warningMsg,
-						"Booking Active", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(this, warningMsg, "Booking Active", JOptionPane.WARNING_MESSAGE);
 			}
 
 			// Make sure to refresh the UI to show the updated buttons
@@ -559,8 +553,7 @@ public class ClientPage extends JPanel {
 				completeCheckoutButton.setVisible(!isCarPresent);
 				if (!isCarPresent) {
 					completeCheckoutButton.setForeground(new Color(0, 128, 0)); // Green color
-					completeCheckoutButton.setFont(new Font(completeCheckoutButton.getFont().getName(),
-							Font.BOLD,
+					completeCheckoutButton.setFont(new Font(completeCheckoutButton.getFont().getName(), Font.BOLD,
 							completeCheckoutButton.getFont().getSize()));
 				}
 			} else if (status == Booking.BookingStatus.OVERSTAYED) {
@@ -571,8 +564,7 @@ public class ClientPage extends JPanel {
 
 				if (!isCarPresent) {
 					completeCheckoutButton.setForeground(new Color(0, 128, 0)); // Green color
-					completeCheckoutButton.setFont(new Font(completeCheckoutButton.getFont().getName(),
-							Font.BOLD,
+					completeCheckoutButton.setFont(new Font(completeCheckoutButton.getFont().getName(), Font.BOLD,
 							completeCheckoutButton.getFont().getSize()));
 				}
 
@@ -584,11 +576,10 @@ public class ClientPage extends JPanel {
 				// Show warning if this is the first time we're showing it
 				if (!warningShown && isCarPresent) {
 					JOptionPane.showMessageDialog(this,
-							"WARNING: Your booking has expired but your car is still in the parking space.\n" +
-									"You must remove your car and complete checkout to avoid additional fees.\n" +
-									"You cannot make new bookings until this is resolved.",
-							"Booking Overstayed",
-							JOptionPane.WARNING_MESSAGE);
+							"WARNING: Your booking has expired but your car is still in the parking space.\n"
+									+ "You must remove your car and complete checkout to avoid additional fees.\n"
+									+ "You cannot make new bookings until this is resolved.",
+							"Booking Overstayed", JOptionPane.WARNING_MESSAGE);
 					warningShown = true;
 				}
 			} else if (status == Booking.BookingStatus.EXPIRED) {
@@ -598,8 +589,7 @@ public class ClientPage extends JPanel {
 				completeCheckoutButton.setVisible(true); // Always show checkout for expired bookings
 
 				completeCheckoutButton.setForeground(new Color(0, 128, 0)); // Green color
-				completeCheckoutButton.setFont(new Font(completeCheckoutButton.getFont().getName(),
-						Font.BOLD,
+				completeCheckoutButton.setFont(new Font(completeCheckoutButton.getFont().getName(), Font.BOLD,
 						completeCheckoutButton.getFont().getSize()));
 
 				// Set status text to notification color
@@ -610,10 +600,9 @@ public class ClientPage extends JPanel {
 				// Show notification if this is the first time we're showing it
 				if (!warningShown) {
 					JOptionPane.showMessageDialog(this,
-							"Your booking has expired and your car has been detected as removed.\n" +
-									"Please complete checkout by clicking the 'Complete Checkout' button to finalize payment.",
-							"Booking Expired",
-							JOptionPane.INFORMATION_MESSAGE);
+							"Your booking has expired and your car has been detected as removed.\n"
+									+ "Please complete checkout by clicking the 'Complete Checkout' button to finalize payment.",
+							"Booking Expired", JOptionPane.INFORMATION_MESSAGE);
 					warningShown = true;
 				}
 			} else {
@@ -626,14 +615,13 @@ public class ClientPage extends JPanel {
 			// Allow extending time for PENDING, CONFIRMED, or CHECKED_IN bookings (not
 			// OVERSTAYED or EXPIRED)
 			extendTimeButton.setVisible(status == Booking.BookingStatus.PENDING
-					|| status == Booking.BookingStatus.CONFIRMED
-					|| status == Booking.BookingStatus.CHECKED_IN);
+					|| status == Booking.BookingStatus.CONFIRMED || status == Booking.BookingStatus.CHECKED_IN);
 
 			// Allow canceling only PENDING or CONFIRMED bookings and only before the start
 			// time
-			deleteButton.setVisible((status == Booking.BookingStatus.PENDING
-					|| status == Booking.BookingStatus.CONFIRMED)
-					&& !LocalDateTime.now().isAfter(selectedBooking.getStartTime()));
+			deleteButton
+					.setVisible((status == Booking.BookingStatus.PENDING || status == Booking.BookingStatus.CONFIRMED)
+							&& !LocalDateTime.now().isAfter(selectedBooking.getStartTime()));
 		} catch (Exception e) {
 			ErrorDialog.show(this, "Error", "Could not refresh booking information: " + e.getMessage());
 		}
@@ -653,17 +641,43 @@ public class ClientPage extends JPanel {
 			return;
 		}
 
-		int confirm = JOptionPane.showConfirmDialog(this,
-				"Are you sure you want to cancel this booking?",
-				"Confirm Cancellation",
-				JOptionPane.YES_NO_OPTION);
+		int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to cancel this booking?",
+				"Confirm Cancellation", JOptionPane.YES_NO_OPTION);
 
 		if (confirm == JOptionPane.YES_OPTION) {
 			try {
-				bookingController.cancelBooking(selectedBooking);
-				JOptionPane.showMessageDialog(this, "Booking cancelled successfully", "Success",
-						JOptionPane.INFORMATION_MESSAGE);
-				refresh();
+				double depositAmount = selectedBooking.getDeposit();
+				String message = String
+						.format("To cancel your booking, you must select a refund method for your deposit of $%.2f.\n\n"
+								+ "Please select your preferred refund method:", depositAmount);
+
+				String[] refundMethods = { "Credit", "Debit", "Cash", "Mobile" };
+				String selectedMethod = (String) JOptionPane.showInputDialog(this, message, "Deposit Refund Required",
+						JOptionPane.INFORMATION_MESSAGE, null, refundMethods, refundMethods[0]);
+
+				if (selectedMethod != null) {
+					bookingController.cancelBooking(selectedBooking);
+
+					try {
+						paymentController.processRefundPayment(selectedBooking, selectedMethod);
+
+						JOptionPane.showMessageDialog(this, String.format(
+								"Your booking has been cancelled and your deposit of $%.2f has been refunded via %s.",
+								depositAmount, selectedMethod), "Cancellation Complete",
+								JOptionPane.INFORMATION_MESSAGE);
+
+						refresh();
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(this,
+								"Error processing refund: " + ex.getMessage() + "\n"
+										+ "Please contact customer support for assistance with your refund.",
+								"Refund Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"Booking cancellation was cancelled. Your booking remains active.", "Cancellation Aborted",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
 			} catch (ParkingSystemException ex) {
 				JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
@@ -682,8 +696,7 @@ public class ClientPage extends JPanel {
 		if (status != Booking.BookingStatus.CHECKED_IN && status != Booking.BookingStatus.OVERSTAYED
 				&& status != Booking.BookingStatus.EXPIRED) {
 			JOptionPane.showMessageDialog(this,
-					"Checkout can only be completed for checked-in, expired, or overstayed bookings",
-					"Invalid Status",
+					"Checkout can only be completed for checked-in, expired, or overstayed bookings", "Invalid Status",
 					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -695,8 +708,7 @@ public class ClientPage extends JPanel {
 			if (isCarPresent) {
 				JOptionPane.showMessageDialog(this,
 						"You must remove your car from the parking space before completing checkout",
-						"Car Still Present",
-						JOptionPane.WARNING_MESSAGE);
+						"Car Still Present", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 		}
@@ -715,26 +727,21 @@ public class ClientPage extends JPanel {
 		String statusWarning = "";
 		if (isOverstayed) {
 			statusWarning = "\n\nWARNING: Your booking was overstayed. In the future, please remove your car before your booking ends.\n"
-					+
-					"Repeated violations may result in additional fees or restrictions.\n";
+					+ "Repeated violations may result in additional fees or restrictions.\n";
 		} else if (isExpired) {
 			statusWarning = "\n\nYour booking has expired. Thank you for removing your car promptly.\n";
 		}
 
 		// Show payment confirmation with amount details
 		String paymentMessage = String.format(
-				"Payment Details:%s\n\n" +
-						"Total parking fee: $%.2f\n" +
-						"Deposit already paid: $%.2f\n" +
-						"Remaining balance: $%.2f\n\n" +
-						"Please select a payment method to complete your booking:",
+				"Payment Details:%s\n\n" + "Total parking fee: $%.2f\n" + "Deposit already paid: $%.2f\n"
+						+ "Remaining balance: $%.2f\n\n" + "Please select a payment method to complete your booking:",
 				statusWarning, totalAmount, depositPaid, finalAmount);
 
 		// Simplify the payment method options
 		String[] paymentMethods = { "Credit", "Debit", "Cash", "Mobile" };
-		String selectedMethod = (String) JOptionPane.showInputDialog(this,
-				paymentMessage,
-				paymentTitle, JOptionPane.QUESTION_MESSAGE, null, paymentMethods, paymentMethods[0]);
+		String selectedMethod = (String) JOptionPane.showInputDialog(this, paymentMessage, paymentTitle,
+				JOptionPane.QUESTION_MESSAGE, null, paymentMethods, paymentMethods[0]);
 
 		if (selectedMethod != null) {
 			try {

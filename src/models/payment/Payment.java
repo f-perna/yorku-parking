@@ -19,7 +19,7 @@ public class Payment {
 	}
 
 	public static enum PaymentType {
-		DEPOSIT, FINAL
+		DEPOSIT, FINAL, REFUND
 	}
 
 	public Payment(double amount, Booking booking, PaymentMethod method, PaymentType type) {

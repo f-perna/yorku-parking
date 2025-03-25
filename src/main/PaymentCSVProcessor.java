@@ -59,11 +59,6 @@ public class PaymentCSVProcessor extends CSVHelper {
 					PaymentMethod paymentMethod = Payment.generateMethod(data[4]);
 					PaymentType paymentType = PaymentType.valueOf(data[5]);
 
-					// Validate data
-					if (amount < 0) {
-						throw new ParkingSystemException("Payment amount must be positive", ErrorType.VALIDATION);
-					}
-
 					Booking booking = bookingMap.get(bookingID);
 					if (booking == null) {
 						logError(String.format("Payment %s references non-existent booking %s at line %d", id,

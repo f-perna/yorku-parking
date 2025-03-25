@@ -186,9 +186,6 @@ public class BookingRepository {
 		}
 
 		booking.cancelBooking();
-		if (booking.getParkingSpace().getStatus() == ParkingSpaceStatus.BOOKED) {
-			booking.getParkingSpace().setStatus(ParkingSpaceStatus.AVAILABLE);
-		}
 		saveBookings();
 	}
 
