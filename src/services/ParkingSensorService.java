@@ -129,7 +129,39 @@ public class ParkingSensorService implements ParkingSensorListener {
 		}
 	}
 
+	/**
+	 * Checks for early arrivals that should now be checked in because their booking
+	 * period has started
+	 */
+	public void checkForEarlyArrivalsToCheckIn() {
+		LocalDateTime now = LocalDateTime.now();
+
+		for (Booking booking : bookingRepository.getConfirmedBookings()) {
+			// If booking start time has passed and we're not yet past 1 hour into the
+			// booking
+			if (booking.getStartTime().isBefore(now) && booking.getStartTime().plusHours(1).isAfter(now)) {
+				ParkingSpace space = booking.getParkingSpace();
+				ParkingSensor sensor = getSensorForSpace(space);
+
+				// If car is present but booking is still in CONFIRMED state (early arrival)
+				if (sensor.isCarPresent() && booking.getStatus() == BookingStatus.CONFIRMED) {
+					String detectedPlate = sensor.getDetectedLicencePlate();
+
+					// Verify this is the right car for this booking
+					if (detectedPlate != null && detectedPlate.equals(booking.getLicencePlate())) {
+						System.out.println("Checking in early arrival for booking: " + booking.getBookingID());
+						bookingRepository.checkInBooking(booking);
+					}
+				}
+			}
+		}
+	}
+
 	public boolean simulateCarArrival(ParkingSpace parkingSpace, String licencePlate) {
+		return simulateCarArrival(parkingSpace, licencePlate, true);
+	}
+
+	public boolean simulateCarArrival(ParkingSpace parkingSpace, String licencePlate, boolean shouldCheckIn) {
 		ParkingSensor sensor = getSensorForSpace(parkingSpace);
 
 		if (sensor.isCarPresent()) {
@@ -140,9 +172,13 @@ public class ParkingSensorService implements ParkingSensorListener {
 		Booking booking = bookingRepository.getActiveBookingForSpace(parkingSpace);
 
 		if (booking != null && booking.getStatus() == BookingStatus.CONFIRMED
-				&& licencePlate.equals(booking.getLicencePlate())) {
+				&& licencePlate.equals(booking.getLicencePlate()) && shouldCheckIn) {
 			System.out.println("Checking in booking: " + booking.getBookingID());
 			bookingRepository.checkInBooking(booking);
+		} else if (booking != null && booking.getStatus() == BookingStatus.CONFIRMED
+				&& licencePlate.equals(booking.getLicencePlate()) && !shouldCheckIn) {
+			System.out.println(
+					"Car detected for booking " + booking.getBookingID() + " but not checking in yet (early arrival)");
 		}
 
 		sensor.detectCar(licencePlate);
@@ -154,5 +190,28 @@ public class ParkingSensorService implements ParkingSensorListener {
 		ParkingSensor sensor = getSensorForSpace(parkingSpace);
 		sensor.removeCar();
 		parkingSensorRepository.updateSensor(sensor);
+	}
+
+	/**
+	 * Checks if a client's car (identified by licence plate) is currently
+	 * parked in any parking space in the system.
+	 * 
+	 * @param licencePlate The licence plate to check for
+	 * @return true if the car is present in any space, false otherwise
+	 */
+	public boolean isClientCarParkedAnywhere(String licencePlate) {
+		if (licencePlate == null || licencePlate.trim().isEmpty()) {
+			return false;
+		}
+
+		// Check all sensors to see if any has detected this licence plate
+		for (ParkingSensor sensor : parkingSensorRepository.getAllSensors()) {
+			if (sensor.isCarPresent() &&
+					licencePlate.equals(sensor.getDetectedLicencePlate())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

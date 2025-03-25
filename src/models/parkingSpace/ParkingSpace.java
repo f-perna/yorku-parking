@@ -59,6 +59,9 @@ public class ParkingSpace {
 	}
 
 	public boolean isBookable() {
+		// Note: This only checks the logical status in the system.
+		// Physical car presence is checked separately in
+		// ParkingSpaceService.getAvailableSpaces()
 		return this.status == ParkingSpaceStatus.AVAILABLE && this.enabled;
 	}
 

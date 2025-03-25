@@ -1,6 +1,7 @@
 package controllers;
 
 import java.util.List;
+import java.util.UUID;
 
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
@@ -38,14 +39,16 @@ public class BookingController {
 	public Booking createBooking(ParkingSpace parkingSpace, int durationHours) {
 		authCheck();
 
-		if (bookingService.hasOverstayedBookings(authState.getLoggedInClient())) {
+		Client client = authState.getLoggedInClient();
+
+		if (bookingService.hasOverstayedBookings(client)) {
 			throw new ParkingSystemException(
 					"You have overstayed bookings that need to be resolved before creating new bookings. "
 							+ "Please return to your parking space, remove your car, and complete checkout.",
 					ErrorType.BUSINESS_LOGIC);
 		}
 
-		return bookingService.createBooking(parkingSpace, durationHours, authState.getLoggedInClient());
+		return bookingService.createBooking(parkingSpace, durationHours, client);
 	}
 
 	public boolean checkIn(Booking booking) {
@@ -89,5 +92,9 @@ public class BookingController {
 		}
 
 		bookingService.cancelBooking(booking, client);
+	}
+
+	public boolean isLatestBookingForSpaceAndClient(Booking booking) {
+		return bookingService.isLatestBookingForSpaceAndClient(booking);
 	}
 }

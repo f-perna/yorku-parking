@@ -22,6 +22,10 @@ public class ParkingSensorController {
 	}
 
 	public void simulateCarArrival(Booking booking) {
+		simulateCarArrival(booking, true);
+	}
+
+	public void simulateCarArrival(Booking booking, boolean shouldCheckIn) {
 		if (booking == null) {
 			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
@@ -43,16 +47,19 @@ public class ParkingSensorController {
 		LocalDateTime startTime = booking.getStartTime();
 		LocalDateTime endTime = booking.getEndTime();
 
-		if (now.isBefore(startTime)) {
-			String formattedTime = startTime.format(TIME_FORMATTER);
-			throw new ParkingSystemException("You cannot park yet. Parking is only allowed from " + formattedTime
-					+ " (your booking start time).", ErrorType.BUSINESS_LOGIC);
-		}
+		// For early arrivals (before booking start), don't check time constraints
+		if (shouldCheckIn) {
+			if (now.isBefore(startTime)) {
+				String formattedTime = startTime.format(TIME_FORMATTER);
+				throw new ParkingSystemException("You cannot park yet. Parking is only allowed from " + formattedTime
+						+ " (your booking start time).", ErrorType.BUSINESS_LOGIC);
+			}
 
-		if (now.isAfter(endTime)) {
-			String formattedEndTime = endTime.format(TIME_FORMATTER);
-			throw new ParkingSystemException("Your booking has expired. It ended at " + formattedEndTime + ".",
-					ErrorType.BUSINESS_LOGIC);
+			if (now.isAfter(endTime)) {
+				String formattedEndTime = endTime.format(TIME_FORMATTER);
+				throw new ParkingSystemException("Your booking has expired. It ended at " + formattedEndTime + ".",
+						ErrorType.BUSINESS_LOGIC);
+			}
 		}
 
 		if (parkingSensorService.isCarPresentAtSpace(parkingSpace)) {
@@ -67,7 +74,7 @@ public class ParkingSensorController {
 					ErrorType.VALIDATION);
 		}
 
-		boolean success = parkingSensorService.simulateCarArrival(parkingSpace, licencePlate);
+		boolean success = parkingSensorService.simulateCarArrival(parkingSpace, licencePlate, shouldCheckIn);
 		if (!success) {
 			throw new ParkingSystemException("Could not park your car. The space appears to be occupied.",
 					ErrorType.BUSINESS_LOGIC);
@@ -120,5 +127,9 @@ public class ParkingSensorController {
 
 	public void checkForNoShows() {
 		parkingSensorService.checkForNoShows();
+	}
+
+	public void checkForEarlyArrivalsToCheckIn() {
+		parkingSensorService.checkForEarlyArrivalsToCheckIn();
 	}
 }

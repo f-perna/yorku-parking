@@ -3,6 +3,7 @@ package services;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
@@ -17,10 +18,13 @@ import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 public class BookingService {
 	private BookingRepository bookingRepository;
 	private ParkingSpaceRepository parkingSpaceRepository;
+	private ParkingSensorService parkingSensorService;
 
-	public BookingService(BookingRepository bookingRepository, ParkingSpaceRepository parkingSpaceRepository) {
+	public BookingService(BookingRepository bookingRepository, ParkingSpaceRepository parkingSpaceRepository,
+			ParkingSensorService parkingSensorService) {
 		this.bookingRepository = bookingRepository;
 		this.parkingSpaceRepository = parkingSpaceRepository;
+		this.parkingSensorService = parkingSensorService;
 	}
 
 	public Booking createBooking(ParkingSpace parkingSpace, int durationHours, Client client) {
@@ -42,6 +46,12 @@ public class BookingService {
 
 		if (!parkingSpace.isBookable()) {
 			throw new ParkingSystemException("Parking space is not available for booking", ErrorType.CONFLICT);
+		}
+
+		if (isClientCarParkedAnywhere(client)) {
+			throw new ParkingSystemException(
+					"Your car is already physically parked in a space. You cannot book another space with the same vehicle.",
+					ErrorType.BUSINESS_LOGIC);
 		}
 
 		return bookingRepository.createBooking(parkingSpace, durationHours, client);
@@ -99,10 +109,8 @@ public class BookingService {
 			throw new ParkingSystemException("Payment must be successfully made.", ErrorType.BUSINESS_LOGIC);
 		}
 
-		// Get current parking space and update its status to AVAILABLE
 		ParkingSpace parkingSpace = booking.getParkingSpace();
 
-		// Set the parking space status back to AVAILABLE
 		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(parkingSpace,
 				ParkingSpaceStatus.AVAILABLE);
 
@@ -220,5 +228,47 @@ public class BookingService {
 			throw new ParkingSystemException("Client cannot be null", ErrorType.VALIDATION);
 		}
 		return bookingRepository.hasOverstayedBookings(client);
+	}
+
+	public boolean isClientCarParkedAnywhere(Client client) {
+		if (client == null) {
+			throw new ParkingSystemException("Client cannot be null", ErrorType.VALIDATION);
+		}
+
+		String licencePlate = client.getLicencePlate();
+		if (licencePlate == null || licencePlate.trim().isEmpty()) {
+			return false;
+		}
+
+		return parkingSensorService.isClientCarParkedAnywhere(licencePlate);
+	}
+
+	public boolean isLatestBookingForSpaceAndClient(Booking booking) {
+		if (booking == null) {
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
+		}
+
+		Client client = booking.getClient();
+		if (client == null) {
+			throw new ParkingSystemException("Booking has no associated client", ErrorType.VALIDATION);
+		}
+
+		// Get all bookings for this client
+		List<Booking> clientBookings = bookingRepository.getBookingsForClient(client);
+
+		// Find all bookings for the same parking space
+		List<Booking> sameSpaceBookings = clientBookings.stream()
+				.filter(b -> b.getParkingSpace().equals(booking.getParkingSpace())).collect(Collectors.toList());
+
+		if (sameSpaceBookings.isEmpty()) {
+			// Should never happen as we should at least have the current booking
+			return true;
+		}
+
+		// Sort by start time descending (latest first)
+		sameSpaceBookings.sort((b1, b2) -> b2.getStartTime().compareTo(b1.getStartTime()));
+
+		// Check if our booking is the first one (latest)
+		return sameSpaceBookings.get(0).getBookingID().equals(booking.getBookingID());
 	}
 }

@@ -48,10 +48,15 @@ public class ServiceFactory {
 		this.superManagerService = new SuperManagerService();
 		this.parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository, parkingSensorRepository);
 		this.parkingLotService = new ParkingLotService(parkingLotRepository);
-		this.bookingService = new BookingService(bookingRepository, parkingSpaceRepository);
-		this.paymentService = new PaymentService(paymentRepository, this.bookingService);
+
+		// Initialize ParkingSensorService before BookingService since BookingService
+		// now depends on it
 		this.parkingSensorService = new ParkingSensorService(bookingRepository, parkingSpaceRepository,
 				parkingSensorRepository);
+
+		// Update BookingService to include ParkingSensorService
+		this.bookingService = new BookingService(bookingRepository, parkingSpaceRepository, parkingSensorService);
+		this.paymentService = new PaymentService(paymentRepository, this.bookingService);
 	}
 
 	public static synchronized ServiceFactory getInstance() {

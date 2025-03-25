@@ -1,5 +1,6 @@
 package services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
+import models.parkingSensor.ParkingSensor;
 import repositories.ParkingSensorRepository;
 import repositories.ParkingSpaceRepository;
 
@@ -38,7 +40,27 @@ public class ParkingSpaceService {
 			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
 		}
 
-		return parkingSpaceRepository.getAvailableSpaces(lot);
+		List<ParkingSpace> availableSpaces = parkingSpaceRepository.getAvailableSpaces(lot);
+
+		// If we have access to the sensor repository, filter out spaces that have cars
+		// in them
+		if (parkingSensorRepository != null) {
+			List<ParkingSpace> trulyAvailableSpaces = new ArrayList<>();
+
+			for (ParkingSpace space : availableSpaces) {
+				// Get the sensor for this space and check if a car is present
+				ParkingSensor sensor = parkingSensorRepository.getSensorBySpaceId(space.getID());
+
+				// If no sensor exists yet or no car is present, the space is truly available
+				if (sensor == null || !sensor.isCarPresent()) {
+					trulyAvailableSpaces.add(space);
+				}
+			}
+
+			return trulyAvailableSpaces;
+		}
+
+		return availableSpaces;
 	}
 
 	public void addParkingSpace(ParkingLot lot, String spaceName) {

@@ -52,6 +52,7 @@ public class BookingStatusSchedulerService {
 					checkForNoShows();
 					checkForExpiredBookings();
 					checkForOverstayedBookings();
+					checkForEarlyArrivalsToCheckIn();
 
 				} catch (Exception e) {
 					System.err.println("Error in booking status scheduler: " + e.getMessage());
@@ -115,6 +116,30 @@ public class BookingStatusSchedulerService {
 			if (!parkingSensorService.isCarPresentAtSpace(space)) {
 				System.out.println("[BookingStatusScheduler] Car has left for overstayed booking "
 						+ booking.getBookingID() + ". User must complete checkout manually.");
+			}
+		}
+	}
+
+	private void checkForEarlyArrivalsToCheckIn() {
+		LocalDateTime now = LocalDateTime.now();
+		List<Booking> confirmedBookings = bookingRepository.getConfirmedBookings();
+
+		for (Booking booking : confirmedBookings) {
+			// If booking start time has passed and we're not yet past 1 hour into the
+			// booking
+			if (booking.getStartTime().isBefore(now) && booking.getStartTime().plusHours(1).isAfter(now)) {
+				ParkingSpace space = booking.getParkingSpace();
+
+				if (parkingSensorService.isCarPresentAtSpace(space)) {
+					String detectedPlate = parkingSensorService.getDetectedLicencePlate(space);
+
+					// Verify this is the right car for this booking
+					if (detectedPlate != null && detectedPlate.equals(booking.getLicencePlate())) {
+						System.out.println("[BookingStatusScheduler] Checking in early arrival for booking: "
+								+ booking.getBookingID());
+						bookingRepository.checkInBooking(booking);
+					}
+				}
 			}
 		}
 	}
