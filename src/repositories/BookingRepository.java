@@ -184,19 +184,6 @@ public class BookingRepository {
 		return matchingBookings;
 	}
 
-	public void cancelBooking(Booking booking) {
-		if (booking == null) {
-			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
-		}
-		if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.CONFIRMED) {
-			throw new ParkingSystemException("Only pending or confirmed bookings can be cancelled",
-					ErrorType.BUSINESS_LOGIC);
-		}
-
-		booking.cancelBooking();
-		saveBookings();
-	}
-
 	public void markAsOverstayed(Booking booking) {
 		if (booking == null) {
 			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);

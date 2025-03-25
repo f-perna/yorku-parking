@@ -119,13 +119,13 @@ public class BookingService {
 
 		bookingRepository.completeBooking(booking);
 	}
-	
+
 	public boolean cancel(Booking booking) {
 		LocalDateTime startTime = booking.getStartTime();
 		LocalDateTime now = LocalDateTime.now();
-		
+
 		ParkingSpace parkingSpace = booking.getParkingSpace();
-		
+
 		if (now.isBefore(startTime)) {
 			ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(parkingSpace,
 					ParkingSpaceStatus.AVAILABLE);
@@ -190,8 +190,12 @@ public class BookingService {
 			throw new ParkingSystemException("Additional hours must be between 1 and 24", ErrorType.VALIDATION);
 		}
 
-		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
-			throw new ParkingSystemException("Only checked-in bookings can be extended", ErrorType.BUSINESS_LOGIC);
+		// Allow pending, confirmed, and checked-in bookings to be extended
+		if (booking.getStatus() != Booking.BookingStatus.PENDING &&
+				booking.getStatus() != Booking.BookingStatus.CONFIRMED &&
+				booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
+			throw new ParkingSystemException("Only pending, confirmed or checked-in bookings can be extended",
+					ErrorType.BUSINESS_LOGIC);
 		}
 
 		LocalDateTime newEndTime = booking.getEndTime().plusHours(additionalHours);
