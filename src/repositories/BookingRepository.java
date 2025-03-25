@@ -103,9 +103,8 @@ public class BookingRepository {
 		if (booking == null) {
 			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
-		if (booking.getStatus() != BookingStatus.CHECKED_IN &&
-				booking.getStatus() != BookingStatus.OVERSTAYED &&
-				booking.getStatus() != Booking.BookingStatus.EXPIRED) {
+		if (booking.getStatus() != BookingStatus.CHECKED_IN && booking.getStatus() != BookingStatus.OVERSTAYED
+				&& booking.getStatus() != Booking.BookingStatus.EXPIRED) {
 			throw new ParkingSystemException("Only checked in, overstayed, or expired bookings can be completed",
 					ErrorType.BUSINESS_LOGIC);
 		}
@@ -145,9 +144,8 @@ public class BookingRepository {
 		}
 
 		for (Booking booking : bookings) {
-			if (booking.getParkingSpace().equals(parkingSpace) &&
-					(booking.getStatus() == BookingStatus.CONFIRMED ||
-							booking.getStatus() == BookingStatus.CHECKED_IN)) {
+			if (booking.getParkingSpace().equals(parkingSpace) && (booking.getStatus() == BookingStatus.CONFIRMED
+					|| booking.getStatus() == BookingStatus.CHECKED_IN)) {
 				return booking;
 			}
 		}
@@ -182,8 +180,7 @@ public class BookingRepository {
 		if (booking == null) {
 			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
-		if (booking.getStatus() != BookingStatus.PENDING &&
-				booking.getStatus() != BookingStatus.CONFIRMED) {
+		if (booking.getStatus() != BookingStatus.PENDING && booking.getStatus() != BookingStatus.CONFIRMED) {
 			throw new ParkingSystemException("Only pending or confirmed bookings can be cancelled",
 					ErrorType.BUSINESS_LOGIC);
 		}

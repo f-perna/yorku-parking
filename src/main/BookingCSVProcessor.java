@@ -125,21 +125,16 @@ public class BookingCSVProcessor extends CSVHelper {
 						continue;
 					}
 
-					String line = String.join(CSV_DELIMITER,
-							booking.getBookingID().toString(),
-							booking.getClient().getEmail(),
-							booking.getParkingSpace().getID().toString(),
-							booking.getStatus().toString(),
-							booking.getStartTime().toString(),
-							booking.getEndTime().toString(),
-							Double.toString(booking.getDeposit()));
+					String line = String.join(CSV_DELIMITER, booking.getBookingID().toString(),
+							booking.getClient().getEmail(), booking.getParkingSpace().getID().toString(),
+							booking.getStatus().toString(), booking.getStartTime().toString(),
+							booking.getEndTime().toString(), Double.toString(booking.getDeposit()));
 
 					bw.write(line);
 					bw.newLine();
 				} catch (Exception e) {
-					logError("Error writing booking data for booking " +
-							(booking != null ? booking.getBookingID() : "null") +
-							": " + e.getMessage());
+					logError("Error writing booking data for booking "
+							+ (booking != null ? booking.getBookingID() : "null") + ": " + e.getMessage());
 				}
 			}
 		} catch (IOException e) {

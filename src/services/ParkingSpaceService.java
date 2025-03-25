@@ -59,7 +59,6 @@ public class ParkingSpaceService {
 					+ MAX_SPACES_PER_LOT + " spaces allowed", ErrorType.BUSINESS_LOGIC);
 		}
 
-		// Check for duplicate space names within the same lot
 		for (ParkingSpace space : existingSpaces) {
 			if (space.getName().equalsIgnoreCase(spaceName.trim())) {
 				throw new ParkingSystemException("A parking space with name '" + spaceName.trim()
@@ -67,10 +66,8 @@ public class ParkingSpaceService {
 			}
 		}
 
-		// Create the new parking space
 		ParkingSpace newSpace = parkingSpaceRepository.addParkingSpace(lot, spaceName.trim());
 
-		// Create a sensor for the new space if the repository is available
 		if (parkingSensorRepository != null) {
 			parkingSensorRepository.createSensor(newSpace);
 		}

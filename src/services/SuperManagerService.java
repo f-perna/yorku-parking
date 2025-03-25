@@ -1,7 +1,7 @@
 package services;
 
 import models.auth.AuthenticationState;
-import models.manager.SuperManager;
+import models.superManager.SuperManager;
 
 public class SuperManagerService {
 	private AuthenticationState authState;

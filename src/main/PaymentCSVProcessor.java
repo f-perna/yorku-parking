@@ -66,8 +66,8 @@ public class PaymentCSVProcessor extends CSVHelper {
 
 					Booking booking = bookingMap.get(bookingID);
 					if (booking == null) {
-						logError(String.format("Payment %s references non-existent booking %s at line %d",
-								id, bookingID, lineNumber));
+						logError(String.format("Payment %s references non-existent booking %s at line %d", id,
+								bookingID, lineNumber));
 						continue;
 					}
 
@@ -106,20 +106,16 @@ public class PaymentCSVProcessor extends CSVHelper {
 						continue;
 					}
 
-					String line = String.join(CSV_DELIMITER,
-							payment.getPaymentID().toString(),
-							payment.getBooking().getBookingID().toString(),
-							Double.toString(payment.getAmount()),
-							payment.getStatus().toString(),
-							payment.getMethod().toString(),
+					String line = String.join(CSV_DELIMITER, payment.getPaymentID().toString(),
+							payment.getBooking().getBookingID().toString(), Double.toString(payment.getAmount()),
+							payment.getStatus().toString(), payment.getMethod().toString(),
 							payment.getPaymentType().toString());
 
 					bw.write(line);
 					bw.newLine();
 				} catch (Exception e) {
-					logError("Error writing payment data for payment " +
-							(payment != null ? payment.getPaymentID() : "null") +
-							": " + e.getMessage());
+					logError("Error writing payment data for payment "
+							+ (payment != null ? payment.getPaymentID() : "null") + ": " + e.getMessage());
 				}
 			}
 		} catch (IOException e) {

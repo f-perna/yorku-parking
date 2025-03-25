@@ -5,7 +5,7 @@ import models.ParkingSystemException.ErrorType;
 import models.auth.AuthenticationState;
 import models.client.Client;
 import models.manager.Manager;
-import models.manager.SuperManager;
+import models.superManager.SuperManager;
 import models.user.User;
 import services.ClientService;
 import services.ManagerService;

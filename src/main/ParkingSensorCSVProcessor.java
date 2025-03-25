@@ -43,8 +43,8 @@ public class ParkingSensorCSVProcessor extends CSVHelper {
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
 				if (data.length != EXPECTED_FIELDS) {
-					logError(String.format("Invalid sensor data format at line %d (expected %d fields): %s",
-							lineNumber, EXPECTED_FIELDS, line));
+					logError(String.format("Invalid sensor data format at line %d (expected %d fields): %s", lineNumber,
+							EXPECTED_FIELDS, line));
 					lineNumber++;
 					continue;
 				}
@@ -107,18 +107,15 @@ public class ParkingSensorCSVProcessor extends CSVHelper {
 						continue;
 					}
 
-					String line = String.join(CSV_DELIMITER,
-							sensor.getId().toString(),
-							sensor.getParkingSpace().getID().toString(),
-							Boolean.toString(sensor.isCarPresent()),
+					String line = String.join(CSV_DELIMITER, sensor.getId().toString(),
+							sensor.getParkingSpace().getID().toString(), Boolean.toString(sensor.isCarPresent()),
 							sensor.getDetectedLicencePlate() != null ? sensor.getDetectedLicencePlate() : "null");
 
 					bw.write(line);
 					bw.newLine();
 				} catch (Exception e) {
-					logError("Error writing sensor data for sensor " +
-							(sensor != null ? sensor.getId() : "null") +
-							": " + e.getMessage());
+					logError("Error writing sensor data for sensor " + (sensor != null ? sensor.getId() : "null") + ": "
+							+ e.getMessage());
 				}
 			}
 		} catch (IOException e) {

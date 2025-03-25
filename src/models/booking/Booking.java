@@ -30,7 +30,7 @@ public class Booking {
 		this.client = client;
 		this.parkingSpace = parkingSpace;
 		this.status = BookingStatus.PENDING;
-		this.startTime = LocalDateTime.now().plusMinutes(0); // booking will start 30 minutes from the time it was
+		this.startTime = LocalDateTime.now().plusMinutes(30); // booking will start 30 minutes from the time it was
 																// placed.
 		this.endTime = this.startTime.plusHours(durationAmount);
 		this.deposit = this.client.getRate();
@@ -168,8 +168,7 @@ public class Booking {
 		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
 		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
 		return "Lot " + parkingSpace.getLot().getName() + ", Space " + parkingSpace.getName() + " | "
-				+ startTime.format(startFormatter) + " - "
-				+ endTime.format(endFormatter);
+				+ startTime.format(startFormatter) + " - " + endTime.format(endFormatter);
 	}
 
 	@Override

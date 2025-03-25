@@ -6,5 +6,5 @@ public class Visitor extends Client {
 		super(name, email, password, type.VISITOR, licencePlate, approved);
 		rate = 15;
 	}
-    
+
 }

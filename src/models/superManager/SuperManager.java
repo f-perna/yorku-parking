@@ -1,4 +1,4 @@
-package models.manager;
+package models.superManager;
 
 import models.user.User;
 

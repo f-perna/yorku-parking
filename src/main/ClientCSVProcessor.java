@@ -27,8 +27,8 @@ public class ClientCSVProcessor extends CSVHelper {
 			while ((line = br.readLine()) != null) {
 				String[] data = line.split(CSV_DELIMITER);
 				if (data.length != EXPECTED_FIELDS) {
-					logError(String.format("Invalid client data format at line %d (expected %d fields): %s",
-							lineNumber, EXPECTED_FIELDS, line));
+					logError(String.format("Invalid client data format at line %d (expected %d fields): %s", lineNumber,
+							EXPECTED_FIELDS, line));
 					lineNumber++;
 					continue;
 				}
@@ -89,19 +89,15 @@ public class ClientCSVProcessor extends CSVHelper {
 						continue;
 					}
 
-					String line = String.join(CSV_DELIMITER,
-							client.getName(),
-							client.getEmail(),
-							client.getPassword(),
-							client.getLicencePlate(),
-							client.getType().toString(),
+					String line = String.join(CSV_DELIMITER, client.getName(), client.getEmail(), client.getPassword(),
+							client.getLicencePlate(), client.getType().toString(),
 							Boolean.toString(client.isApproved()));
 
 					bw.write(line);
 					bw.newLine();
 				} catch (Exception e) {
-					logError("Error writing client data for client " + (client != null ? client.getEmail() : "null") +
-							": " + e.getMessage());
+					logError("Error writing client data for client " + (client != null ? client.getEmail() : "null")
+							+ ": " + e.getMessage());
 				}
 			}
 		} catch (IOException e) {

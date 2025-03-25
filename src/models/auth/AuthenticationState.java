@@ -5,7 +5,7 @@ import java.util.List;
 
 import models.client.Client;
 import models.manager.Manager;
-import models.manager.SuperManager;
+import models.superManager.SuperManager;
 import models.user.User;
 
 public class AuthenticationState {

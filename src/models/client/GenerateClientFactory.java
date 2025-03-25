@@ -1,7 +1,8 @@
 package models.client;
 
 public class GenerateClientFactory {
-	public static Client getClientType(String name, String email, String password, Client.type clientType, String licencePlate, boolean approved) {
+	public static Client getClientType(String name, String email, String password, Client.type clientType,
+			String licencePlate, boolean approved) {
 		if (clientType == Client.type.STUDENT) {
 			return new Student(name, email, password, licencePlate, approved);
 		} else if (clientType == Client.type.FACULTY) {

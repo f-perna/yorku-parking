@@ -48,7 +48,6 @@ public class ServiceFactory {
 		this.superManagerService = new SuperManagerService();
 		this.parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository, parkingSensorRepository);
 		this.parkingLotService = new ParkingLotService(parkingLotRepository);
-		// Create services that depend on other services
 		this.bookingService = new BookingService(bookingRepository, parkingSpaceRepository);
 		this.paymentService = new PaymentService(paymentRepository, this.bookingService);
 		this.parkingSensorService = new ParkingSensorService(bookingRepository, parkingSpaceRepository,
