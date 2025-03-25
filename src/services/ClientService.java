@@ -34,11 +34,12 @@ public class ClientService {
 		}
 		if (password == null || !PASSWORD_PATTERN.matcher(password).matches()) {
 			throw new ParkingSystemException(
-					"Password must contain at least one uppercase letter, one lowercase letter, one number, and one symbol (minimum 8 characters)",
+					"Password must include uppercase, lowercase, number and symbol (min 8 chars)",
 					ErrorType.VALIDATION);
 		}
 		if (licencePlate == null || !licencePlate.matches("^[A-Z0-9\\s]{2,8}$")) {
-			throw new ParkingSystemException("Invalid licence plate format", ErrorType.VALIDATION);
+			throw new ParkingSystemException("Licence plate must be 2-8 uppercase letters, numbers, or spaces",
+					ErrorType.VALIDATION);
 		}
 
 		if (clientRepository.getClientByEmail(email) != null) {

@@ -127,6 +127,9 @@ public class RegisterPage extends JPanel {
 		// Status label
 		statusLabel = new JLabel(" ");
 		statusLabel.setForeground(Color.RED);
+		statusLabel.setPreferredSize(new Dimension(400, 60));
+		statusLabel.setMinimumSize(new Dimension(400, 60));
+		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		gbc.gridy = 7;
 		formPanel.add(statusLabel, gbc);
 
@@ -136,7 +139,7 @@ public class RegisterPage extends JPanel {
 		formPanel.add(goToLogin, gbc);
 
 		// Set preferred size for the form panel
-		formPanel.setPreferredSize(new Dimension(400, 450));
+		formPanel.setPreferredSize(new Dimension(450, 500));
 
 		// Add form panel to center of main panel
 		add(formPanel, BorderLayout.CENTER);
@@ -167,14 +170,14 @@ public class RegisterPage extends JPanel {
 				resetFields();
 				NavigationController.showPage("Login");
 			} else {
-				statusLabel.setText("Registration failed. Email may already be in use.");
+				setStatusText("Registration failed. Email may already be in use.");
 				emailField.setBorder(errorBorder);
 			}
 		} catch (ParkingSystemException e) {
-			statusLabel.setText(e.getMessage());
+			setStatusText(e.getMessage());
 			highlightFieldWithError(e.getMessage());
 		} catch (Exception e) {
-			statusLabel.setText("An unexpected error occurred: " + e.getMessage());
+			setStatusText("An unexpected error occurred: " + e.getMessage());
 		}
 	}
 
@@ -194,7 +197,8 @@ public class RegisterPage extends JPanel {
 		} else if (errorMessage.contains("licence plate")) {
 			licencePlateField.setBorder(errorBorder);
 		}
-		// If the error message doesn't match any field, no border will be set
+
+		setStatusText(errorMessage);
 	}
 
 	private void resetFieldBorders() {
@@ -202,7 +206,7 @@ public class RegisterPage extends JPanel {
 		emailField.setBorder(defaultBorder);
 		passwordField.setBorder(defaultBorder);
 		licencePlateField.setBorder(defaultBorder);
-		statusLabel.setText(" ");
+		setStatusText(" ");
 	}
 
 	private void resetFields() {
@@ -211,5 +215,12 @@ public class RegisterPage extends JPanel {
 		passwordField.setText("");
 		licencePlateField.setText("");
 		type.setSelectedIndex(0); // Reset to first option
+	}
+
+	private void setStatusText(String message) {
+		// Create HTML content to ensure text wrapping
+		statusLabel.setText("<html><div style='text-align: center; width: 380px; word-wrap: break-word;'>" +
+				message.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;") +
+				"</div></html>");
 	}
 }
