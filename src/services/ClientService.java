@@ -8,10 +8,16 @@ import models.client.GenerateClientFactory;
 import repositories.ClientRepository;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ClientService {
 	private final ClientRepository clientRepository;
 	private final AuthenticationState authState;
+
+	// Password pattern: at least one uppercase, one lowercase, one digit, one
+	// special character, min 8 chars
+	private static final Pattern PASSWORD_PATTERN = Pattern
+			.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$");
 
 	public ClientService(ClientRepository clientRepository) {
 		this.clientRepository = clientRepository;
@@ -26,8 +32,10 @@ public class ClientService {
 		if (email == null || !email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
 			throw new ParkingSystemException("Invalid email format", ErrorType.VALIDATION);
 		}
-		if (password == null || password.length() < 6) {
-			throw new ParkingSystemException("Password must be at least 6 characters", ErrorType.VALIDATION);
+		if (password == null || !PASSWORD_PATTERN.matcher(password).matches()) {
+			throw new ParkingSystemException(
+					"Password must contain at least one uppercase letter, one lowercase letter, one number, and one symbol (minimum 8 characters)",
+					ErrorType.VALIDATION);
 		}
 		if (licencePlate == null || !licencePlate.matches("^[A-Z0-9\\s]{2,8}$")) {
 			throw new ParkingSystemException("Invalid licence plate format", ErrorType.VALIDATION);
