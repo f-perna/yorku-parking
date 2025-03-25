@@ -11,15 +11,25 @@ import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
+import repositories.ParkingSensorRepository;
 import repositories.ParkingSpaceRepository;
 
 public class ParkingSpaceService {
 	private static final int MAX_SPACES_PER_LOT = 100;
-	private ParkingSpaceRepository parkingSpaceRepository;
-	private AuthenticationState authState;
+	private final ParkingSpaceRepository parkingSpaceRepository;
+	private final ParkingSensorRepository parkingSensorRepository;
+	private final AuthenticationState authState;
 
 	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceRepository) {
 		this.parkingSpaceRepository = parkingSpaceRepository;
+		this.parkingSensorRepository = null;
+		this.authState = AuthenticationState.getInstance();
+	}
+
+	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceRepository,
+			ParkingSensorRepository parkingSensorRepository) {
+		this.parkingSpaceRepository = parkingSpaceRepository;
+		this.parkingSensorRepository = parkingSensorRepository;
 		this.authState = AuthenticationState.getInstance();
 	}
 
@@ -49,7 +59,21 @@ public class ParkingSpaceService {
 					+ MAX_SPACES_PER_LOT + " spaces allowed", ErrorType.BUSINESS_LOGIC);
 		}
 
-		parkingSpaceRepository.addParkingSpace(lot, spaceName.trim());
+		// Check for duplicate space names within the same lot
+		for (ParkingSpace space : existingSpaces) {
+			if (space.getName().equalsIgnoreCase(spaceName.trim())) {
+				throw new ParkingSystemException("A parking space with name '" + spaceName.trim()
+						+ "' already exists in lot '" + lot.getName() + "'", ErrorType.VALIDATION);
+			}
+		}
+
+		// Create the new parking space
+		ParkingSpace newSpace = parkingSpaceRepository.addParkingSpace(lot, spaceName.trim());
+
+		// Create a sensor for the new space if the repository is available
+		if (parkingSensorRepository != null) {
+			parkingSensorRepository.createSensor(newSpace);
+		}
 	}
 
 	public ParkingSpace enableParkingSpace(ParkingSpace parkingSpace) {

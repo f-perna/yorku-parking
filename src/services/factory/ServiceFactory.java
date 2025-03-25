@@ -1,4 +1,4 @@
-package services;
+package services.factory;
 
 import repositories.BookingRepository;
 import repositories.ClientRepository;
@@ -6,7 +6,16 @@ import repositories.ManagerRepository;
 import repositories.ParkingLotRepository;
 import repositories.ParkingSpaceRepository;
 import repositories.PaymentRepository;
-import repositories.RepositoryFactory;
+import repositories.factory.RepositoryFactory;
+import services.BookingService;
+import services.ClientService;
+import services.ManagerService;
+import services.ParkingLotService;
+import services.ParkingSensorService;
+import services.ParkingSpaceService;
+import services.PaymentService;
+import services.SuperManagerService;
+import repositories.ParkingSensorRepository;
 
 public class ServiceFactory {
 	private static ServiceFactory instance;
@@ -18,34 +27,32 @@ public class ServiceFactory {
 	private ParkingSpaceService parkingSpaceService;
 	private PaymentService paymentService;
 	private SuperManagerService superManagerService;
+	private ParkingSensorService parkingSensorService;
 
 	private ServiceFactory() {
 		initializeServices();
 	}
 
 	private void initializeServices() {
-		// Get repositories from a repository factory
 		RepositoryFactory repoFactory = RepositoryFactory.getInstance();
 		BookingRepository bookingRepository = repoFactory.getBookingRepository();
 		ClientRepository clientRepository = repoFactory.getClientRepository();
 		ManagerRepository managerRepository = repoFactory.getManagerRepository();
 		ParkingLotRepository parkingLotRepository = repoFactory.getParkingLotRepository();
 		ParkingSpaceRepository parkingSpaceRepository = repoFactory.getParkingSpaceRepository();
+		ParkingSensorRepository parkingSensorRepository = repoFactory.getParkingSensorRepository();
 		PaymentRepository paymentRepository = repoFactory.getPaymentRepository();
 
-		// Create services in the right order to handle dependencies
 		this.clientService = new ClientService(clientRepository);
 		this.managerService = new ManagerService(managerRepository);
-		this.superManagerService = new SuperManagerService(managerRepository);
-		this.parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository);
+		this.superManagerService = new SuperManagerService();
+		this.parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository, parkingSensorRepository);
 		this.parkingLotService = new ParkingLotService(parkingLotRepository);
-
-		// Set dependencies for services that need them
-		this.parkingLotService.setDependencies(this.parkingSpaceService);
-
 		// Create services that depend on other services
 		this.bookingService = new BookingService(bookingRepository, parkingSpaceRepository);
 		this.paymentService = new PaymentService(paymentRepository, this.bookingService);
+		this.parkingSensorService = new ParkingSensorService(bookingRepository, parkingSpaceRepository,
+				parkingSensorRepository);
 	}
 
 	public static synchronized ServiceFactory getInstance() {
@@ -81,5 +88,9 @@ public class ServiceFactory {
 
 	public SuperManagerService getSuperManagerService() {
 		return superManagerService;
+	}
+
+	public ParkingSensorService getParkingSensorService() {
+		return parkingSensorService;
 	}
 }

@@ -26,24 +26,30 @@ public class AuthController {
 	}
 
 	public boolean login(String email, String password, String userType) {
-		if (email == null || password == null || userType == null) {
-			throw new ParkingSystemException("Email, password, and user type cannot be null", ErrorType.VALIDATION);
+		if (email == null || email.trim().isEmpty()) {
+			throw new ParkingSystemException("Email cannot be empty", ErrorType.VALIDATION);
+		}
+		if (password == null || password.isEmpty()) {
+			throw new ParkingSystemException("Password cannot be empty", ErrorType.VALIDATION);
+		}
+		if (userType == null) {
+			throw new ParkingSystemException("User type cannot be null", ErrorType.VALIDATION);
 		}
 
 		boolean success = false;
 
 		switch (userType.toLowerCase()) {
-			case "client":
-				success = clientService.login(email, password);
-				break;
-			case "manager":
-				success = managerService.login(email, password);
-				break;
-			case "supermanager":
-				success = superManagerService.login(email, password);
-				break;
-			default:
-				throw new ParkingSystemException("Invalid user type: " + userType, ErrorType.VALIDATION);
+		case "client":
+			success = clientService.login(email, password);
+			break;
+		case "manager":
+			success = managerService.login(email, password);
+			break;
+		case "supermanager":
+			success = superManagerService.login(email, password);
+			break;
+		default:
+			throw new ParkingSystemException("Invalid user type: " + userType, ErrorType.VALIDATION);
 		}
 
 		return success;

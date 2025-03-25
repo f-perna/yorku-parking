@@ -10,16 +10,16 @@ import repositories.ClientRepository;
 import java.util.List;
 
 public class ClientService {
-	private ClientRepository clientModel;
-	private AuthenticationState authState;
+	private final ClientRepository clientRepository;
+	private final AuthenticationState authState;
 
-	public ClientService(ClientRepository clientModel) {
-		this.clientModel = clientModel;
+	public ClientService(ClientRepository clientRepository) {
+		this.clientRepository = clientRepository;
 		this.authState = AuthenticationState.getInstance();
 	}
 
 	public boolean registerClient(String name, String email, String password, Client.type clientType,
-			String licensePlate) {
+			String licencePlate) {
 		if (name == null || name.trim().isEmpty()) {
 			throw new ParkingSystemException("Name cannot be empty", ErrorType.VALIDATION);
 		}
@@ -29,20 +29,21 @@ public class ClientService {
 		if (password == null || password.length() < 6) {
 			throw new ParkingSystemException("Password must be at least 6 characters", ErrorType.VALIDATION);
 		}
-		if (licensePlate == null || !licensePlate.matches("^[A-Z0-9]{2,8}$")) {
-			throw new ParkingSystemException("Invalid license plate format", ErrorType.VALIDATION);
+		if (licencePlate == null || !licencePlate.matches("^[A-Z0-9\\s]{2,8}$")) {
+			throw new ParkingSystemException("Invalid licence plate format", ErrorType.VALIDATION);
 		}
 
-		if (clientModel.getClientByEmail(email) != null) {
-			return false;
+		if (clientRepository.getClientByEmail(email) != null) {
+			throw new ParkingSystemException("Email address is already registered in the system",
+					ErrorType.BUSINESS_LOGIC);
 		}
 
 		boolean approved = (clientType == Client.type.VISITOR);
 
 		Client newClient = GenerateClientFactory.getClientType(name.trim(), email.toLowerCase(), password, clientType,
-				licensePlate.toUpperCase(), approved);
+				licencePlate.toUpperCase(), approved);
 
-		clientModel.registerClient(newClient);
+		clientRepository.registerClient(newClient);
 		return true;
 	}
 
@@ -53,43 +54,58 @@ public class ClientService {
 
 		email = email.toLowerCase().trim();
 
-		Client client = clientModel.authenticateClient(email, password);
-		if (client != null) {
-			authState.setLoggedInUser(client);
-			return true;
+		Client client = clientRepository.authenticateClient(email, password);
+		if (client == null) {
+			throw new ParkingSystemException("Invalid email address or password", ErrorType.AUTHENTICATION);
 		}
-		return false;
+
+		if (!client.isApproved() && client.getType() != Client.type.VISITOR) {
+			throw new ParkingSystemException(
+					"Your account is pending approval by a manager. Please wait for approval to access the system.",
+					ErrorType.AUTHORIZATION);
+		}
+
+		authState.setLoggedInUser(client);
+		return true;
 	}
 
 	public List<Client> getAllClients() {
-		return clientModel.getAllClients();
+		return clientRepository.getAllClients();
 	}
 
 	public Client getClientByEmail(String email) {
 		if (email == null) {
-			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
+			throw new ParkingSystemException("Email address must be provided", ErrorType.VALIDATION);
 		}
 
-		return clientModel.getClientByEmail(email.toLowerCase().trim());
+		Client currentUser = (Client) authState.getLoggedInUser();
+		if (currentUser == null || (!currentUser.getEmail().equals(email) && !authState.isManagerLoggedIn())) {
+			throw new ParkingSystemException("You are not authorized to view this client's information",
+					ErrorType.AUTHORIZATION);
+		}
+		return clientRepository.getClientByEmail(email);
 	}
 
 	public boolean approveClient(String email, boolean approved) {
 		if (email == null) {
-			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
+			throw new ParkingSystemException("Email address must be provided", ErrorType.VALIDATION);
 		}
 
 		if (!authState.isManagerLoggedIn()) {
 			throw new ParkingSystemException("Only managers can approve clients", ErrorType.AUTHORIZATION);
 		}
 
-		Client client = clientModel.getClientByEmail(email.toLowerCase().trim());
+		Client client = clientRepository.getClientByEmail(email);
 		if (client == null) {
-			return false;
+			throw new ParkingSystemException("Client account not found", ErrorType.BUSINESS_LOGIC);
+		}
+
+		if (client.getType() == Client.type.VISITOR) {
+			throw new ParkingSystemException("Visitor accounts cannot be approved", ErrorType.BUSINESS_LOGIC);
 		}
 
 		client.setApproved(approved);
-		clientModel.saveClients();
+		clientRepository.saveClients();
 		return true;
 	}
-
 }

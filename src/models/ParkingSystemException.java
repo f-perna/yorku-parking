@@ -8,12 +8,14 @@ public class ParkingSystemException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public enum ErrorType {
-        AUTHENTICATION,
-        AUTHORIZATION,
-        VALIDATION,
-        DATA_ACCESS,
-        BUSINESS_LOGIC,
-        SYSTEM_ERROR
+        VALIDATION, // Input validation errors
+        AUTHENTICATION, // User authentication errors
+        AUTHORIZATION, // User authorization errors
+        BUSINESS_LOGIC, // Business rule violations
+        DATA_ACCESS, // Database/file access errors
+        NOT_FOUND, // Resource not found errors
+        CONFLICT, // Resource conflict errors
+        SYSTEM_ERROR // Unexpected system errors
     }
 
     private final ErrorType errorType;
@@ -23,7 +25,7 @@ public class ParkingSystemException extends RuntimeException {
         this.errorType = ErrorType.SYSTEM_ERROR;
     }
 
-	public ParkingSystemException(String message, ErrorType errorType) {
+    public ParkingSystemException(String message, ErrorType errorType) {
         super(message);
         this.errorType = errorType;
     }

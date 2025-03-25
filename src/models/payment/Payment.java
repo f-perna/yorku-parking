@@ -98,16 +98,35 @@ public class Payment {
 	}
 
 	public static PaymentMethod generateMethod(String method) {
-		if (method.equals("Debit")) {
-			return new Debit();
-		} else if (method.equals("Credit")) {
-			return new Credit();
-		} else if (method.equals("Mobile")) {
-			return new Mobile();
-		} else if (method.equals("Cash")) {
-			return new Cash();
-		} else {
+		if (method == null) {
 			return null;
 		}
+
+		// Normalize the method string
+		String normalizedMethod = method.trim();
+
+		// Handle common patterns in the method names
+		if (normalizedMethod.contains("Debit") || normalizedMethod.equals("Debit Card")) {
+			return new Debit();
+		} else if (normalizedMethod.contains("Credit") || normalizedMethod.equals("Credit Card")) {
+			return new Credit();
+		} else if (normalizedMethod.contains("Mobile") || normalizedMethod.equals("Mobile Payment")) {
+			return new Mobile();
+		} else if (normalizedMethod.contains("Cash")) {
+			return new Cash();
+		} else {
+			System.out.println("Warning: Unrecognized payment method: " + method);
+			// Default to Credit as a fallback
+			return new Credit();
+		}
+	}
+
+	/**
+	 * Gets the booking ID safely
+	 * 
+	 * @return The booking ID, or null if no booking is associated
+	 */
+	public UUID getBookingID() {
+		return booking != null ? booking.getBookingID() : null;
 	}
 }

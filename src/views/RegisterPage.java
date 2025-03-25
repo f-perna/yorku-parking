@@ -1,13 +1,14 @@
 package views;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 import controllers.ClientController;
-import controllers.ControllerFactory;
 import controllers.NavigationController;
+import controllers.factory.ControllerFactory;
 import models.client.Client;
-import models.client.Client.type;
+import models.ParkingSystemException;
 
 public class RegisterPage extends JPanel {
 
@@ -16,10 +17,16 @@ public class RegisterPage extends JPanel {
 	private JLabel statusLabel;
 	private JComboBox<Client.type> type;
 	private ClientController clientController;
+	private Border defaultBorder;
+	private Border errorBorder;
 
 	public RegisterPage(JFrame parent) {
 		clientController = ControllerFactory.getInstance().getClientController();
 		setLayout(new BorderLayout());
+
+		// Create default and error borders
+		defaultBorder = BorderFactory.createLineBorder(Color.GRAY);
+		errorBorder = BorderFactory.createLineBorder(Color.RED, 2);
 
 		// Create form panel that will contain all form components
 		JPanel formPanel = new JPanel(new GridBagLayout());
@@ -49,6 +56,7 @@ public class RegisterPage extends JPanel {
 		formPanel.add(nameLabel, gbc);
 
 		nameField = new JTextField(20);
+		nameField.setBorder(defaultBorder);
 		gbc.gridx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		formPanel.add(nameField, gbc);
@@ -61,6 +69,7 @@ public class RegisterPage extends JPanel {
 		formPanel.add(emailLabel, gbc);
 
 		emailField = new JTextField(20);
+		emailField.setBorder(defaultBorder);
 		gbc.gridx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		formPanel.add(emailField, gbc);
@@ -73,11 +82,12 @@ public class RegisterPage extends JPanel {
 		formPanel.add(passLabel, gbc);
 
 		passwordField = new JPasswordField(20);
+		passwordField.setBorder(defaultBorder);
 		gbc.gridx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		formPanel.add(passwordField, gbc);
 
-		// License Plate field
+		// Licence Plate field
 		JLabel licencePlateLabel = new JLabel("Licence Plate:");
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -85,6 +95,7 @@ public class RegisterPage extends JPanel {
 		formPanel.add(licencePlateLabel, gbc);
 
 		licencePlateField = new JTextField(20);
+		licencePlateField.setBorder(defaultBorder);
 		gbc.gridx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		formPanel.add(licencePlateField, gbc);
@@ -136,21 +147,69 @@ public class RegisterPage extends JPanel {
 	}
 
 	private void handleRegister() {
+		// Reset field styling
+		resetFieldBorders();
+
 		try {
-			boolean success = clientController.registerClient(
-					nameField.getText(),
-					emailField.getText(),
-					new String(passwordField.getPassword()),
-					(Client.type) type.getSelectedItem(),
-					licencePlateField.getText());
+			Client.type selectedType = (Client.type) type.getSelectedItem();
+			boolean success = clientController.registerClient(nameField.getText(), emailField.getText(),
+					new String(passwordField.getPassword()), selectedType, licencePlateField.getText());
 
 			if (success) {
+				if (selectedType == Client.type.VISITOR) {
+					showSuccessDialog("Registration Successful",
+							"Your account has been successfully registered. You can now log in.");
+				} else {
+					showSuccessDialog("Registration Pending Approval",
+							"Your account has been registered but will need to be approved by a manager "
+									+ "to have access to the parking system.");
+				}
+				resetFields();
 				NavigationController.showPage("Login");
 			} else {
 				statusLabel.setText("Registration failed. Email may already be in use.");
+				emailField.setBorder(errorBorder);
 			}
-		} catch (IllegalArgumentException e) {
+		} catch (ParkingSystemException e) {
 			statusLabel.setText(e.getMessage());
+			highlightFieldWithError(e.getMessage());
+		} catch (Exception e) {
+			statusLabel.setText("An unexpected error occurred: " + e.getMessage());
 		}
+	}
+
+	private void showSuccessDialog(String title, String message) {
+		JOptionPane.showMessageDialog(this, message, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private void highlightFieldWithError(String errorMessage) {
+		errorMessage = errorMessage.toLowerCase();
+
+		if (errorMessage.contains("name")) {
+			nameField.setBorder(errorBorder);
+		} else if (errorMessage.contains("email")) {
+			emailField.setBorder(errorBorder);
+		} else if (errorMessage.contains("password")) {
+			passwordField.setBorder(errorBorder);
+		} else if (errorMessage.contains("licence plate")) {
+			licencePlateField.setBorder(errorBorder);
+		}
+		// If the error message doesn't match any field, no border will be set
+	}
+
+	private void resetFieldBorders() {
+		nameField.setBorder(defaultBorder);
+		emailField.setBorder(defaultBorder);
+		passwordField.setBorder(defaultBorder);
+		licencePlateField.setBorder(defaultBorder);
+		statusLabel.setText(" ");
+	}
+
+	private void resetFields() {
+		nameField.setText("");
+		emailField.setText("");
+		passwordField.setText("");
+		licencePlateField.setText("");
+		type.setSelectedIndex(0); // Reset to first option
 	}
 }

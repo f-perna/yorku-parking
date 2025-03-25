@@ -14,12 +14,10 @@ import services.ParkingSpaceService;
 public class ManagerController {
 	private ParkingLotService parkingLotService;
 	private ParkingSpaceService parkingSpaceService;
-	private ManagerService managerService;
 	private ClientService clientService;
 
-	public ManagerController(ManagerService managerService, ParkingLotService parkingLotService,
+	public ManagerController(ParkingLotService parkingLotService,
 			ParkingSpaceService parkingSpaceService, ClientService clientService) {
-		this.managerService = managerService;
 		this.parkingLotService = parkingLotService;
 		this.parkingSpaceService = parkingSpaceService;
 		this.clientService = clientService;

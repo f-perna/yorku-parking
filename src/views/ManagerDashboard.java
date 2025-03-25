@@ -8,9 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import controllers.ControllerFactory;
 import controllers.ManagerController;
 import controllers.NavigationController;
+import controllers.factory.ControllerFactory;
 import models.client.Client;
 
 public class ManagerDashboard extends JPanel {
@@ -74,7 +74,7 @@ public class ManagerDashboard extends JPanel {
 		panel.setBorder(BorderFactory.createTitledBorder("Client Approval"));
 
 		// Create table model with columns
-		String[] columns = { "Name", "Email", "Type", "License Plate", "Status" };
+		String[] columns = { "Name", "Email", "Type", "Licence Plate", "Status" };
 		tableModel = new DefaultTableModel(columns, 0) {
 			@Override
 			public boolean isCellEditable(int row, int column) {

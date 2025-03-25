@@ -1,6 +1,5 @@
 package models.manager;
 
-import java.io.Serializable;
 import models.user.User;
 
 public class Manager implements User {

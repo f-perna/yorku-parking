@@ -7,8 +7,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import controllers.AuthController;
-import controllers.ControllerFactory;
 import controllers.NavigationController;
+import controllers.factory.ControllerFactory;
 import models.auth.AuthStateObserver;
 import models.auth.AuthenticationState;
 

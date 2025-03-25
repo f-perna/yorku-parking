@@ -34,6 +34,12 @@ public class PaymentController {
 	}
 
 	public Payment processFinalPayment(Booking booking, String paymentMethod) {
+		// Allow payment processing for both CHECKED_IN and OVERSTAYED bookings
+		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN &&
+				booking.getStatus() != Booking.BookingStatus.OVERSTAYED && booking.getStatus() != Booking.BookingStatus.EXPIRED) {
+			throw new ParkingSystemException("Can only process final payment for checked-in, overstayed or expired bookings");
+		}
+
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
 			throw new ParkingSystemException("User must be logged in to process payment", ErrorType.AUTHENTICATION);

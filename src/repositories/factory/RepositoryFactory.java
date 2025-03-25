@@ -1,4 +1,12 @@
-package repositories;
+package repositories.factory;
+
+import repositories.BookingRepository;
+import repositories.ClientRepository;
+import repositories.ManagerRepository;
+import repositories.ParkingLotRepository;
+import repositories.ParkingSensorRepository;
+import repositories.ParkingSpaceRepository;
+import repositories.PaymentRepository;
 
 public class RepositoryFactory {
     private static RepositoryFactory instance;
@@ -8,6 +16,7 @@ public class RepositoryFactory {
     private ManagerRepository managerRepository;
     private ParkingLotRepository parkingLotRepository;
     private ParkingSpaceRepository parkingSpaceRepository;
+    private ParkingSensorRepository parkingSensorRepository;
     private PaymentRepository paymentRepository;
 
     private RepositoryFactory() {
@@ -16,6 +25,7 @@ public class RepositoryFactory {
         this.managerRepository = new ManagerRepository();
         this.parkingLotRepository = new ParkingLotRepository();
         this.parkingSpaceRepository = new ParkingSpaceRepository();
+        this.parkingSensorRepository = new ParkingSensorRepository();
         this.paymentRepository = new PaymentRepository();
     }
 
@@ -44,6 +54,10 @@ public class RepositoryFactory {
 
     public ParkingSpaceRepository getParkingSpaceRepository() {
         return parkingSpaceRepository;
+    }
+    
+    public ParkingSensorRepository getParkingSensorRepository() {
+    	return parkingSensorRepository;
     }
 
     public PaymentRepository getPaymentRepository() {

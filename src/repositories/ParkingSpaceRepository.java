@@ -7,7 +7,6 @@ import main.ParkingSpaceCSVProcessor;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
-import models.payment.Payment;
 
 public class ParkingSpaceRepository {
 	private List<ParkingSpace> parkingSpaces;
@@ -52,10 +51,11 @@ public class ParkingSpaceRepository {
 		return storedSpace;
 	}
 
-	public void addParkingSpace(ParkingLot lot, String name) {
+	public ParkingSpace addParkingSpace(ParkingLot lot, String name) {
 		ParkingSpace newSpace = new ParkingSpace(lot, name);
 		parkingSpaces.add(newSpace);
 		saveSpaces();
+		return newSpace;
 	}
 
 	public ParkingSpace getParkingSpaceByID(UUID parkingSpaceID) {

@@ -8,7 +8,6 @@ import models.ParkingSystemException.ErrorType;
 import models.booking.Booking;
 import models.client.Client;
 import models.payment.Payment;
-import models.payment.Payment.PaymentType;
 import repositories.PaymentRepository;
 
 public class PaymentService {
@@ -65,9 +64,9 @@ public class PaymentService {
 					ErrorType.AUTHORIZATION);
 		}
 
-		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
-			throw new ParkingSystemException("Can only process final payment for checked in bookings",
-					ErrorType.BUSINESS_LOGIC);
+		if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN &&
+				booking.getStatus() != Booking.BookingStatus.OVERSTAYED && booking.getStatus() != Booking.BookingStatus.EXPIRED) {
+			throw new ParkingSystemException("Can only process final payment for checked-in, overstayed or expired bookings");
 		}
 
 		double finalAmount = booking.deductedPrice();

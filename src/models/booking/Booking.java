@@ -14,7 +14,7 @@ import models.ParkingSystemException.ErrorType;
 public class Booking {
 
 	public static enum BookingStatus {
-		PENDING, CONFIRMED, CHECKED_IN, CANCELED, COMPLETED, NO_SHOW
+		PENDING, CONFIRMED, CHECKED_IN, CANCELED, COMPLETED, NO_SHOW, OVERSTAYED, EXPIRED
 	}
 
 	private UUID bookingID;
@@ -30,10 +30,14 @@ public class Booking {
 		this.client = client;
 		this.parkingSpace = parkingSpace;
 		this.status = BookingStatus.PENDING;
-		this.startTime = LocalDateTime.now(); // booking will start 30 minutes from the time it was
-												// placed.
+		this.startTime = LocalDateTime.now().plusMinutes(0); // booking will start 30 minutes from the time it was
+																// placed.
 		this.endTime = this.startTime.plusHours(durationAmount);
 		this.deposit = this.client.getRate();
+
+		if (client.getLicencePlate() == null || client.getLicencePlate().trim().isEmpty()) {
+			throw new ParkingSystemException("Client must have a licence plate number", ErrorType.VALIDATION);
+		}
 	}
 
 	// Constructor to retrieve data from bookings.csv
@@ -54,7 +58,6 @@ public class Booking {
 
 	public void completeBooking() {
 		this.status = BookingStatus.COMPLETED;
-
 	}
 
 	public void checkIn() {
@@ -63,6 +66,22 @@ public class Booking {
 
 	public void cancelBooking() {
 		this.status = BookingStatus.CANCELED;
+	}
+
+	public void markAsOverstayed() {
+		if (this.status == BookingStatus.CHECKED_IN) {
+			this.status = BookingStatus.OVERSTAYED;
+		} else {
+			System.out.println("Cannot mark as overstayed for booking with status: " + status);
+		}
+	}
+
+	public void markAsExpired() {
+		if (this.status == BookingStatus.CHECKED_IN) {
+			this.status = BookingStatus.EXPIRED;
+		} else {
+			System.out.println("Cannot mark as expired for booking with status: " + status);
+		}
 	}
 
 	public void updateStatus(BookingStatus newStatus) {
@@ -134,6 +153,10 @@ public class Booking {
 		return status;
 	}
 
+	public String getLicencePlate() {
+		return client.getLicencePlate();
+	}
+
 	public String getDuration() {
 		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
 		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
@@ -144,7 +167,8 @@ public class Booking {
 	public String toString() {
 		DateTimeFormatter startFormatter = DateTimeFormatter.ofPattern("MMMM d: h:m a", Locale.US);
 		DateTimeFormatter endFormatter = DateTimeFormatter.ofPattern("h:m a", Locale.US);
-		return "Lot " + parkingSpace.getLot().getName() + " | " + startTime.format(startFormatter) + " - "
+		return "Lot " + parkingSpace.getLot().getName() + ", Space " + parkingSpace.getName() + " | "
+				+ startTime.format(startFormatter) + " - "
 				+ endTime.format(endFormatter);
 	}
 

@@ -1,4 +1,4 @@
-package views;
+package views.dialog;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;

@@ -17,7 +17,7 @@ public class PaymentRepository {
 	}
 
 	private void loadFromDatabase() {
-		payments = PaymentCSVProcessor.readPaymentsData();
+		payments = PaymentCSVProcessor.readPaymentData();
 	}
 
 	private void savePayments() {
@@ -31,16 +31,52 @@ public class PaymentRepository {
 	}
 
 	public Payment createDepositPayment(Booking booking, String paymentMethod) {
+		if (booking == null) {
+			throw new models.ParkingSystemException("Booking cannot be null",
+					models.ParkingSystemException.ErrorType.VALIDATION);
+		}
+
+		// Validate booking ID to ensure it's properly set
+		if (booking.getBookingID() == null) {
+			throw new models.ParkingSystemException("Booking ID cannot be null",
+					models.ParkingSystemException.ErrorType.VALIDATION);
+		}
+
 		Payment newPayment = new Payment(booking.getDeposit(), booking, Payment.generateMethod(paymentMethod),
 				PaymentType.DEPOSIT);
+
+		// Verify that the payment has a valid booking before saving
+		if (newPayment.getBooking() == null) {
+			throw new models.ParkingSystemException("Failed to associate booking with payment",
+					models.ParkingSystemException.ErrorType.SYSTEM_ERROR);
+		}
+
 		payments.add(newPayment);
 		savePayments();
 		return newPayment;
 	}
 
 	public Payment createFinalPayment(double finalAmount, Booking booking, String paymentMethod) {
+		if (booking == null) {
+			throw new models.ParkingSystemException("Booking cannot be null",
+					models.ParkingSystemException.ErrorType.VALIDATION);
+		}
+
+		// Validate booking ID to ensure it's properly set
+		if (booking.getBookingID() == null) {
+			throw new models.ParkingSystemException("Booking ID cannot be null",
+					models.ParkingSystemException.ErrorType.VALIDATION);
+		}
+
 		Payment newPayment = new Payment(finalAmount, booking, Payment.generateMethod(paymentMethod),
 				PaymentType.FINAL);
+
+		// Verify that the payment has a valid booking before saving
+		if (newPayment.getBooking() == null) {
+			throw new models.ParkingSystemException("Failed to associate booking with payment",
+					models.ParkingSystemException.ErrorType.SYSTEM_ERROR);
+		}
+
 		payments.add(newPayment);
 		savePayments();
 		return newPayment;
