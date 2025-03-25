@@ -3,9 +3,10 @@ package views;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import controllers.ControllerFactory;
 import controllers.ManagerController;
 import controllers.NavigationController;
+import controllers.ParkingSensorController;
+import controllers.factory.ControllerFactory;
 import models.ParkingSystemException;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
@@ -232,35 +233,7 @@ public class ParkingManagementPage extends JPanel {
 		disableButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (selectedLot != null && parkingSpacesTable.getSelectedRow() != -1) {
-					List<ParkingSpace> spaces = managerController.getParkingSpacesForLot(selectedLot.getID());
-					if (spaces.isEmpty()) {
-						JOptionPane.showMessageDialog(parentFrame, "No spaces found for this lot.");
-						return;
-					}
-
-					ParkingSpace selectedSpace = spaces.get(parkingSpacesTable.getSelectedRow());
-
-					try {
-						ParkingSpace updatedSpace = managerController.disableParkingSpace(selectedSpace);
-						if (updatedSpace != null) {
-							if (updatedSpace.getStatus() == ParkingSpaceStatus.OCCUPIED
-									|| updatedSpace.getStatus() == ParkingSpaceStatus.BOOKED) {
-								JOptionPane.showMessageDialog(parentFrame,
-										"Space is currently in use but has been administratively disabled. No new bookings will be allowed.",
-										"Space Administratively Disabled", JOptionPane.INFORMATION_MESSAGE);
-							} else {
-								JOptionPane.showMessageDialog(parentFrame,
-										"Parking space administratively disabled successfully!");
-							}
-							loadParkingSpacesForLot(selectedLot.getID());
-						}
-					} catch (ParkingSystemException ex) {
-						JOptionPane.showMessageDialog(parentFrame, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-					}
-				} else {
-					JOptionPane.showMessageDialog(parentFrame, "Please select a parking space.");
-				}
+				handleDisableButton();
 			}
 		});
 
@@ -280,6 +253,38 @@ public class ParkingManagementPage extends JPanel {
 		panel.add(buttonsPanel, BorderLayout.SOUTH);
 
 		return panel;
+	}
+
+	private void handleDisableButton() {
+		if (selectedLot != null && parkingSpacesTable.getSelectedRow() != -1) {
+			List<ParkingSpace> spaces = managerController.getParkingSpacesForLot(selectedLot.getID());
+			if (spaces.isEmpty()) {
+				JOptionPane.showMessageDialog(parentFrame, "No spaces found for this lot.");
+				return;
+			}
+
+			ParkingSpace selectedSpace = spaces.get(parkingSpacesTable.getSelectedRow());
+
+			try {
+				ParkingSpace updatedSpace = managerController.disableParkingSpace(selectedSpace);
+				if (updatedSpace != null) {
+					// Check if the space is booked
+					if (updatedSpace.getStatus() == ParkingSpaceStatus.BOOKED) {
+						JOptionPane.showMessageDialog(parentFrame,
+								"Space is currently booked but has been administratively disabled. No new bookings will be allowed.",
+								"Space Administratively Disabled", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(parentFrame,
+								"Parking space administratively disabled successfully!");
+					}
+					loadParkingSpacesForLot(selectedLot.getID());
+				}
+			} catch (ParkingSystemException ex) {
+				JOptionPane.showMessageDialog(parentFrame, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		} else {
+			JOptionPane.showMessageDialog(parentFrame, "Please select a parking space.");
+		}
 	}
 
 	private void loadParkingLots() {
@@ -318,10 +323,14 @@ public class ParkingManagementPage extends JPanel {
 					statusText = "Available";
 				} else if (space.getStatus() == ParkingSpaceStatus.BOOKED) {
 					statusText = "Booked";
-				} else if (space.getStatus() == ParkingSpaceStatus.OCCUPIED) {
-					statusText = "Occupied";
 				} else {
 					statusText = space.getStatus().toString();
+				}
+
+				// Check if a car is present using the sensor service
+				ParkingSensorController sensorController = ControllerFactory.getInstance().getParkingSensorController();
+				if (sensorController.isCarPresentAtSpace(space)) {
+					statusText += " (Car Present)";
 				}
 
 				// Display administrative state separately

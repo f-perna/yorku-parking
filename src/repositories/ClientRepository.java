@@ -2,47 +2,54 @@ package repositories;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import main.ClientCSVProcessor;
 import models.client.Client;
 
 public class ClientRepository {
-	private List<Client> clients;
+	private final List<Client> clients;
+	private final Object lock = new Object();
 
 	public ClientRepository() {
-		this.clients = new ArrayList<>();
+		this.clients = new CopyOnWriteArrayList<>();
 		loadFromDatabase();
 	}
 
 	private void loadFromDatabase() {
-		clients = ClientCSVProcessor.readClientData();
+		synchronized (lock) {
+			clients.clear();
+			clients.addAll(ClientCSVProcessor.readClientData());
+		}
 	}
 
 	public void registerClient(Client client) {
-		clients.add(client);
-		saveClients();
+		if (client == null) {
+			throw new IllegalArgumentException("Client cannot be null");
+		}
+		synchronized (lock) {
+			clients.add(client);
+			saveClients();
+		}
 	}
 
 	public void saveClients() {
-		ClientCSVProcessor.setClientData(clients);
+		synchronized (lock) {
+			ClientCSVProcessor.setClientData(new ArrayList<>(clients));
+		}
 	}
 
 	public Client authenticateClient(String email, String password) {
-		for (Client client : clients) {
-			if (client.authenticate(email, password)) {
-				return client;
-			}
-			;
+		if (email == null || password == null) {
+			return null;
 		}
-		return null;
+		return clients.stream().filter(client -> client.authenticate(email, password)).findFirst().orElse(null);
 	}
 
 	public Client getClientByEmail(String email) {
-		for (Client client : clients) {
-			if (client.getEmail().equals(email)) {
-				return client;
-			}
+		if (email == null) {
+			return null;
 		}
-		return null;
+		return clients.stream().filter(client -> client.getEmail().equals(email)).findFirst().orElse(null);
 	}
 
 	public List<Client> getAllClients() {

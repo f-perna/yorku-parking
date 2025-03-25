@@ -1,4 +1,4 @@
-package models.manager;
+package models.superManager;
 
 import models.user.User;
 
@@ -14,7 +14,7 @@ public class SuperManager implements User {
 
 	public static synchronized SuperManager getInstance() {
 		if (instance == null) {
-			instance = new SuperManager("superadmin", "SuperSecurePassword123!");
+			instance = new SuperManager("superadmin", "Super@dmin123!");
 		}
 		return instance;
 	}

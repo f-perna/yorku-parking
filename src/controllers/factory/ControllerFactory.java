@@ -1,13 +1,23 @@
-package controllers;
+package controllers.factory;
 
+import controllers.AuthController;
+import controllers.BookingController;
+import controllers.ClientController;
+import controllers.ManagerController;
+import controllers.ParkingLotController;
+import controllers.ParkingSensorController;
+import controllers.ParkingSpaceController;
+import controllers.PaymentController;
+import controllers.SuperManagerController;
 import services.BookingService;
 import services.ClientService;
 import services.ManagerService;
 import services.ParkingLotService;
 import services.ParkingSpaceService;
 import services.PaymentService;
-import services.ServiceFactory;
 import services.SuperManagerService;
+import services.factory.ServiceFactory;
+import services.ParkingSensorService;
 
 public class ControllerFactory {
 
@@ -21,6 +31,7 @@ public class ControllerFactory {
 	private ManagerController managerController;
 	private AuthController authController;
 	private SuperManagerController superManagerController;
+	private ParkingSensorController parkingSensorController;
 
 	private ControllerFactory() {
 		initializeControllers();
@@ -37,6 +48,7 @@ public class ControllerFactory {
 		ParkingSpaceService parkingSpaceService = serviceFactory.getParkingSpaceService();
 		PaymentService paymentService = serviceFactory.getPaymentService();
 		SuperManagerService superManagerService = serviceFactory.getSuperManagerService();
+		ParkingSensorService parkingSensorService = serviceFactory.getParkingSensorService();
 
 		// Create controllers with their required dependencies
 		this.bookingController = new BookingController(bookingService);
@@ -46,10 +58,10 @@ public class ControllerFactory {
 		this.paymentController = new PaymentController(paymentService);
 
 		// Create controllers that depend on multiple services
-		this.managerController = new ManagerController(managerService, parkingLotService, parkingSpaceService,
-				clientService);
+		this.managerController = new ManagerController(parkingLotService, parkingSpaceService, clientService);
 		this.authController = new AuthController(clientService, managerService, superManagerService);
-		this.superManagerController = new SuperManagerController(superManagerService);
+		this.superManagerController = new SuperManagerController(managerService);
+		this.parkingSensorController = new ParkingSensorController(parkingSensorService);
 	}
 
 	public static synchronized ControllerFactory getInstance() {
@@ -89,5 +101,9 @@ public class ControllerFactory {
 
 	public SuperManagerController getSuperManagerController() {
 		return superManagerController;
+	}
+
+	public ParkingSensorController getParkingSensorController() {
+		return parkingSensorController;
 	}
 }

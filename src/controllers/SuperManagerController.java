@@ -2,26 +2,32 @@ package controllers;
 
 import java.util.List;
 
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.manager.Manager;
-import services.SuperManagerService;
+import services.ManagerService;
 
 public class SuperManagerController {
-	private SuperManagerService superManagerService;
+	private ManagerService managerService;
 
-	public SuperManagerController(SuperManagerService superManagerService) {
-		this.superManagerService = superManagerService;
+	public SuperManagerController(ManagerService managerService) {
+		this.managerService = managerService;
 	}
 
 	public Manager generateAndGetManagerAccount() {
-		return superManagerService.generateAndGetManagerAccount();
+		return managerService.generateAndGetManagerAccount();
 	}
 
 	public boolean removeManager(String email) {
-		return superManagerService.removeManager(email);
+		if (email == null) {
+			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
+		}
+
+		return managerService.removeManager(email);
 	}
 
 	public List<Manager> getAllManagers() {
-		return superManagerService.getAllManagers();
+		return managerService.getAllManagers();
 	}
 
 }

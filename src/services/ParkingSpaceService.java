@@ -1,5 +1,6 @@
 package services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,15 +12,26 @@ import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
+import models.parkingSensor.ParkingSensor;
+import repositories.ParkingSensorRepository;
 import repositories.ParkingSpaceRepository;
 
 public class ParkingSpaceService {
 	private static final int MAX_SPACES_PER_LOT = 100;
-	private ParkingSpaceRepository parkingSpaceRepository;
-	private AuthenticationState authState;
+	private final ParkingSpaceRepository parkingSpaceRepository;
+	private final ParkingSensorRepository parkingSensorRepository;
+	private final AuthenticationState authState;
 
 	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceRepository) {
 		this.parkingSpaceRepository = parkingSpaceRepository;
+		this.parkingSensorRepository = null;
+		this.authState = AuthenticationState.getInstance();
+	}
+
+	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceRepository,
+			ParkingSensorRepository parkingSensorRepository) {
+		this.parkingSpaceRepository = parkingSpaceRepository;
+		this.parkingSensorRepository = parkingSensorRepository;
 		this.authState = AuthenticationState.getInstance();
 	}
 
@@ -28,7 +40,27 @@ public class ParkingSpaceService {
 			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
 		}
 
-		return parkingSpaceRepository.getAvailableSpaces(lot);
+		List<ParkingSpace> availableSpaces = parkingSpaceRepository.getAvailableSpaces(lot);
+
+		// If we have access to the sensor repository, filter out spaces that have cars
+		// in them
+		if (parkingSensorRepository != null) {
+			List<ParkingSpace> trulyAvailableSpaces = new ArrayList<>();
+
+			for (ParkingSpace space : availableSpaces) {
+				// Get the sensor for this space and check if a car is present
+				ParkingSensor sensor = parkingSensorRepository.getSensorBySpaceId(space.getID());
+
+				// If no sensor exists yet or no car is present, the space is truly available
+				if (sensor == null || !sensor.isCarPresent()) {
+					trulyAvailableSpaces.add(space);
+				}
+			}
+
+			return trulyAvailableSpaces;
+		}
+
+		return availableSpaces;
 	}
 
 	public void addParkingSpace(ParkingLot lot, String spaceName) {
@@ -49,7 +81,18 @@ public class ParkingSpaceService {
 					+ MAX_SPACES_PER_LOT + " spaces allowed", ErrorType.BUSINESS_LOGIC);
 		}
 
-		parkingSpaceRepository.addParkingSpace(lot, spaceName.trim());
+		for (ParkingSpace space : existingSpaces) {
+			if (space.getName().equalsIgnoreCase(spaceName.trim())) {
+				throw new ParkingSystemException("A parking space with name '" + spaceName.trim()
+						+ "' already exists in lot '" + lot.getName() + "'", ErrorType.VALIDATION);
+			}
+		}
+
+		ParkingSpace newSpace = parkingSpaceRepository.addParkingSpace(lot, spaceName.trim());
+
+		if (parkingSensorRepository != null) {
+			parkingSensorRepository.createSensor(newSpace);
+		}
 	}
 
 	public ParkingSpace enableParkingSpace(ParkingSpace parkingSpace) {

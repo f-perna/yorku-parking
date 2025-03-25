@@ -9,6 +9,9 @@ import java.awt.Insets;
 import java.awt.Dimension;
 import java.awt.Component;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -25,32 +28,49 @@ import javax.swing.DefaultListCellRenderer;
 import controllers.AuthController;
 import controllers.BookingController;
 import controllers.ClientController;
-import controllers.ControllerFactory;
 import controllers.NavigationController;
 import controllers.PaymentController;
+import controllers.factory.ControllerFactory;
+import controllers.ParkingSensorController;
 import models.booking.Booking;
 import models.client.Client;
 import models.payment.Payment;
+import models.ParkingSystemException;
+import views.dialog.ErrorDialog;
+import views.dialog.SuccessDialog;
 
 public class ClientPage extends JPanel {
 	private BookingController bookingController;
 	private ClientController clientController;
 	private AuthController authController;
 	private PaymentController paymentController;
+	private ParkingSensorController parkingSensorController;
 
 	private JComboBox<Booking> bookingsList;
 	private JLabel welcomeMessage;
 	private JLabel bookingLabel, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue, depositLabel,
 			depositValue, statusLabel, statusValue, totalLabel, totalValue, errorLabel, paymentsLabel;
-	private JButton checkinButton, checkoutButton, deleteButton, extendTimeButton, cancelButton;
+	private JLabel carPresenceLabel, carPresenceValue;
+	private JLabel licencePlateLabel, licencePlateValue;
+	private JButton simulateCarArrivalButton, simulateCarDepartureButton, completeCheckoutButton, deleteButton,
+			extendTimeButton;
 	private JList<Payment> paymentsList;
 	private DefaultListModel<Payment> paymentsListModel;
+	private JScrollPane paymentsScrollPane;
+	private boolean warningShown = false;
+
+	// Constants for UI colors
+	private static final Color COLOR_SUCCESS = new Color(0, 128, 0); // Green
+	private static final Color COLOR_WARNING = new Color(255, 128, 0); // Orange
+	private static final Color COLOR_ERROR = Color.RED;
+	private static final Color COLOR_INACTIVE = new Color(128, 128, 128); // Grey
 
 	public ClientPage(JFrame parent) {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
 		this.clientController = ControllerFactory.getInstance().getClientController();
 		this.authController = ControllerFactory.getInstance().getAuthController();
 		this.paymentController = ControllerFactory.getInstance().getPaymentController();
+		this.parkingSensorController = ControllerFactory.getInstance().getParkingSensorController();
 		setLayout(new GridBagLayout());
 
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -167,10 +187,38 @@ public class ClientPage extends JPanel {
 		add(totalValue, gbc);
 		totalValue.setVisible(false);
 
-		// Add payments section
-		paymentsLabel = new JLabel("Payments: ");
+		// After totalValue setup, add car presence status
+		carPresenceLabel = new JLabel("Car at Space: ");
 		gbc.gridx = 0;
 		gbc.gridy = 9;
+		gbc.anchor = GridBagConstraints.EAST;
+		add(carPresenceLabel, gbc);
+		carPresenceLabel.setVisible(false);
+
+		carPresenceValue = new JLabel();
+		gbc.gridx = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		add(carPresenceValue, gbc);
+		carPresenceValue.setVisible(false);
+
+		// After carPresenceValue setup, add licence plate info
+		licencePlateLabel = new JLabel("Licence Plate: ");
+		gbc.gridx = 0;
+		gbc.gridy = 10;
+		gbc.anchor = GridBagConstraints.EAST;
+		add(licencePlateLabel, gbc);
+		licencePlateLabel.setVisible(false);
+
+		licencePlateValue = new JLabel();
+		gbc.gridx = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		add(licencePlateValue, gbc);
+		licencePlateValue.setVisible(false);
+
+		// Add payments list
+		paymentsLabel = new JLabel("Payments: ");
+		gbc.gridx = 0;
+		gbc.gridy = 11;
 		gbc.anchor = GridBagConstraints.EAST;
 		add(paymentsLabel, gbc);
 		paymentsLabel.setVisible(false);
@@ -178,94 +226,184 @@ public class ClientPage extends JPanel {
 		paymentsListModel = new DefaultListModel<>();
 		paymentsList = new JList<>(paymentsListModel);
 		paymentsList.setCellRenderer(new PaymentListCellRenderer());
-		JScrollPane paymentsScrollPane = new JScrollPane(paymentsList);
-		paymentsScrollPane.setPreferredSize(new Dimension(300, 100));
+		paymentsScrollPane = new JScrollPane(paymentsList);
+		paymentsScrollPane.setPreferredSize(new Dimension(300, 80));
+		paymentsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		gbc.gridx = 1;
 		gbc.anchor = GridBagConstraints.WEST;
 		add(paymentsScrollPane, gbc);
 		paymentsScrollPane.setVisible(false);
 
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-		cancelButton = new JButton("Cancel");
-		checkinButton = new JButton("Check-In");
-		checkoutButton = new JButton("Check-Out");
-		extendTimeButton = new JButton("Extend Time");
+		// Add action buttons for booking
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
-		buttonPanel.add(cancelButton);
-		buttonPanel.add(checkinButton);
-		buttonPanel.add(checkoutButton);
+		simulateCarArrivalButton = new JButton("Park Your Car");
+		simulateCarDepartureButton = new JButton("Remove Your Car");
+		completeCheckoutButton = new JButton("Complete Checkout");
+		extendTimeButton = new JButton("Extend Time");
+		deleteButton = new JButton("Cancel Booking");
+
+		// Add action listeners to buttons
+		simulateCarArrivalButton.addActionListener(e -> handleSimulateCarArrival());
+		simulateCarDepartureButton.addActionListener(e -> handleSimulateCarDeparture());
+		completeCheckoutButton.addActionListener(e -> handleCompleteCheckout());
+		extendTimeButton.addActionListener(e -> handleExtendTime());
+		deleteButton.addActionListener(e -> handleCancelBooking());
+
+		buttonPanel.add(simulateCarArrivalButton);
+		buttonPanel.add(simulateCarDepartureButton);
+		buttonPanel.add(completeCheckoutButton);
 		buttonPanel.add(extendTimeButton);
+		buttonPanel.add(deleteButton);
 
 		gbc.gridx = 0;
-		gbc.gridy = 10;
+		gbc.gridy = 12;
 		gbc.gridwidth = 2;
-		gbc.insets = new Insets(15, 10, 15, 10);
+		gbc.anchor = GridBagConstraints.CENTER;
 		add(buttonPanel, gbc);
 
-		cancelButton.setVisible(false);
-		checkinButton.setVisible(false);
-		checkoutButton.setVisible(false);
+		simulateCarArrivalButton.setVisible(false);
+		simulateCarDepartureButton.setVisible(false);
+		completeCheckoutButton.setVisible(false);
 		extendTimeButton.setVisible(false);
-
-		cancelButton.addActionListener(e -> handleCancel());
-		checkinButton.addActionListener(e -> handleCheckin());
-		extendTimeButton.addActionListener(e -> handleExtendTime());
-
-		checkoutButton.addActionListener(e -> handleCheckout());
+		deleteButton.setVisible(false);
 
 		errorLabel = new JLabel();
 		errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		gbc.gridx = 0;
-		gbc.gridy = 11;
+		gbc.gridy = 13; // Increased
 		gbc.gridwidth = 2;
 		gbc.insets = new Insets(10, 10, 20, 10);
 		add(errorLabel, gbc);
 	}
 
-	private void handleCancel() {
+	private void handleSimulateCarArrival() {
+		Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
+		if (selectedBooking == null) {
+			JOptionPane.showMessageDialog(this, "Please select a booking first", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		try {
-			Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
-			if (selectedBooking == null) {
-				ErrorDialog.show(this, "Error", "No booking selected");
+			// Check if the booking has started or if it's an early arrival
+			boolean isEarlyArrival = LocalDateTime.now().isBefore(selectedBooking.getStartTime());
+
+			// Park the user's car (using the licence plate from the booking)
+			// We'll pass a new parameter to the controller to separate car detection from
+			// check-in
+			parkingSensorController.simulateCarArrival(selectedBooking, !isEarlyArrival);
+
+			// Different messages based on early arrival or regular check-in
+			String message;
+			if (isEarlyArrival) {
+				message = "Your car has been detected at the parking space.\n"
+						+ "Since you arrived before your booking start time, you're not checked in yet.\n"
+						+ "Your booking will automatically check in at the scheduled start time.";
+			} else {
+				message = "Your car has been detected at the parking space.\n" + "Your booking is now checked in.";
+			}
+
+			JOptionPane.showMessageDialog(this, message, "Parking Successful", JOptionPane.INFORMATION_MESSAGE);
+
+			// Make sure to refresh the UI to show the updated status and buttons
+			refresh();
+		} catch (ParkingSystemException ex) {
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void handleSimulateCarDeparture() {
+		Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
+		if (selectedBooking == null) {
+			JOptionPane.showMessageDialog(this, "Please select a booking first", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		try {
+			parkingSensorController.simulateCarDeparture(selectedBooking);
+
+			// Car departure success message
+			String message = "Your car has been removed from the parking space.";
+			JOptionPane.showMessageDialog(this, message, "Car Departure Successful", JOptionPane.INFORMATION_MESSAGE);
+
+			// Skip payment flow if booking is already canceled or still in CONFIRMED status
+			// (early arrival)
+			if (selectedBooking.getStatus() == Booking.BookingStatus.CANCELED) {
+				JOptionPane.showMessageDialog(this, "Your car has been removed from a cancelled booking space.",
+						"Car Removed", JOptionPane.INFORMATION_MESSAGE);
+				refresh();
+				return;
+			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CONFIRMED) {
+				JOptionPane.showMessageDialog(this,
+						"Your car has been removed before official check-in. Your booking is still active and will be available at the scheduled start time.",
+						"Early Arrival Departure", JOptionPane.INFORMATION_MESSAGE);
+				refresh();
 				return;
 			}
 
-			boolean cancelSuccessful = bookingController.cancel(selectedBooking);
+			boolean isOverstayed = selectedBooking.getStatus() == Booking.BookingStatus.OVERSTAYED;
+			String paymentTitle = isOverstayed ? "Overstayed Booking Payment" : "Payment Confirmation";
 
-			if (cancelSuccessful) {
-				SuccessDialog.show(this, "Cancel Successful", "You have successfully canceled!");
-				refresh();
+			// Calculate payment amount
+			double finalAmount = selectedBooking.deductedPrice();
+			double depositPaid = selectedBooking.getDeposit();
+			double totalAmount = selectedBooking.calculatePrice();
+
+			// Show extra warning for overstayed bookings
+			String overstayedWarning = isOverstayed
+					? "\n\nWARNING: Your booking was overstayed. In the future, please remove your car before your booking ends.\n"
+							+ "Repeated violations may result in additional fees or restrictions.\n"
+					: "";
+
+			// Show payment confirmation with amount details
+			String paymentMessage = String.format(
+					"Payment Details:%s\n\n" + "Total parking fee: $%.2f\n" + "Deposit already paid: $%.2f\n"
+							+ "Remaining balance: $%.2f\n\n"
+							+ "Please select a payment method to complete your booking:",
+					overstayedWarning, totalAmount, depositPaid, finalAmount);
+
+			// Simplify the payment method options
+			String[] paymentMethods = { "Credit", "Debit", "Cash", "Mobile" };
+			String selectedMethod = (String) JOptionPane.showInputDialog(this, paymentMessage, paymentTitle,
+					JOptionPane.QUESTION_MESSAGE, null, paymentMethods, paymentMethods[0]);
+
+			if (selectedMethod != null) {
+				try {
+					Payment payment = paymentController.processFinalPayment(selectedBooking, selectedMethod);
+					if (payment != null) {
+						// Reset the warning flag when the booking is successfully completed
+						warningShown = false;
+
+						JOptionPane.showMessageDialog(this,
+								String.format("Payment of $%.2f processed successfully.\nYour booking is now complete.",
+										finalAmount),
+								"Booking Completed", JOptionPane.INFORMATION_MESSAGE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace(); // Add this for debugging
+					JOptionPane.showMessageDialog(this, "Error processing final payment: " + e.getMessage(),
+							"Payment Error", JOptionPane.ERROR_MESSAGE);
+				}
 			} else {
-				ErrorDialog.show(this, "Cancel Failed", "It is too late to cancel.");
-				refresh();
+				String warningMsg = isOverstayed
+						? "Your car has been removed but the booking is still active and marked as OVERSTAYED.\n"
+								+ "You must complete checkout to be able to make new bookings."
+						: "Your car has been removed but the booking is still active.\n"
+								+ "Please complete payment to finish your booking.";
+
+				JOptionPane.showMessageDialog(this, warningMsg, "Booking Active", JOptionPane.WARNING_MESSAGE);
 			}
-		} catch (Exception e) {
-			ErrorDialog.show(this, "Error", "An error occurred during cancellation: " + e.getMessage());
+
+			// Make sure to refresh the UI to show the updated buttons
 			refresh();
+		} catch (ParkingSystemException ex) {
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	private void handleCheckin() {
-		try {
-			Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
-			if (selectedBooking == null) {
-				ErrorDialog.show(this, "Error", "No booking selected");
-				return;
-			}
-
-			boolean checkInSuccessful = bookingController.checkIn(selectedBooking);
-
-			if (checkInSuccessful) {
-				SuccessDialog.show(this, "Check In Successful", "You have successfully checked in!");
-				refresh();
-			} else {
-				ErrorDialog.show(this, "Check In Failed", "Could not check in at this time. Please try again later.");
-				refresh();
-			}
-		} catch (Exception e) {
-			ErrorDialog.show(this, "Error", "An error occurred during check-in: " + e.getMessage());
-			refresh();
-		}
+		// This method is no longer needed as we're using sensor simulation
 	}
 
 	public void handleNewBooking() {
@@ -279,149 +417,235 @@ public class ClientPage extends JPanel {
 	}
 
 	public void refresh() {
-		try {
-			Client loggedInClient = authController.getLoggedInClient();
-			if (loggedInClient == null) {
-				NavigationController.showPage("Login");
-				return;
-			}
+		Client loggedInClient = authController.getLoggedInClient();
+		welcomeMessage.setText("Welcome, " + loggedInClient.getEmail());
 
-			welcomeMessage.setText("Welcome, " + loggedInClient.getName() + "!");
+		bookingsList.removeAllItems();
+		paymentsList.removeAll();
+		paymentsListModel.clear();
 
-			List<Booking> clientBookings = bookingController.getBookingsForClient();
-
-			if (clientBookings.isEmpty()) {
-				bookingLabel.setVisible(false);
-				bookingsList.setVisible(false);
-				lotLabel.setVisible(false);
-				spaceLabel.setVisible(false);
-				durationLabel.setVisible(false);
-				statusLabel.setVisible(false);
-				depositLabel.setVisible(false);
-				totalLabel.setVisible(false);
-				lotValue.setVisible(false);
-				spaceValue.setVisible(false);
-				durationValue.setVisible(false);
-				statusValue.setVisible(false);
-				depositValue.setVisible(false);
-				totalValue.setVisible(false);
-				checkinButton.setVisible(false);
-				checkoutButton.setVisible(false);
-				extendTimeButton.setVisible(false);
-				paymentsLabel.setVisible(false);
-				paymentsList.setVisible(false);
-				cancelButton.setVisible(false);
-			} else {
-				bookingLabel.setVisible(true);
-				bookingsList.setVisible(true);
-				bookingsList.removeAllItems();
-
-				for (Booking booking : clientBookings) {
-					bookingsList.addItem(booking);
-				}
-
-				bookingsList.setSelectedIndex(0);
-				refreshBookingInfo();
-			}
-
-		} catch (Exception e) {
-			ErrorDialog.show(this, "Error", "Could not load client info: " + e.getMessage());
-			e.printStackTrace();
+		List<Booking> bookings = bookingController.getBookingsForClient();
+		for (Booking booking : bookings) {
+			bookingsList.addItem(booking);
 		}
+
+		boolean hasBookings = bookings.size() > 0;
+		bookingLabel.setVisible(hasBookings);
+		bookingsList.setVisible(hasBookings);
+
+		if (hasBookings) {
+			// Select the last item (most recent booking) in the list
+			bookingsList.setSelectedIndex(bookingsList.getItemCount() - 1);
+			refreshBookingInfo();
+		} else {
+			hideAllBookingDetails();
+		}
+	}
+
+	/**
+	 * Hide all booking related UI elements when no bookings are available
+	 */
+	private void hideAllBookingDetails() {
+		// Hide all labels and values
+		setVisibility(false, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue,
+				statusLabel, statusValue, depositLabel, depositValue, totalLabel, totalValue,
+				paymentsLabel, paymentsScrollPane, carPresenceLabel, carPresenceValue,
+				licencePlateLabel, licencePlateValue);
+
+		// Hide all action buttons
+		hideAllActionButtons();
+	}
+
+	/**
+	 * Set visibility for a group of components
+	 * 
+	 * @param visible    Whether components should be visible
+	 * @param components Components to update
+	 */
+	private void setVisibility(boolean visible, Component... components) {
+		for (Component component : components) {
+			component.setVisible(visible);
+		}
+	}
+
+	/**
+	 * Hide all booking action buttons
+	 */
+	private void hideAllActionButtons() {
+		setVisibility(false, simulateCarArrivalButton, simulateCarDepartureButton,
+				completeCheckoutButton, extendTimeButton, deleteButton);
 	}
 
 	public void refreshBookingInfo() {
 		try {
 			Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
 			if (selectedBooking == null) {
-				lotValue.setText("");
-				spaceValue.setText("");
-				durationValue.setText("");
-				statusValue.setText("");
-				depositValue.setText("");
-				totalValue.setText("");
-
-				lotLabel.setVisible(false);
-				spaceLabel.setVisible(false);
-				durationLabel.setVisible(false);
-				statusLabel.setVisible(false);
-				depositLabel.setVisible(false);
-				totalLabel.setVisible(false);
-				lotValue.setVisible(false);
-				spaceValue.setVisible(false);
-				durationValue.setVisible(false);
-				statusValue.setVisible(false);
-				depositValue.setVisible(false);
-				totalValue.setVisible(false);
-				paymentsLabel.setVisible(false);
-				paymentsList.getParent().getParent().setVisible(false);
-
-				cancelButton.setVisible(false);
-				checkinButton.setVisible(false);
-				checkoutButton.setVisible(false);
-				extendTimeButton.setVisible(false);
+				hideAllBookingDetails();
 				return;
 			}
 
 			try {
-				lotValue.setText(selectedBooking.getParkingSpace().getLot().getName());
-				spaceValue.setText(selectedBooking.getParkingSpace().getName());
-				durationValue.setText(selectedBooking.getDuration());
-				statusValue.setText(selectedBooking.getStatus().toString());
-				depositValue.setText(Double.toString(selectedBooking.getDeposit()));
-				totalValue.setText(Double.toString(selectedBooking.deductedPrice()));
-
-				// Show payments
-				paymentsListModel.clear();
-				List<Payment> payments = paymentController.getPaymentsForBooking(selectedBooking);
-				for (Payment payment : payments) {
-					paymentsListModel.addElement(payment);
-				}
+				updateBookingDetails(selectedBooking);
+				updateCarPresenceInfo(selectedBooking);
+				updatePaymentsList(selectedBooking);
+				showAllBookingDetails();
+				updateActionButtonsForStatus(selectedBooking);
 			} catch (Exception e) {
 				ErrorDialog.show(this, "Error", "Could not load booking details: " + e.getMessage());
 				return;
 			}
-
-			lotLabel.setVisible(true);
-			spaceLabel.setVisible(true);
-			durationLabel.setVisible(true);
-			statusLabel.setVisible(true);
-			depositLabel.setVisible(true);
-			totalLabel.setVisible(true);
-			lotValue.setVisible(true);
-			spaceValue.setVisible(true);
-			durationValue.setVisible(true);
-			statusValue.setVisible(true);
-			depositValue.setVisible(true);
-			totalValue.setVisible(true);
-			paymentsLabel.setVisible(true);
-			paymentsList.getParent().getParent().setVisible(true);
-
-			if (selectedBooking.getStatus() == Booking.BookingStatus.PENDING) {
-				cancelButton.setVisible(false);
-				checkinButton.setVisible(false);
-				checkoutButton.setVisible(false);
-				extendTimeButton.setVisible(false);
-				// show pay deposit button
-			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CONFIRMED) {
-				cancelButton.setVisible(true);
-				checkinButton.setVisible(true);
-				checkoutButton.setVisible(false);
-				extendTimeButton.setVisible(true);
-			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CHECKED_IN) {
-				cancelButton.setVisible(false);
-				checkinButton.setVisible(false);
-				checkoutButton.setVisible(true);
-				extendTimeButton.setVisible(true);
-			} else {
-				cancelButton.setVisible(false);
-				checkinButton.setVisible(false);
-				checkoutButton.setVisible(false);
-				extendTimeButton.setVisible(false);
-			}
 		} catch (Exception e) {
 			ErrorDialog.show(this, "Error", "Could not refresh booking information: " + e.getMessage());
 		}
+	}
+
+	private void updateBookingDetails(Booking booking) {
+		lotValue.setText(booking.getParkingSpace().getLot().getName());
+		spaceValue.setText(booking.getParkingSpace().getName());
+		durationValue.setText(booking.getDuration());
+		statusValue.setText(booking.getStatus().toString());
+		depositValue.setText(Double.toString(booking.getDeposit()));
+		totalValue.setText(Double.toString(booking.deductedPrice()));
+		licencePlateValue.setText(booking.getClient().getLicencePlate());
+
+		// Reset status text color and font
+		statusValue.setForeground(Color.BLACK);
+		statusValue.setFont(new Font(statusValue.getFont().getName(), Font.PLAIN, statusValue.getFont().getSize()));
+
+		// Set status colors based on booking status
+		Booking.BookingStatus status = booking.getStatus();
+		if (status == Booking.BookingStatus.OVERSTAYED) {
+			statusValue.setForeground(COLOR_ERROR);
+			statusValue.setFont(new Font(statusValue.getFont().getName(), Font.BOLD, statusValue.getFont().getSize()));
+		} else if (status == Booking.BookingStatus.EXPIRED) {
+			statusValue.setForeground(COLOR_WARNING);
+			statusValue.setFont(new Font(statusValue.getFont().getName(), Font.BOLD, statusValue.getFont().getSize()));
+		} else if (status == Booking.BookingStatus.CANCELED) {
+			statusValue.setForeground(COLOR_INACTIVE);
+		}
+	}
+
+	private void updateCarPresenceInfo(Booking booking) {
+		boolean isCarPresent = parkingSensorController.isCarPresentAtSpace(booking.getParkingSpace());
+		boolean isOwnerCar = parkingSensorController.isBookingOwnerCar(booking);
+		String detectedPlate = parkingSensorController.getDetectedLicencePlate(booking.getParkingSpace());
+		boolean isActiveBooking = booking.getStatus() == Booking.BookingStatus.CONFIRMED
+				|| booking.getStatus() == Booking.BookingStatus.CHECKED_IN
+				|| booking.getStatus() == Booking.BookingStatus.OVERSTAYED;
+
+		if (isCarPresent) {
+			if (isActiveBooking) {
+				if (isOwnerCar) {
+					carPresenceValue.setText("Yes - Your car is detected");
+					carPresenceValue.setForeground(COLOR_SUCCESS);
+				} else {
+					carPresenceValue.setText("Yes - Unauthorized vehicle (" + detectedPlate + ")");
+					carPresenceValue.setForeground(COLOR_WARNING);
+				}
+			} else {
+				carPresenceValue.setText("Yes - Car with plate: " + detectedPlate);
+				carPresenceValue.setForeground(Color.BLACK);
+			}
+		} else {
+			carPresenceValue.setText("No - Space is empty");
+			carPresenceValue.setForeground(COLOR_ERROR);
+		}
+	}
+
+	private void updatePaymentsList(Booking booking) {
+		paymentsListModel.clear();
+		List<Payment> payments = paymentController.getPaymentsForBooking(booking);
+		for (Payment payment : payments) {
+			paymentsListModel.addElement(payment);
+		}
+	}
+
+	private void showAllBookingDetails() {
+		setVisibility(true, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue,
+				statusLabel, statusValue, depositLabel, depositValue, totalLabel, totalValue,
+				paymentsLabel, paymentsScrollPane, carPresenceLabel, carPresenceValue,
+				licencePlateLabel, licencePlateValue);
+	}
+
+	private void updateActionButtonsForStatus(Booking booking) {
+		// Start by hiding all buttons
+		hideAllActionButtons();
+
+		Booking.BookingStatus status = booking.getStatus();
+		boolean isCarPresent = parkingSensorController.isCarPresentAtSpace(booking.getParkingSpace());
+		boolean isOwnerCar = parkingSensorController.isBookingOwnerCar(booking);
+
+		switch (status) {
+			case CONFIRMED:
+				simulateCarArrivalButton.setVisible(!isCarPresent);
+				simulateCarDepartureButton.setVisible(isCarPresent);
+				break;
+
+			case CHECKED_IN:
+				simulateCarArrivalButton.setVisible(!isCarPresent);
+				simulateCarDepartureButton.setVisible(isCarPresent);
+				completeCheckoutButton.setVisible(!isCarPresent);
+				if (!isCarPresent) {
+					styleCheckoutButton(completeCheckoutButton);
+				}
+				break;
+
+			case OVERSTAYED:
+				simulateCarDepartureButton.setVisible(isCarPresent);
+				completeCheckoutButton.setVisible(!isCarPresent);
+				if (!isCarPresent) {
+					styleCheckoutButton(completeCheckoutButton);
+				}
+				if (!warningShown && isCarPresent) {
+					showOverstayWarning();
+				}
+				break;
+
+			case EXPIRED:
+				completeCheckoutButton.setVisible(true);
+				styleCheckoutButton(completeCheckoutButton);
+				if (!warningShown) {
+					showExpiredNotification();
+				}
+				break;
+
+			case CANCELED:
+				boolean isLatestBooking = bookingController.isLatestBookingForSpaceAndClient(booking);
+				simulateCarDepartureButton.setVisible(isCarPresent && isOwnerCar && isLatestBooking);
+				break;
+		}
+
+		// Update extend time button (for PENDING, CONFIRMED, CHECKED_IN)
+		extendTimeButton.setVisible(status == Booking.BookingStatus.PENDING
+				|| status == Booking.BookingStatus.CONFIRMED
+				|| status == Booking.BookingStatus.CHECKED_IN);
+
+		// Update cancel button (for PENDING or CONFIRMED before start time)
+		deleteButton.setVisible((status == Booking.BookingStatus.PENDING
+				|| status == Booking.BookingStatus.CONFIRMED)
+				&& !LocalDateTime.now().isAfter(booking.getStartTime()));
+	}
+
+	private void styleCheckoutButton(JButton button) {
+		button.setForeground(COLOR_SUCCESS);
+		button.setFont(new Font(button.getFont().getName(), Font.BOLD, button.getFont().getSize()));
+	}
+
+	private void showOverstayWarning() {
+		JOptionPane.showMessageDialog(this,
+				"WARNING: Your booking has expired but your car is still in the parking space.\n"
+						+ "You must remove your car and complete checkout to avoid additional fees.\n"
+						+ "You cannot make new bookings until this is resolved.",
+				"Booking Overstayed", JOptionPane.WARNING_MESSAGE);
+		warningShown = true;
+	}
+
+	private void showExpiredNotification() {
+		JOptionPane.showMessageDialog(this,
+				"Your booking has expired and your car has been detected as removed.\n"
+						+ "Please complete checkout by clicking the 'Complete Checkout' button to finalize payment.",
+				"Booking Expired", JOptionPane.INFORMATION_MESSAGE);
+		warningShown = true;
 	}
 
 	private void handleExtendTime() {
@@ -431,10 +655,143 @@ public class ClientPage extends JPanel {
 		}
 	}
 
-	private void handleCheckout() {
+	private void handleCancelBooking() {
 		Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
-		if (CheckoutPopup.showDialog(this, selectedBooking)) {
-			refresh();
+		if (selectedBooking == null) {
+			JOptionPane.showMessageDialog(this, "Please select a booking first", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		boolean isCarPresent = false;
+		try {
+			isCarPresent = parkingSensorController.isCarPresentAtSpace(selectedBooking.getParkingSpace());
+		} catch (Exception ex) {
+			// Ignore exceptions here - we'll just assume no car is present
+		}
+
+		String confirmMessage = "Are you sure you want to cancel this booking?";
+		if (isCarPresent) {
+			confirmMessage += "\n\nNOTE: Your car is still in the parking space. After cancellation, you'll need to remove it.";
+		}
+
+		int confirm = JOptionPane.showConfirmDialog(this, confirmMessage, "Confirm Cancellation",
+				JOptionPane.YES_NO_OPTION);
+
+		if (confirm == JOptionPane.YES_OPTION) {
+			try {
+				double depositAmount = selectedBooking.getDeposit();
+				String message = String
+						.format("To cancel your booking, you must select a refund method for your deposit of $%.2f.\n\n"
+								+ "Please select your preferred refund method:", depositAmount);
+
+				String[] refundMethods = { "Credit", "Debit", "Cash", "Mobile" };
+				String selectedMethod = (String) JOptionPane.showInputDialog(this, message, "Deposit Refund Required",
+						JOptionPane.INFORMATION_MESSAGE, null, refundMethods, refundMethods[0]);
+
+				if (selectedMethod != null) {
+					bookingController.cancelBooking(selectedBooking);
+
+					try {
+						paymentController.processRefundPayment(selectedBooking, selectedMethod);
+
+						JOptionPane.showMessageDialog(this, String.format(
+								"Your booking has been cancelled and your deposit of $%.2f has been refunded via %s.",
+								depositAmount, selectedMethod), "Cancellation Complete",
+								JOptionPane.INFORMATION_MESSAGE);
+
+						refresh();
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(this,
+								"Error processing refund: " + ex.getMessage() + "\n"
+										+ "Please contact customer support for assistance with your refund.",
+								"Refund Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					JOptionPane.showMessageDialog(this,
+							"Booking cancellation was cancelled. Your booking remains active.", "Cancellation Aborted",
+							JOptionPane.INFORMATION_MESSAGE);
+				}
+			} catch (ParkingSystemException ex) {
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	private void handleCompleteCheckout() {
+		Booking selectedBooking = (Booking) bookingsList.getSelectedItem();
+		if (selectedBooking == null) {
+			JOptionPane.showMessageDialog(this, "Please select a booking first", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		Booking.BookingStatus status = selectedBooking.getStatus();
+		if (status != Booking.BookingStatus.CHECKED_IN && status != Booking.BookingStatus.OVERSTAYED
+				&& status != Booking.BookingStatus.EXPIRED) {
+			JOptionPane.showMessageDialog(this,
+					"Checkout can only be completed for checked-in, expired, or overstayed bookings", "Invalid Status",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		if (status != Booking.BookingStatus.EXPIRED) {
+			boolean isCarPresent = parkingSensorController.isCarPresentAtSpace(selectedBooking.getParkingSpace());
+			if (isCarPresent) {
+				JOptionPane.showMessageDialog(this,
+						"You must remove your car from the parking space before completing checkout",
+						"Car Still Present", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+		}
+
+		boolean isOverstayed = status == Booking.BookingStatus.OVERSTAYED;
+		boolean isExpired = status == Booking.BookingStatus.EXPIRED;
+		String paymentTitle = isOverstayed ? "Overstayed Booking Payment"
+				: isExpired ? "Expired Booking Payment" : "Complete Checkout";
+
+		// Calculate payment amount
+		double finalAmount = selectedBooking.deductedPrice();
+		double depositPaid = selectedBooking.getDeposit();
+		double totalAmount = selectedBooking.calculatePrice();
+
+		// Show appropriate message based on booking status
+		String statusWarning = "";
+		if (isOverstayed) {
+			statusWarning = "\n\nWARNING: Your booking was overstayed. In the future, please remove your car before your booking ends.\n"
+					+ "Repeated violations may result in additional fees or restrictions.\n";
+		} else if (isExpired) {
+			statusWarning = "\n\nYour booking has expired. Thank you for removing your car promptly.\n";
+		}
+
+		// Show payment confirmation with amount details
+		String paymentMessage = String.format(
+				"Payment Details:%s\n\n" + "Total parking fee: $%.2f\n" + "Deposit already paid: $%.2f\n"
+						+ "Remaining balance: $%.2f\n\n" + "Please select a payment method to complete your booking:",
+				statusWarning, totalAmount, depositPaid, finalAmount);
+
+		// Simplify the payment method options
+		String[] paymentMethods = { "Credit", "Debit", "Cash", "Mobile" };
+		String selectedMethod = (String) JOptionPane.showInputDialog(this, paymentMessage, paymentTitle,
+				JOptionPane.QUESTION_MESSAGE, null, paymentMethods, paymentMethods[0]);
+
+		if (selectedMethod != null) {
+			try {
+				Payment payment = paymentController.processFinalPayment(selectedBooking, selectedMethod);
+				if (payment != null) {
+					// Reset the warning flag when the booking is successfully completed
+					warningShown = false;
+
+					JOptionPane.showMessageDialog(this,
+							String.format("Payment of $%.2f processed successfully.\nYour booking is now complete.",
+									finalAmount),
+							"Booking Completed", JOptionPane.INFORMATION_MESSAGE);
+
+					refresh();
+				}
+			} catch (Exception e) {
+				e.printStackTrace(); // Add this for debugging
+				JOptionPane.showMessageDialog(this, "Error processing final payment: " + e.getMessage(),
+						"Payment Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 }

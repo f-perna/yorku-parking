@@ -20,14 +20,7 @@ public class BookingController {
 		this.authState = AuthenticationState.getInstance();
 	}
 
-	public Booking createBooking(ParkingSpace parkingSpace, int durationHours) {
-		if (parkingSpace == null) {
-			throw new ParkingSystemException("Parking space cannot be null", ErrorType.VALIDATION);
-		}
-		if (durationHours <= 0 || durationHours > 24) {
-			throw new ParkingSystemException("Duration must be between 1 and 24 hours", ErrorType.VALIDATION);
-		}
-
+	public void authCheck() {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
 			throw new ParkingSystemException("User must be logged in to create a booking", ErrorType.AUTHENTICATION);
@@ -35,6 +28,24 @@ public class BookingController {
 
 		if (!client.isApproved() && client.getType() != Client.type.VISITOR) {
 			throw new ParkingSystemException("Client must be approved to make a booking", ErrorType.AUTHORIZATION);
+		}
+
+		if (client.getLicencePlate() == null || client.getLicencePlate().trim().isEmpty()) {
+			throw new ParkingSystemException("Client must have a licence plate registered", ErrorType.VALIDATION);
+		}
+
+	}
+
+	public Booking createBooking(ParkingSpace parkingSpace, int durationHours) {
+		authCheck();
+
+		Client client = authState.getLoggedInClient();
+
+		if (bookingService.hasOverstayedBookings(client)) {
+			throw new ParkingSystemException(
+					"You have overstayed bookings that need to be resolved before creating new bookings. "
+							+ "Please return to your parking space, remove your car, and complete checkout.",
+					ErrorType.BUSINESS_LOGIC);
 		}
 
 		return bookingService.createBooking(parkingSpace, durationHours, client);
@@ -58,16 +69,9 @@ public class BookingController {
 	}
 
 	public boolean checkIn(Booking booking) {
-		if (booking == null) {
-			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
-		}
+		authCheck();
 
-		Client client = authState.getLoggedInClient();
-		if (client == null) {
-			throw new ParkingSystemException("User must be logged in to check in", ErrorType.AUTHENTICATION);
-		}
-
-		if (!booking.getClient().equals(client)) {
+		if (!booking.getClient().equals(authState.getLoggedInClient())) {
 			throw new ParkingSystemException("Cannot check in for another user's booking", ErrorType.AUTHORIZATION);
 		}
 
@@ -75,24 +79,39 @@ public class BookingController {
 	}
 
 	public List<Booking> getBookingsForClient() {
-		Client client = authState.getLoggedInClient();
-		if (client == null) {
-			throw new ParkingSystemException("User must be logged in to view bookings", ErrorType.AUTHENTICATION);
-		}
+		authCheck();
 
-		return bookingService.getBookingsForClient(client);
+		return bookingService.getBookingsForClient(authState.getLoggedInClient());
 	}
 
 	public Booking extendBookingTime(Booking booking, int additionalHours) {
+		authCheck();
+
+		if (!booking.getClient().equals(authState.getLoggedInClient())) {
+			throw new ParkingSystemException("Cannot extend another user's booking", ErrorType.AUTHORIZATION);
+		}
+
+		return bookingService.extendBookingTime(booking, additionalHours);
+	}
+
+	public void cancelBooking(Booking booking) {
 		if (booking == null) {
 			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
 
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
-			throw new ParkingSystemException("User must be logged in to extend a booking", ErrorType.AUTHENTICATION);
+			throw new ParkingSystemException("User must be logged in to cancel a booking", ErrorType.AUTHENTICATION);
 		}
 
-		return bookingService.extendBookingTime(booking, additionalHours, client);
+		if (!booking.getClient().equals(client)) {
+			throw new ParkingSystemException("Cannot cancel another user's booking", ErrorType.AUTHORIZATION);
+		}
+
+		bookingService.cancelBooking(booking, client);
+	}
+
+	public boolean isLatestBookingForSpaceAndClient(Booking booking) {
+		return bookingService.isLatestBookingForSpaceAndClient(booking);
 	}
 }

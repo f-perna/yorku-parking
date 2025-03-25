@@ -21,6 +21,9 @@ public class HomePage extends JPanel implements AuthStateObserver {
 	private JButton loginButton;
 	private JButton registerButton;
 	private JButton bookingsButton;
+	private JButton managerDashboardButton;
+	private JButton superManagerButton;
+	private JLabel welcomeLabel;
 
 	public HomePage(JFrame parent) {
 		setLayout(new GridBagLayout());
@@ -31,17 +34,24 @@ public class HomePage extends JPanel implements AuthStateObserver {
 		gbc.gridy = 0;
 		gbc.anchor = GridBagConstraints.CENTER;
 
-		JLabel label = new JLabel("Welcome to YorkU Parking Booking System!");
+		welcomeLabel = new JLabel("Welcome to YorkU Parking Booking System!");
 		loginButton = new JButton("Login");
 		registerButton = new JButton("Register");
 		bookingsButton = new JButton("Go to Bookings");
+		managerDashboardButton = new JButton("Manager Dashboard");
+		superManagerButton = new JButton("Super Manager Dashboard");
 
 		loginButton.addActionListener(e -> NavigationController.showPage("Login"));
 		registerButton.addActionListener(e -> NavigationController.showPage("Register"));
 		bookingsButton.addActionListener(e -> NavigationController.showPage("Client"));
-		loginButton.setFocusPainted(false);
+		managerDashboardButton.addActionListener(e -> NavigationController.showPage("ManagerDashboard"));
+		superManagerButton.addActionListener(e -> NavigationController.showPage("SuperManager"));
 
-		add(label, gbc);
+		loginButton.setFocusPainted(false);
+		managerDashboardButton.setFocusPainted(false);
+		superManagerButton.setFocusPainted(false);
+
+		add(welcomeLabel, gbc);
 		buttonArea.add(loginButton);
 		buttonArea.add(registerButton);
 
@@ -52,19 +62,31 @@ public class HomePage extends JPanel implements AuthStateObserver {
 		AuthenticationState.getInstance().addObserver(this);
 
 		// Initialize UI state
-		updateButtonVisibility(AuthenticationState.getInstance().isLoggedIn());
+		refresh(AuthenticationState.getInstance().isLoggedIn());
 	}
 
 	@Override
 	public void onAuthStateChanged(boolean isLoggedIn) {
-		updateButtonVisibility(isLoggedIn);
+		refresh(isLoggedIn);
 	}
 
-	private void updateButtonVisibility(boolean isLoggedIn) {
+	private void refresh(boolean isLoggedIn) {
 		buttonArea.removeAll();
+		AuthenticationState authState = AuthenticationState.getInstance();
+
 		if (isLoggedIn) {
-			buttonArea.add(bookingsButton);
+			if (authState.isSuperManagerLoggedIn()) {
+				welcomeLabel.setText("Welcome Super Manager!");
+				buttonArea.add(superManagerButton);
+			} else if (authState.isManagerLoggedIn()) {
+				welcomeLabel.setText("Welcome Manager!");
+				buttonArea.add(managerDashboardButton);
+			} else {
+				welcomeLabel.setText("Welcome to YorkU Parking Booking System!");
+				buttonArea.add(bookingsButton);
+			}
 		} else {
+			welcomeLabel.setText("Welcome to YorkU Parking Booking System!");
 			buttonArea.add(loginButton);
 			buttonArea.add(registerButton);
 		}

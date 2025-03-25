@@ -4,8 +4,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import controllers.BookingController;
-import controllers.ControllerFactory;
+import controllers.factory.ControllerFactory;
 import models.booking.Booking;
+import views.dialog.ErrorDialog;
+import views.dialog.SuccessDialog;
 
 public class ExtendTimePopup {
 

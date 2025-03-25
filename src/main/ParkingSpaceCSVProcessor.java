@@ -69,12 +69,8 @@ public class ParkingSpaceCSVProcessor extends CSVHelper {
 			bw.newLine();
 
 			for (ParkingSpace space : spaces) {
-				String line = String.join(CSV_DELIMITER,
-						space.getID().toString(),
-						space.getLot().getID().toString(),
-						space.getStatus().toString(),
-						space.getName(),
-						String.valueOf(space.isEnabled()));
+				String line = String.join(CSV_DELIMITER, space.getID().toString(), space.getLot().getID().toString(),
+						space.getStatus().toString(), space.getName(), String.valueOf(space.isEnabled()));
 				bw.write(line);
 				bw.newLine();
 			}

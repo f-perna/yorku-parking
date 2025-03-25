@@ -3,14 +3,16 @@ package views;
 import javax.swing.*;
 
 import controllers.BookingController;
-import controllers.ControllerFactory;
 import controllers.NavigationController;
 import controllers.ParkingLotController;
 import controllers.ParkingSpaceController;
 import controllers.PaymentController;
+import controllers.factory.ControllerFactory;
 import models.booking.Booking;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
+import views.dialog.ErrorDialog;
+import views.dialog.SuccessDialog;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,6 +31,7 @@ public class BookingPage extends JPanel {
 	private JComboBox<ParkingLot> lotComboBox;
 	private JComboBox<ParkingSpace> spaceComboBox;
 	private JComboBox<String> durationComboBox;
+	private JLabel licencePlateInfoLabel;
 
 	public BookingPage(JFrame parent) {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
@@ -99,9 +102,17 @@ public class BookingPage extends JPanel {
 		durationComboBox.insertItemAt(null, 0);
 		durationComboBox.setSelectedItem(null);
 
+		licencePlateInfoLabel = new JLabel("Your vehicle's licence plate will be used for this booking.");
+		licencePlateInfoLabel.setFont(new Font("Arial", Font.ITALIC, 12));
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.CENTER;
+		add(licencePlateInfoLabel, gbc);
+
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
 		JButton backButton = new JButton("Back");
-		JButton continueButton = new JButton("Checkout");
+		JButton continueButton = new JButton("Continue");
 
 		Dimension buttonSize = new Dimension(100, 30);
 		backButton.setPreferredSize(buttonSize);
@@ -111,10 +122,10 @@ public class BookingPage extends JPanel {
 		buttonPanel.add(continueButton);
 
 		gbc.gridx = 0;
-		gbc.gridy = 4;
+		gbc.gridy = 5;
 		gbc.gridwidth = 2;
-		gbc.insets = new Insets(20, 10, 10, 10);
 		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.insets = new Insets(30, 10, 10, 10);
 		add(buttonPanel, gbc);
 
 		backButton.addActionListener((ActionEvent e) -> handleBack());

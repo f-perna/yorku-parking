@@ -20,8 +20,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
-import controllers.ControllerFactory;
 import controllers.SuperManagerController;
+import controllers.factory.ControllerFactory;
 import models.manager.Manager;
 
 public class SuperManagerPage extends JPanel {

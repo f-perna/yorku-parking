@@ -13,14 +13,17 @@ import javax.swing.JButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 
 import controllers.AuthController;
-import controllers.ControllerFactory;
 import controllers.NavigationController;
+import controllers.factory.ControllerFactory;
+import views.dialog.ErrorDialog;
 
 public class LoginPage extends JPanel {
 	private AuthController authController;
@@ -32,10 +35,16 @@ public class LoginPage extends JPanel {
 	private JRadioButton managerRadioButton;
 	private JRadioButton superManagerRadioButton;
 	private ButtonGroup loginTypeGroup;
+	private Border defaultBorder;
+	private Border errorBorder;
 
 	public LoginPage(JFrame parent) {
 		this.authController = ControllerFactory.getInstance().getAuthController();
 		setLayout(new BorderLayout());
+
+		// Create default and error borders
+		defaultBorder = BorderFactory.createLineBorder(Color.GRAY);
+		errorBorder = BorderFactory.createLineBorder(Color.RED, 2);
 
 		// Create form panel that will contain all form components
 		JPanel formPanel = new JPanel(new GridBagLayout());
@@ -65,6 +74,7 @@ public class LoginPage extends JPanel {
 		formPanel.add(emailLabel, gbc);
 
 		emailField = new JTextField(20);
+		emailField.setBorder(defaultBorder);
 		gbc.gridx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		formPanel.add(emailField, gbc);
@@ -77,6 +87,7 @@ public class LoginPage extends JPanel {
 		formPanel.add(passLabel, gbc);
 
 		passwordField = new JPasswordField(20);
+		passwordField.setBorder(defaultBorder);
 		gbc.gridx = 1;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		formPanel.add(passwordField, gbc);
@@ -156,6 +167,9 @@ public class LoginPage extends JPanel {
 		goToRegister.addActionListener(e -> NavigationController.showPage("Register"));
 
 		loginButton.addActionListener(e -> {
+			// Reset field borders
+			resetFieldBorders();
+
 			String loginType = "client";
 			if (managerRadioButton.isSelected()) {
 				loginType = "manager";
@@ -167,11 +181,19 @@ public class LoginPage extends JPanel {
 		});
 	}
 
+	private void resetFieldBorders() {
+		emailField.setBorder(defaultBorder);
+		passwordField.setBorder(defaultBorder);
+		statusLabel.setText(" ");
+	}
+
 	private void handleLogin(String username, String password, String loginType) {
 		try {
 			boolean success = authController.login(username, password, loginType);
 
 			if (success) {
+				resetFields();
+
 				if (loginType.equals("manager")) {
 					NavigationController.showPage("ManagerDashboard");
 				} else if (loginType.equals("superManager")) {
@@ -187,11 +209,39 @@ public class LoginPage extends JPanel {
 				ErrorDialog.show(this, "Invalid " + loginType + " credentials");
 			}
 		} catch (models.ParkingSystemException e) {
-			ErrorDialog.show(this, e.getMessage());
+			if (e.getErrorType() == models.ParkingSystemException.ErrorType.AUTHORIZATION
+					&& e.getMessage().contains("pending approval")) {
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Account Pending Approval",
+						JOptionPane.WARNING_MESSAGE);
+			} else if (e.getErrorType() == models.ParkingSystemException.ErrorType.VALIDATION) {
+				highlightFieldWithError(e.getMessage());
+				statusLabel.setText(e.getMessage());
+			} else {
+				JOptionPane.showMessageDialog(this, e.getMessage(), "Parking System Exception",
+						JOptionPane.WARNING_MESSAGE);
+			}
 		} catch (IllegalArgumentException e) {
 			ErrorDialog.show(this, e.getMessage());
 		} catch (Exception e) {
 			ErrorDialog.show(this, "An unexpected error occurred: " + e.getMessage());
 		}
+	}
+
+	private void highlightFieldWithError(String errorMessage) {
+		errorMessage = errorMessage.toLowerCase();
+
+		if (errorMessage.contains("email")) {
+			emailField.setBorder(errorBorder);
+		} else if (errorMessage.contains("password")) {
+			passwordField.setBorder(errorBorder);
+		}
+	}
+
+	private void resetFields() {
+		emailField.setText("");
+		passwordField.setText("");
+		clientRadioButton.setSelected(true);
+		statusLabel.setText(" ");
+		resetFieldBorders();
 	}
 }

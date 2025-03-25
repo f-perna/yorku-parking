@@ -1,5 +1,5 @@
 package models.auth;
 
 public interface AuthStateObserver {
-    void onAuthStateChanged(boolean isLoggedIn);
+	void onAuthStateChanged(boolean isLoggedIn);
 }

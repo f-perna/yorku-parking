@@ -18,8 +18,10 @@ import javax.swing.SwingConstants;
 
 import controllers.NavigationController;
 import controllers.PaymentController;
-import controllers.ControllerFactory;
+import controllers.factory.ControllerFactory;
 import models.booking.Booking;
+import views.dialog.ErrorDialog;
+import views.dialog.SuccessDialog;
 
 public class CheckoutPage extends JPanel {
 
@@ -147,6 +149,17 @@ public class CheckoutPage extends JPanel {
 
 			currentBooking = booking;
 
+			// Validate that booking has all necessary properties
+			if (booking.getParkingSpace() == null) {
+				ErrorDialog.show(this, "Error", "Booking has no associated parking space");
+				return;
+			}
+
+			if (booking.getParkingSpace().getLot() == null) {
+				ErrorDialog.show(this, "Error", "Parking space has no associated parking lot");
+				return;
+			}
+
 			lotValueLabel.setText(booking.getParkingSpace().getLot().getName());
 			spaceValueLabel.setText(booking.getParkingSpace().getName());
 			durationValueLabel.setText(booking.getDuration());
@@ -156,6 +169,7 @@ public class CheckoutPage extends JPanel {
 			paymentComboBox.setSelectedIndex(0);
 		} catch (Exception e) {
 			ErrorDialog.show(this, "Error", "Could not load booking details: " + e.getMessage());
+			e.printStackTrace(); // Print stack trace for debugging
 		}
 	}
 
