@@ -22,8 +22,8 @@ public class ClientController {
 			throw new ParkingSystemException("Email address must be in a valid format (e.g., user@domain.com)",
 					ErrorType.VALIDATION);
 		}
-		if (password == null || password.length() < 6) {
-			throw new ParkingSystemException("Password must be at least 6 characters long", ErrorType.VALIDATION);
+		if (password == null || password.length() < 8) {
+			throw new ParkingSystemException("Password must be at least 8 characters long", ErrorType.VALIDATION);
 		}
 		if (licencePlate == null || !licencePlate.matches("^[A-Z0-9\\s]{2,8}$")) {
 			throw new ParkingSystemException("Licence plate must contain 2-8 uppercase letters, numbers, and spaces",
