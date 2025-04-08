@@ -3,7 +3,7 @@ package repositories;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import main.PaymentCSVProcessor;
+import csv.PaymentCSVProcessor;
 import models.booking.Booking;
 import models.payment.Payment;
 import models.payment.Payment.PaymentType;

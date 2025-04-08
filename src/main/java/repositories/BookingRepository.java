@@ -5,14 +5,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import main.BookingCSVProcessor;
+import csv.BookingCSVProcessor;
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
 import models.booking.Booking;
 import models.booking.Booking.BookingStatus;
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
-import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 
 public class BookingRepository {
 	private final List<Booking> bookings;

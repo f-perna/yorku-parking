@@ -3,7 +3,7 @@ package repositories;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import main.ParkingLotCSVProcessor;
+import csv.ParkingLotCSVProcessor;
 import models.parkingLot.ParkingLot;
 
 public class ParkingLotRepository {

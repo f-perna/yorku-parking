@@ -3,7 +3,7 @@ package repositories;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.ManagerCSVProcessor;
+import csv.ManagerCSVProcessor;
 import models.manager.Manager;
 
 public class ManagerRepository {
