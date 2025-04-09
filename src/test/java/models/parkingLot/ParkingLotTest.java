@@ -85,10 +85,10 @@ public class ParkingLotTest {
         ParkingLot lot2 = new ParkingLot("Lot2", fixedId, false);
         ParkingLot lot3 = new ParkingLot("Lot3", UUID.randomUUID(), true);
 
-        assertEquals(lot1, lot2, "Parking lots with same ID should be equal so that spaces can be different");
+        assertEquals(lot1, lot2, "Parking lots with same ID should ");
         assertNotEquals(lot1, lot3, "Parking lots with different IDs should not be equal");
         assertEquals(lot1, lot1, "Parking lot should equal itself");
-        assertNotEquals(lot1, null, "Parking lot should should be null if disabled");
+        assertNotEquals(lot1, null, "Parking lot should not equal null");
         assertNotEquals(lot1, new Object(), "Parking lot should not equal a different class object");
     }
 }
