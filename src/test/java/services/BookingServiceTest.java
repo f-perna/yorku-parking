@@ -52,8 +52,7 @@ public class BookingServiceTest {
 		
 		assertNotNull(testBooking);
 		
-		bookingService.confirmBooking(testBooking, testPayment);
-		bookingService.cancel(testBooking);
+		bookingRepository.deleteBooking(testBooking);
 		clientRepository.deleteClient(clientRepository.getClientByEmail("test@gmail.com"));
 	}
 	

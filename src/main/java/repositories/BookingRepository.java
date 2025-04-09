@@ -218,4 +218,12 @@ public class BookingRepository {
 		}
 		return false;
 	}
+	
+	public void deleteBooking(Booking booking) {
+		if (booking == null) {
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
+		}
+		bookings.remove(booking);
+		saveBookings();
+	}
 }
