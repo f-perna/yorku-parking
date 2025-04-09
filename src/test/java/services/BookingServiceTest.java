@@ -52,7 +52,12 @@ public class BookingServiceTest {
 		
 		assertNotNull(testBooking);
 		
+<<<<<<< Updated upstream
 		bookingRepository.deleteBooking(testBooking);
+=======
+		bookingService.confirmBooking(testBooking, testPayment);
+		bookingService.cancel(testBooking);
+>>>>>>> Stashed changes
 		clientRepository.deleteClient(clientRepository.getClientByEmail("test@gmail.com"));
 	}
 	
