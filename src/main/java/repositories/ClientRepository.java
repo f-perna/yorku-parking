@@ -31,6 +31,16 @@ public class ClientRepository {
 			saveClients();
 		}
 	}
+	
+	public void deleteClient(Client client) {
+		if (client == null) {
+			throw new IllegalArgumentException("Client cannot be null");
+		}
+		synchronized (lock) {
+			clients.remove(client);
+			saveClients();
+		}
+	}
 
 	public void saveClients() {
 		synchronized (lock) {
