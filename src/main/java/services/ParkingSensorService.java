@@ -35,6 +35,10 @@ public class ParkingSensorService implements ParkingSensorListener {
 		sensor.addListener(this);
 		return sensor;
 	}
+	
+	public void removeSensor(ParkingSpace parkingSpace) {
+		parkingSensorRepository.removeSensor(parkingSpace);
+	}
 
 	public ParkingSensor getSensorForSpace(ParkingSpace parkingSpace) {
 		ParkingSensor sensor = parkingSensorRepository.getSensorBySpaceId(parkingSpace.getID());

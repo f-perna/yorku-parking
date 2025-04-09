@@ -133,6 +133,13 @@ public class ParkingSpaceService {
 
 		return parkingSpaceRepository.updateParkingSpaceStatus(space, space.getStatus());
 	}
+	
+	public void removeParkingSpace(ParkingSpace parkingSpace) {
+		if (parkingSpace == null) {
+			throw new ParkingSystemException("Parking space canot be null", ErrorType.VALIDATION);
+		}
+		parkingSpaceRepository.removeParkingSpace(parkingSpace);
+	}
 
 	public ParkingSpace getParkingSpaceById(UUID spaceId) {
 		if (spaceId == null) {

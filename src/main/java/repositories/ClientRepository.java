@@ -32,12 +32,18 @@ public class ClientRepository {
 		}
 	}
 	
-	public void deleteClient(Client client) {
-		if (client == null) {
-			throw new IllegalArgumentException("Client cannot be null");
+	public void deleteClient(String email) {
+		if (email == null) {
+			throw new IllegalArgumentException("Email cannot be null");
 		}
 		synchronized (lock) {
-			clients.remove(client);
+			Client removeClient = null;
+			for (Client client : clients) {
+				if (client.getEmail().equals(email)) {
+					removeClient = client;
+				}
+			}
+			clients.remove(removeClient);
 			saveClients();
 		}
 	}

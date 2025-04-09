@@ -50,4 +50,12 @@ public class ParkingLotService {
 		managerAuth();
 		return parkingLotRepository.disableParkingLot(parkingLot);
 	}
+	
+	public void removeParkingLot(ParkingLot parkingLot) {
+		managerAuth();
+		if (parkingLot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
+		parkingLotRepository.removeParkingLot(parkingLot.getID());
+	}
 }

@@ -39,6 +39,11 @@ public class ParkingSensorRepository {
 		saveSensors();
 		return sensor;
 	}
+	
+	public void removeSensor(ParkingSpace parkingSpace) {
+		sensors.remove(getSensorBySpaceId(parkingSpace.getID()));
+		saveSensors();
+	}
 
 	public void saveSensors() {
 		ParkingSensorCSVProcessor.setSensorData(sensors);

@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import models.ParkingSystemException;
+import models.auth.AuthenticationState;
 import models.booking.Booking;
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
@@ -18,69 +19,66 @@ import repositories.ClientRepository;
 import repositories.ParkingLotRepository;
 import repositories.ParkingSensorRepository;
 import repositories.ParkingSpaceRepository;
+import services.factory.ServiceFactory;
 
 public class BookingServiceTest {
-	private BookingRepository bookingRepository;
-	private BookingService bookingService;
-	private ParkingSpaceRepository parkingSpaceRepository;
-	private ParkingLotRepository parkingLotRepository;
-	private ParkingSensorService parkingSensorService;
-	private ParkingSensorRepository parkingSensorRepository;
-	private ClientRepository clientRepository;
-	private ClientService clientService;
+	private ServiceFactory serviceFactory;
 	
 	@Before
 	public void beforeClientServiceTest() {
-		bookingRepository = new BookingRepository();
-		parkingSensorRepository = new ParkingSensorRepository();
-		parkingSpaceRepository = new ParkingSpaceRepository();
-		parkingSensorService = new ParkingSensorService(bookingRepository, parkingSpaceRepository, parkingSensorRepository);
-		bookingService = new BookingService(bookingRepository, parkingSpaceRepository, parkingSensorService);
-		parkingLotRepository = new ParkingLotRepository();
-		clientRepository = new ClientRepository();
-		clientService = new ClientService(clientRepository);
+		serviceFactory = ServiceFactory.getInstance();
 	}
 	
 	@Test
 	public void verifyValidBooking() {
-		ParkingSpace parkingSpace = parkingSpaceRepository.getAvailableSpaces(parkingLotRepository.getAllParkingLots().getFirst()).getFirst();
-		clientService.registerClient("Bob","test@gmail.com", "ABc123!!", Client.type.VISITOR, "ABC 123");
+		ParkingSpace parkingSpace = serviceFactory.getParkingSpaceService().getAvailableSpaces(serviceFactory.getParkingLotService().getAllParkingLots().getFirst()).getFirst();
+		serviceFactory.getClientService().registerClient("Bob","test@gmail.com", "ABc123!!", Client.type.VISITOR, "ABC 123");
+		serviceFactory.getClientService().login("test@gmail.com", "ABc123!!");
 		
-		Booking testBooking = bookingService.createBooking(parkingSpace, 5, clientRepository.getClientByEmail("test@gmail.com"));
+		Booking testBooking = serviceFactory.getBookingService().createBooking(parkingSpace, 5, serviceFactory.getClientService().getClientByEmail("test@gmail.com"));
 		Payment testPayment = new Payment(10, testBooking, Payment.generateMethod("Debit"), PaymentType.DEPOSIT);
 		testPayment.processPayment();
 		
 		assertNotNull(testBooking);
 		
-		bookingRepository.deleteBooking(testBooking);
-		clientRepository.deleteClient(clientRepository.getClientByEmail("test@gmail.com"));
+		serviceFactory.getBookingService().deleteBooking(testBooking);
+		serviceFactory.getClientService().removeClient("test@gmail.com");
 	}
 	
 	@Test
 	public void verifyInvalidBookingTime() {
-		ParkingSpace parkingSpace = parkingSpaceRepository.getAvailableSpaces(parkingLotRepository.getAllParkingLots().getFirst()).getFirst();
-		clientService.registerClient("Bob","test@gmail.com", "ABc123!!", Client.type.VISITOR, "ABC 123");
+		ParkingSpace parkingSpace = serviceFactory.getParkingSpaceService().getAvailableSpaces(serviceFactory.getParkingLotService().getAllParkingLots().getFirst()).getFirst();
+		serviceFactory.getClientService().registerClient("Bob","test@gmail.com", "ABc123!!", Client.type.VISITOR, "ABC 123");
+		serviceFactory.getClientService().login("test@gmail.com", "ABc123!!");
 		
 		try {
-			bookingService.createBooking(parkingSpace, 25, clientRepository.getClientByEmail("test@gmail.com"));
+			serviceFactory.getBookingService().createBooking(parkingSpace, 25, serviceFactory.getClientService().getClientByEmail("test@gmail.com"));
 	        fail("Expected ParkingSystemException");
 	    } catch (ParkingSystemException e) {
 	        assertEquals("Duration must be between 1 and 24 hours", e.getMessage());
 	    }
-		clientRepository.deleteClient(clientRepository.getClientByEmail("test@gmail.com"));
+		serviceFactory.getClientService().removeClient("test@gmail.com");
 	}
 	
 	@Test
 	public void verifyInvalidBookingClientApproval() {
-		ParkingSpace parkingSpace = parkingSpaceRepository.getAvailableSpaces(parkingLotRepository.getAllParkingLots().getFirst()).getFirst();
-		clientService.registerClient("Bob","test@gmail.com", "ABc123!!", Client.type.STUDENT, "ABC 123");
+		ParkingSpace parkingSpace = serviceFactory.getParkingSpaceService().getAvailableSpaces(serviceFactory.getParkingLotService().getAllParkingLots().getFirst()).getFirst();
+		serviceFactory.getClientService().registerClient("Bob","test@gmail.com", "ABc123!!", Client.type.STUDENT, "ABC 123");
+		Client client = null;
+		
+		for (Client testClient : serviceFactory.getClientService().getAllClients()) {
+			if (testClient.getEmail().equals("test@gmail.com")) {
+				client = testClient;
+				break;
+			}
+		}
 		
 		try {
-			bookingService.createBooking(parkingSpace, 5, clientRepository.getClientByEmail("test@gmail.com"));
+			serviceFactory.getBookingService().createBooking(parkingSpace, 5, client);
 	        fail("Expected ParkingSystemException");
 	    } catch (ParkingSystemException e) {
 	        assertEquals("Client must be approved to make a booking", e.getMessage());
 	    }
-		clientRepository.deleteClient(clientRepository.getClientByEmail("test@gmail.com"));
+		serviceFactory.getClientService().removeClient("test@gmail.com");
 	}
 }
