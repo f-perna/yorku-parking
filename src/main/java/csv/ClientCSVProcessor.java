@@ -12,8 +12,19 @@ import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
 
 public class ClientCSVProcessor extends CSVHelper {
-	private static final String CLIENTS_CSV = DATA_DIRECTORY + "clients.csv";
+	private static String CLIENTS_CSV = DATA_DIRECTORY + "clients.csv";
 	private static final int EXPECTED_FIELDS = 6;
+	private static final String HEADER = "name,email,password,licencePlate,type,approved";
+
+	public static void initializeTestFile(String filePath) throws IOException {
+		CLIENTS_CSV = filePath;
+		initializeTestFile(filePath, HEADER);
+	}
+
+	public static void cleanupAndReset(String filePath) {
+		cleanupTestFile(filePath);
+		CLIENTS_CSV = DATA_DIRECTORY + "clients.csv";
+	}
 
 	public static List<Client> readClientData() {
 		List<Client> clients = new ArrayList<>();

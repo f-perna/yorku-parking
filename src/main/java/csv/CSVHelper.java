@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public abstract class CSVHelper {
 	protected static final String CSV_DELIMITER = ",";
@@ -31,4 +33,20 @@ public abstract class CSVHelper {
 	protected static void logError(String message) {
 		System.err.println("CSV Error: " + message);
 	}
+
+	protected static void initializeTestFile(String filePath, String header) throws IOException {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+			writer.write(header);
+			writer.newLine();
+		}
+	}
+
+	protected static void cleanupTestFile(String filePath) {
+		try {
+			Files.deleteIfExists(Paths.get(filePath));
+		} catch (IOException e) {
+			// Ignore, will be cleaned up by temp directory
+		}
+	}
+
 }

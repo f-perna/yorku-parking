@@ -43,17 +43,4 @@ public class ClientController {
 	public List<Client> getAllClients() {
 		return clientService.getAllClients();
 	}
-
-	public Client getClientByEmail(String email) {
-		if (email == null || email.trim().isEmpty()) {
-			throw new ParkingSystemException("Email address must be provided", ErrorType.VALIDATION);
-		}
-		if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-			throw new ParkingSystemException("Email address must be in a valid format (e.g., user@domain.com)",
-					ErrorType.VALIDATION);
-		}
-
-		String formattedEmail = email.toLowerCase().trim();
-		return clientService.getClientByEmail(formattedEmail);
-	}
 }

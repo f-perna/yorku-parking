@@ -51,6 +51,14 @@ public class ClientRepository {
 		}
 		return clients.stream().filter(client -> client.getEmail().equals(email)).findFirst().orElse(null);
 	}
+	
+	public Client getClientByLicensePlate(String licensePlate) {
+		if (licensePlate == null) {
+			return null;
+		}
+		
+		return clients.stream().filter(client -> client.getLicencePlate().equals(licensePlate)).findFirst().orElse(null);
+	}
 
 	public List<Client> getAllClients() {
 		return new ArrayList<>(clients);

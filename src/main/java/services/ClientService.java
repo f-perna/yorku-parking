@@ -46,6 +46,10 @@ public class ClientService {
 			throw new ParkingSystemException("Email address is already registered in the system",
 					ErrorType.BUSINESS_LOGIC);
 		}
+		
+		if (clientRepository.getClientByLicensePlate(licencePlate) != null) {
+			throw new ParkingSystemException("License Plate is already being used by a user in the system", ErrorType.BUSINESS_LOGIC);
+		}
 
 		boolean approved = (clientType == Client.type.VISITOR);
 
@@ -80,19 +84,6 @@ public class ClientService {
 
 	public List<Client> getAllClients() {
 		return clientRepository.getAllClients();
-	}
-
-	public Client getClientByEmail(String email) {
-		if (email == null) {
-			throw new ParkingSystemException("Email address must be provided", ErrorType.VALIDATION);
-		}
-
-		Client currentUser = (Client) authState.getLoggedInUser();
-		if (currentUser == null || (!currentUser.getEmail().equals(email) && !authState.isManagerLoggedIn())) {
-			throw new ParkingSystemException("You are not authorized to view this client's information",
-					ErrorType.AUTHORIZATION);
-		}
-		return clientRepository.getClientByEmail(email);
 	}
 
 	public boolean approveClient(String email, boolean approved) {
