@@ -18,41 +18,36 @@ import models.parkingLot.ParkingLot;
 import models.superManager.SuperManager;
 import repositories.ManagerRepository;
 import repositories.ParkingLotRepository;
+import services.factory.ServiceFactory;
 
 public class ParkingLotServiceTest {
-	private ParkingLotRepository parkingLotRepository;
-	private ParkingLotService parkingLotService;
+	private ServiceFactory serviceFactory;
 	private AuthenticationState authState;
-	private ManagerRepository managerRepository;
-	private ManagerService managerService;
 	private SuperManager superManager;
 	private Manager testManager;
 	
 	@Before
 	public void beforeParkingLotServiceTest() {
-		managerRepository = new ManagerRepository();
-		managerService = new ManagerService(managerRepository);
-		parkingLotRepository = new ParkingLotRepository();
-		parkingLotService = new ParkingLotService(parkingLotRepository);
+		serviceFactory = ServiceFactory.getInstance();
 		authState = AuthenticationState.getInstance();
 		superManager = SuperManager.getInstance();
 		authState.setLoggedInUser(superManager);
 		
-		testManager = managerService.generateAndGetManagerAccount();
-		managerService.login(testManager.getEmail(), testManager.getPassword());
+		testManager = serviceFactory.getManagerService().generateAndGetManagerAccount();
+		serviceFactory.getManagerService().login(testManager.getEmail(), testManager.getPassword());
 	}
 	
 	@After
 	public void afterAllParkingLotServiceTest() {
 		authState.setLoggedInUser(superManager);
 		
-		managerService.removeManager(testManager.getEmail());
+		serviceFactory.getManagerService().removeManager(testManager.getEmail());
 	}
 	
 	@Test
 	public void verifyAddParkingLot() {
-		parkingLotService.addParkingLot("Test Lot");
-		List<ParkingLot> lots = parkingLotService.getAllParkingLots();
+		serviceFactory.getParkingLotService().addParkingLot("Test Lot");
+		List<ParkingLot> lots = serviceFactory.getParkingLotService().getAllParkingLots();
 		Boolean lotAdded = false;
 		ParkingLot testLot = null;
 		for (ParkingLot lot: lots) {
@@ -64,27 +59,27 @@ public class ParkingLotServiceTest {
 		}
 		if (lotAdded != null) {
 			assertTrue(lotAdded);
-			parkingLotRepository.removeParkingLot(testLot.getID());
+			serviceFactory.getParkingLotService().removeParkingLot(testLot);
 		}
 	}
 	
 	@Test
 	public void verifyDuplicateParkingLot() {
-		parkingLotService.addParkingLot("Test Lot");
+		serviceFactory.getParkingLotService().addParkingLot("Test Lot");
 		try {
-			parkingLotService.addParkingLot("Test Lot");
+			serviceFactory.getParkingLotService().addParkingLot("Test Lot");
 	        fail("Expected ParkingSystemException");
 	    } catch (ParkingSystemException e) {
 	        assertEquals("A parking lot with name 'Test Lot' already exists", e.getMessage());
 	        ParkingLot testLot = null;
-	        List<ParkingLot> lots = parkingLotService.getAllParkingLots();
+	        List<ParkingLot> lots = serviceFactory.getParkingLotService().getAllParkingLots();
 			for (ParkingLot lot: lots) {
 				if (lot.getName().equals("Test Lot")) {
 					testLot = lot;
 					break;
 				}
 			}
-			parkingLotRepository.removeParkingLot(testLot.getID());
+			serviceFactory.getParkingLotService().removeParkingLot(testLot);
 	    }
 	}
 }
