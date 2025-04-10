@@ -22,7 +22,7 @@ public class AuthenticationStateTest {
     @BeforeEach
     void setUp() throws NoSuchFieldException, IllegalAccessException {
     	
-    	// we are testing singleton too, this is how its generally done
+    
        
         if (manager == null) {
             manager = new Manager("manager@example.com", "password");
