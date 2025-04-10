@@ -6,7 +6,6 @@ import models.auth.AuthenticationState;
 import models.booking.Booking;
 import models.client.Client;
 import models.parkingSpace.ParkingSpace;
-import services.BookingService;
 import services.ParkingSensorService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,10 +18,6 @@ public class ParkingSensorController {
 	public ParkingSensorController(ParkingSensorService parkingSensorService) {
 		this.parkingSensorService = parkingSensorService;
 		this.authState = AuthenticationState.getInstance();
-	}
-
-	public void simulateCarArrival(Booking booking) {
-		simulateCarArrival(booking, true);
 	}
 
 	public void simulateCarArrival(Booking booking, boolean shouldCheckIn) {

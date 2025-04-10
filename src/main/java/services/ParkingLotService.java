@@ -1,6 +1,7 @@
 package services;
 
 import java.util.List;
+import java.util.UUID;
 
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
@@ -29,15 +30,6 @@ public class ParkingLotService {
 
 	public void addParkingLot(String name) {
 		managerAuth();
-
-		List<ParkingLot> existingLots = parkingLotRepository.getAllParkingLots();
-		for (ParkingLot lot : existingLots) {
-			if (lot.getName().equalsIgnoreCase(name)) {
-				throw new ParkingSystemException("A parking lot with name '" + name + "' already exists",
-						ErrorType.VALIDATION);
-			}
-		}
-
 		parkingLotRepository.addParkingLot(name);
 	}
 
@@ -49,5 +41,33 @@ public class ParkingLotService {
 	public boolean disableParkingLot(ParkingLot parkingLot) {
 		managerAuth();
 		return parkingLotRepository.disableParkingLot(parkingLot);
+	}
+
+	public List<ParkingLot> getAllEnabledParkingLots() {
+		return parkingLotRepository.getAllEnabledParkingLots();
+	}
+
+	public List<ParkingLot> getAllDisabledParkingLots() {
+		return parkingLotRepository.getAllDisabledParkingLots();
+	}
+
+	public ParkingLot getParkingLotByName(String name) {
+		return parkingLotRepository.getParkingLotByName(name);
+	}
+
+	public ParkingLot getParkingLotById(UUID id) {
+		return parkingLotRepository.getParkingLotById(id);
+	}
+
+	public int getTotalParkingLotsCount() {
+		return parkingLotRepository.getAllParkingLots().size();
+	}
+
+	public int getEnabledParkingLotsCount() {
+		return getAllEnabledParkingLots().size();
+	}
+
+	public int getDisabledParkingLotsCount() {
+		return getAllDisabledParkingLots().size();
 	}
 }

@@ -12,7 +12,7 @@ public class ParkingSpace {
 
 	private UUID id;
 	private ParkingLot parkingLot;
-	private ParkingSpaceStatus status = ParkingSpaceStatus.AVAILABLE;;
+	private ParkingSpaceStatus status = ParkingSpaceStatus.AVAILABLE;
 	private String name;
 	private boolean enabled = true;
 

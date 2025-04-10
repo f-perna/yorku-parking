@@ -6,13 +6,11 @@ import controllers.BookingController;
 import controllers.NavigationController;
 import controllers.ParkingLotController;
 import controllers.ParkingSpaceController;
-import controllers.PaymentController;
 import controllers.factory.ControllerFactory;
 import models.booking.Booking;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import views.dialog.ErrorDialog;
-import views.dialog.SuccessDialog;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,11 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("serial")
 public class BookingPage extends JPanel {
 	private BookingController bookingController;
 	private ParkingLotController parkingLotController;
 	private ParkingSpaceController parkingSpaceController;
-	private PaymentController paymentController;
 
 	private final String[] DURATIONS = { "1 Hour", "2 Hours", "3 Hours" };
 	private JComboBox<ParkingLot> lotComboBox;
@@ -33,11 +31,11 @@ public class BookingPage extends JPanel {
 	private JComboBox<String> durationComboBox;
 	private JLabel licencePlateInfoLabel;
 
+	@SuppressWarnings("unused")
 	public BookingPage(JFrame parent) {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
 		this.parkingLotController = ControllerFactory.getInstance().getParkingLotController();
 		this.parkingSpaceController = ControllerFactory.getInstance().getParkingSpaceController();
-		this.paymentController = ControllerFactory.getInstance().getPaymentController();
 
 		setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -246,29 +244,6 @@ public class BookingPage extends JPanel {
 			durationComboBox.setSelectedItem(null);
 		} catch (Exception e) {
 			ErrorDialog.show(this, "Error", "Could not prepare booking extension: " + e.getMessage());
-		}
-	}
-
-	private void handleBookingCreation(int durationHours) {
-		try {
-			ParkingSpace selectedSpace = (ParkingSpace) spaceComboBox.getSelectedItem();
-			if (selectedSpace == null) {
-				ErrorDialog.show(this, "Please select a parking space");
-				return;
-			}
-
-			Booking booking = bookingController.createBooking(selectedSpace, durationHours);
-			paymentController.processDepositPayment(booking, "Credit Card");
-
-			SuccessDialog.show(this, "Booking Confirmed",
-					"Your booking has been confirmed. Booking ID: " + booking.getBookingID());
-
-			NavigationController.showPage("Client");
-
-		} catch (models.ParkingSystemException e) {
-			ErrorDialog.show(this, e.getMessage());
-		} catch (Exception e) {
-			ErrorDialog.show(this, "Unexpected error", "An unexpected error occurred: " + e.getMessage());
 		}
 	}
 }

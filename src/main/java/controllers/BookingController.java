@@ -1,7 +1,6 @@
 package controllers;
 
 import java.util.List;
-import java.util.UUID;
 
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;

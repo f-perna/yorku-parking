@@ -15,8 +15,19 @@ import models.parkingSensor.ParkingSensor;
 import models.parkingSpace.ParkingSpace;
 
 public class ParkingSensorCSVProcessor extends CSVHelper {
-	private static final String SENSORS_CSV = DATA_DIRECTORY + "parkingSensors.csv";
+	private static String SENSORS_CSV = DATA_DIRECTORY + "parkingSensors.csv";
 	private static final int EXPECTED_FIELDS = 4;
+	private static final String HEADER = "sensorId,parkingSpaceId,carPresent,licencePlate";
+	
+	public static void initializeTestFile(String filePath) throws IOException {
+		SENSORS_CSV = filePath;
+		initializeTestFile(filePath, HEADER);
+	}
+
+	public static void cleanupAndReset(String filePath) {
+		cleanupTestFile(filePath);
+		SENSORS_CSV = DATA_DIRECTORY + "parkingSensors.csv";
+	}
 
 	public static List<ParkingSensor> readSensorData() {
 		List<ParkingSensor> sensors = new ArrayList<>();
@@ -92,7 +103,7 @@ public class ParkingSensorCSVProcessor extends CSVHelper {
 	public static void setSensorData(List<ParkingSensor> sensors) {
 		try (BufferedWriter bw = getFileWriter(SENSORS_CSV)) {
 			// Write header
-			bw.write("sensorId,parkingSpaceId,carPresent,licencePlate");
+			bw.write(HEADER);
 			bw.newLine();
 
 			for (ParkingSensor sensor : sensors) {

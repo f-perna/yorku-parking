@@ -2,7 +2,6 @@ package services;
 
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
-import models.auth.AuthenticationState;
 import models.client.Client;
 import models.client.GenerateClientFactory;
 import repositories.ClientRepository;
@@ -12,16 +11,12 @@ import java.util.regex.Pattern;
 
 public class ClientService {
 	private final ClientRepository clientRepository;
-	private final AuthenticationState authState;
-
-	// Password pattern: at least one uppercase, one lowercase, one digit, one
-	// special character, min 8 chars
+	
 	private static final Pattern PASSWORD_PATTERN = Pattern
 			.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$");
 
 	public ClientService(ClientRepository clientRepository) {
 		this.clientRepository = clientRepository;
-		this.authState = AuthenticationState.getInstance();
 	}
 
 	public boolean registerClient(String name, String email, String password, Client.type clientType,
@@ -46,9 +41,10 @@ public class ClientService {
 			throw new ParkingSystemException("Email address is already registered in the system",
 					ErrorType.BUSINESS_LOGIC);
 		}
-		
+
 		if (clientRepository.getClientByLicensePlate(licencePlate) != null) {
-			throw new ParkingSystemException("License Plate is already being used by a user in the system", ErrorType.BUSINESS_LOGIC);
+			throw new ParkingSystemException("License Plate is already being used by a user in the system",
+					ErrorType.BUSINESS_LOGIC);
 		}
 
 		boolean approved = (clientType == Client.type.VISITOR);
@@ -60,9 +56,9 @@ public class ClientService {
 		return true;
 	}
 
-	public boolean login(String email, String password) {
+	public Client login(String email, String password) {
 		if (email == null || password == null) {
-			return false;
+			return null;
 		}
 
 		email = email.toLowerCase().trim();
@@ -78,8 +74,7 @@ public class ClientService {
 					ErrorType.AUTHORIZATION);
 		}
 
-		authState.setLoggedInUser(client);
-		return true;
+		return client;
 	}
 
 	public List<Client> getAllClients() {
@@ -89,10 +84,6 @@ public class ClientService {
 	public boolean approveClient(String email, boolean approved) {
 		if (email == null) {
 			throw new ParkingSystemException("Email address must be provided", ErrorType.VALIDATION);
-		}
-
-		if (!authState.isManagerLoggedIn()) {
-			throw new ParkingSystemException("Only managers can approve clients", ErrorType.AUTHORIZATION);
 		}
 
 		Client client = clientRepository.getClientByEmail(email);

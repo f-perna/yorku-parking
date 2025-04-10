@@ -1,5 +1,5 @@
 sensorId,parkingSpaceId,carPresent,licencePlate
-aae1ae55-cf54-457c-93f5-c5565621fd3b,9ccd340f-34c9-49f7-a66d-34074b9d23c7,true,123 ANB
-a709f852-e658-4b77-9db7-817e1f0de8a1,c749b8d3-6e24-42aa-84ca-dde750075a60,false,null
+aae1ae55-cf54-457c-93f5-c5565621fd3b,9ccd340f-34c9-49f7-a66d-34074b9d23c7,false,null
+a709f852-e658-4b77-9db7-817e1f0de8a1,c749b8d3-6e24-42aa-84ca-dde750075a60,true,123 ANB
 f6f55c90-0328-402d-a79e-21b8f64a051a,bddfe247-3ad3-4685-aa66-fd0aac50ec70,false,null
 2c84e7a7-9648-4ee5-9d6f-62b6d169c6a8,5e7106bf-599d-4637-80cd-59bdc3507340,false,null

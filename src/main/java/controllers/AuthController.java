@@ -7,6 +7,7 @@ import models.client.Client;
 import models.manager.Manager;
 import models.superManager.SuperManager;
 import models.user.User;
+import models.user.UserType;
 import services.ClientService;
 import services.ManagerService;
 import services.SuperManagerService;
@@ -25,7 +26,11 @@ public class AuthController {
 		this.authState = AuthenticationState.getInstance();
 	}
 
-	public boolean login(String email, String password, String userType) {
+	public boolean login(String email, String password, UserType userType) {
+		if (authState.isLoggedIn()) {
+			throw new ParkingSystemException("Another user is currently logged in", ErrorType.AUTHENTICATION);
+		}
+
 		if (email == null || email.trim().isEmpty()) {
 			throw new ParkingSystemException("Email cannot be empty", ErrorType.VALIDATION);
 		}
@@ -36,23 +41,25 @@ public class AuthController {
 			throw new ParkingSystemException("User type cannot be null", ErrorType.VALIDATION);
 		}
 
-		boolean success = false;
+		User loggedInUser = null;
 
-		switch (userType.toLowerCase()) {
-		case "client":
-			success = clientService.login(email, password);
-			break;
-		case "manager":
-			success = managerService.login(email, password);
-			break;
-		case "supermanager":
-			success = superManagerService.login(email, password);
-			break;
-		default:
-			throw new ParkingSystemException("Invalid user type: " + userType, ErrorType.VALIDATION);
+		switch (userType) {
+			case CLIENT:
+				loggedInUser = clientService.login(email, password);
+				break;
+			case MANAGER:
+				loggedInUser = managerService.login(email, password);
+				break;
+			case SUPER_MANAGER:
+				loggedInUser = superManagerService.login(email, password);
+				break;
 		}
 
-		return success;
+		if (loggedInUser != null) {
+			authState.setLoggedInUser(loggedInUser);
+			return true;
+		}
+		return false;
 	}
 
 	public void logout() {
@@ -61,10 +68,6 @@ public class AuthController {
 		}
 
 		authState.setLoggedInUser(null);
-	}
-
-	public User getLoggedInUser() {
-		return authState.getLoggedInUser();
 	}
 
 	public Client getLoggedInClient() {
@@ -81,17 +84,5 @@ public class AuthController {
 
 	public boolean isLoggedIn() {
 		return authState.isLoggedIn();
-	}
-
-	public boolean isClientLoggedIn() {
-		return authState.isClientLoggedIn();
-	}
-
-	public boolean isManagerLoggedIn() {
-		return authState.isManagerLoggedIn();
-	}
-
-	public boolean isSuperManagerLoggedIn() {
-		return authState.isSuperManagerLoggedIn();
 	}
 }

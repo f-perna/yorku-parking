@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
@@ -24,7 +23,9 @@ import controllers.AuthController;
 import controllers.NavigationController;
 import controllers.factory.ControllerFactory;
 import views.dialog.ErrorDialog;
+import models.user.UserType;
 
+@SuppressWarnings("serial")
 public class LoginPage extends JPanel {
 	private AuthController authController;
 
@@ -36,15 +37,15 @@ public class LoginPage extends JPanel {
 	private JRadioButton superManagerRadioButton;
 	private ButtonGroup loginTypeGroup;
 	private Border defaultBorder;
-	private Border errorBorder;
+	private UserType loginType = UserType.CLIENT;
 
+	@SuppressWarnings("unused")
 	public LoginPage(JFrame parent) {
 		this.authController = ControllerFactory.getInstance().getAuthController();
 		setLayout(new BorderLayout());
 
 		// Create default and error borders
 		defaultBorder = BorderFactory.createLineBorder(Color.GRAY);
-		errorBorder = BorderFactory.createLineBorder(Color.RED, 2);
 
 		// Create form panel that will contain all form components
 		JPanel formPanel = new JPanel(new GridBagLayout());
@@ -123,18 +124,9 @@ public class LoginPage extends JPanel {
 		formPanel.add(radioPanel, gbc);
 
 		// Add action listeners for radio buttons
-		clientRadioButton.addActionListener(e -> {
-			titleLabel.setText("Login");
-			emailLabel.setText("Email:");
-		});
-
-		managerRadioButton.addActionListener(e -> {
-			titleLabel.setText("Manager Login");
-		});
-
-		superManagerRadioButton.addActionListener(e -> {
-			titleLabel.setText("Super Manager Login");
-		});
+		clientRadioButton.addActionListener(e -> loginType = UserType.CLIENT);
+		managerRadioButton.addActionListener(e -> loginType = UserType.MANAGER);
+		superManagerRadioButton.addActionListener(e -> loginType = UserType.SUPER_MANAGER);
 
 		// Login button
 		JButton loginButton = new JButton("Login");
@@ -170,14 +162,7 @@ public class LoginPage extends JPanel {
 			// Reset field borders
 			resetFieldBorders();
 
-			String loginType = "client";
-			if (managerRadioButton.isSelected()) {
-				loginType = "manager";
-			} else if (superManagerRadioButton.isSelected()) {
-				loginType = "superManager";
-			}
-
-			handleLogin(emailField.getText(), new String(passwordField.getPassword()), loginType);
+			handleLogin();
 		});
 	}
 
@@ -187,53 +172,24 @@ public class LoginPage extends JPanel {
 		statusLabel.setText(" ");
 	}
 
-	private void handleLogin(String username, String password, String loginType) {
+	private void handleLogin() {
 		try {
-			boolean success = authController.login(username, password, loginType);
+			boolean success = authController.login(emailField.getText(), new String(passwordField.getPassword()),
+					loginType);
 
 			if (success) {
 				resetFields();
 
-				if (loginType.equals("manager")) {
-					NavigationController.showPage("ManagerDashboard");
-				} else if (loginType.equals("superManager")) {
-					SuperManagerPage superManagerPage = (SuperManagerPage) NavigationController.getPage("SuperManager");
+				if (loginType == UserType.MANAGER) {
+					NavigationController.showPage("Manager");
+				} else if (loginType == UserType.SUPER_MANAGER) {
 					NavigationController.showPage("SuperManager");
-					superManagerPage.refresh();
 				} else {
-					ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
-					clientPage.refresh();
 					NavigationController.showPage("Client");
 				}
-			} else {
-				ErrorDialog.show(this, "Invalid " + loginType + " credentials");
 			}
-		} catch (models.ParkingSystemException e) {
-			if (e.getErrorType() == models.ParkingSystemException.ErrorType.AUTHORIZATION
-					&& e.getMessage().contains("pending approval")) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), "Account Pending Approval",
-						JOptionPane.WARNING_MESSAGE);
-			} else if (e.getErrorType() == models.ParkingSystemException.ErrorType.VALIDATION) {
-				highlightFieldWithError(e.getMessage());
-				statusLabel.setText(e.getMessage());
-			} else {
-				JOptionPane.showMessageDialog(this, e.getMessage(), "Parking System Exception",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		} catch (IllegalArgumentException e) {
-			ErrorDialog.show(this, e.getMessage());
 		} catch (Exception e) {
-			ErrorDialog.show(this, "An unexpected error occurred: " + e.getMessage());
-		}
-	}
-
-	private void highlightFieldWithError(String errorMessage) {
-		errorMessage = errorMessage.toLowerCase();
-
-		if (errorMessage.contains("email")) {
-			emailField.setBorder(errorBorder);
-		} else if (errorMessage.contains("password")) {
-			passwordField.setBorder(errorBorder);
+			ErrorDialog.showException(this, e);
 		}
 	}
 
@@ -241,6 +197,7 @@ public class LoginPage extends JPanel {
 		emailField.setText("");
 		passwordField.setText("");
 		clientRadioButton.setSelected(true);
+		loginType = UserType.CLIENT;
 		statusLabel.setText(" ");
 		resetFieldBorders();
 	}

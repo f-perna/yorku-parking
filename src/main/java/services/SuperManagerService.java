@@ -1,21 +1,18 @@
 package services;
 
-import models.auth.AuthenticationState;
+import models.ParkingSystemException;
+import models.ParkingSystemException.ErrorType;
 import models.superManager.SuperManager;
 
 public class SuperManagerService {
-	private AuthenticationState authState;
-
 	public SuperManagerService() {
-		this.authState = AuthenticationState.getInstance();
 	}
 
-	public boolean login(String username, String password) {
+	public SuperManager login(String username, String password) {
 		SuperManager superManager = SuperManager.getInstance();
-		if (superManager.authenticate(username, password)) {
-			authState.setLoggedInUser(superManager);
-			return true;
+		if (!superManager.authenticate(username, password)) {
+			throw new ParkingSystemException("Invalid username or password", ErrorType.AUTHENTICATION);
 		}
-		return false;
+		return superManager;
 	}
 }

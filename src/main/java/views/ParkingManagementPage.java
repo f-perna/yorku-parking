@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("serial")
 public class ParkingManagementPage extends JPanel {
 	private ManagerController managerController;
 	private JFrame parentFrame;
@@ -28,6 +29,7 @@ public class ParkingManagementPage extends JPanel {
 	private ParkingLot selectedLot;
 	private JLabel spacesInfoLabel;
 
+	@SuppressWarnings("unused")
 	public ParkingManagementPage(JFrame parent) {
 		this.parentFrame = parent;
 		this.managerController = ControllerFactory.getInstance().getManagerController();
@@ -59,6 +61,7 @@ public class ParkingManagementPage extends JPanel {
 		loadParkingLots();
 	}
 
+	@SuppressWarnings("unused")
 	private JPanel createParkingLotsPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Parking Lots"));
@@ -149,6 +152,7 @@ public class ParkingManagementPage extends JPanel {
 		return panel;
 	}
 
+	@SuppressWarnings("unused")
 	private JPanel createParkingSpacesPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Parking Spaces"));

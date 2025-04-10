@@ -10,8 +10,6 @@ import java.awt.Dimension;
 import java.awt.Component;
 import java.util.List;
 import java.time.LocalDateTime;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,7 +25,6 @@ import javax.swing.DefaultListCellRenderer;
 
 import controllers.AuthController;
 import controllers.BookingController;
-import controllers.ClientController;
 import controllers.NavigationController;
 import controllers.PaymentController;
 import controllers.factory.ControllerFactory;
@@ -37,11 +34,10 @@ import models.client.Client;
 import models.payment.Payment;
 import models.ParkingSystemException;
 import views.dialog.ErrorDialog;
-import views.dialog.SuccessDialog;
 
+@SuppressWarnings("serial")
 public class ClientPage extends JPanel {
 	private BookingController bookingController;
-	private ClientController clientController;
 	private AuthController authController;
 	private PaymentController paymentController;
 	private ParkingSensorController parkingSensorController;
@@ -65,9 +61,9 @@ public class ClientPage extends JPanel {
 	private static final Color COLOR_ERROR = Color.RED;
 	private static final Color COLOR_INACTIVE = new Color(128, 128, 128); // Grey
 
+	@SuppressWarnings("unused")
 	public ClientPage(JFrame parent) {
 		this.bookingController = ControllerFactory.getInstance().getBookingController();
-		this.clientController = ControllerFactory.getInstance().getClientController();
 		this.authController = ControllerFactory.getInstance().getAuthController();
 		this.paymentController = ControllerFactory.getInstance().getPaymentController();
 		this.parkingSensorController = ControllerFactory.getInstance().getParkingSensorController();
@@ -306,7 +302,6 @@ public class ClientPage extends JPanel {
 
 			JOptionPane.showMessageDialog(this, message, "Parking Successful", JOptionPane.INFORMATION_MESSAGE);
 
-			// Make sure to refresh the UI to show the updated status and buttons
 			refresh();
 		} catch (ParkingSystemException ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -395,15 +390,10 @@ public class ClientPage extends JPanel {
 				JOptionPane.showMessageDialog(this, warningMsg, "Booking Active", JOptionPane.WARNING_MESSAGE);
 			}
 
-			// Make sure to refresh the UI to show the updated buttons
 			refresh();
 		} catch (ParkingSystemException ex) {
 			JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
-	}
-
-	private void handleCheckin() {
-		// This method is no longer needed as we're using sensor simulation
 	}
 
 	public void handleNewBooking() {
@@ -434,7 +424,6 @@ public class ClientPage extends JPanel {
 		bookingsList.setVisible(hasBookings);
 
 		if (hasBookings) {
-			// Select the last item (most recent booking) in the list
 			bookingsList.setSelectedIndex(bookingsList.getItemCount() - 1);
 			refreshBookingInfo();
 		} else {
@@ -442,35 +431,21 @@ public class ClientPage extends JPanel {
 		}
 	}
 
-	/**
-	 * Hide all booking related UI elements when no bookings are available
-	 */
 	private void hideAllBookingDetails() {
-		// Hide all labels and values
 		setVisibility(false, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue,
 				statusLabel, statusValue, depositLabel, depositValue, totalLabel, totalValue,
 				paymentsLabel, paymentsScrollPane, carPresenceLabel, carPresenceValue,
 				licencePlateLabel, licencePlateValue);
 
-		// Hide all action buttons
 		hideAllActionButtons();
 	}
 
-	/**
-	 * Set visibility for a group of components
-	 * 
-	 * @param visible    Whether components should be visible
-	 * @param components Components to update
-	 */
 	private void setVisibility(boolean visible, Component... components) {
 		for (Component component : components) {
 			component.setVisible(visible);
 		}
 	}
 
-	/**
-	 * Hide all booking action buttons
-	 */
 	private void hideAllActionButtons() {
 		setVisibility(false, simulateCarArrivalButton, simulateCarDepartureButton,
 				completeCheckoutButton, extendTimeButton, deleteButton);
@@ -613,6 +588,8 @@ public class ClientPage extends JPanel {
 				boolean isLatestBooking = bookingController.isLatestBookingForSpaceAndClient(booking);
 				simulateCarDepartureButton.setVisible(isCarPresent && isOwnerCar && isLatestBooking);
 				break;
+		default:
+			break;
 		}
 
 		// Update extend time button (for PENDING, CONFIRMED, CHECKED_IN)
@@ -797,6 +774,7 @@ public class ClientPage extends JPanel {
 }
 
 // Custom renderer for the payments list
+@SuppressWarnings("serial")
 class PaymentListCellRenderer extends DefaultListCellRenderer {
 	@Override
 	public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,

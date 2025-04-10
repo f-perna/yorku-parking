@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import models.ParkingSystemException;
-import models.ParkingSystemException.ErrorType;
 import models.booking.Booking;
 import models.payment.Payment;
 import models.payment.Payment.PaymentType;

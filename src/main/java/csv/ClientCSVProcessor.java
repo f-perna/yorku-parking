@@ -90,7 +90,7 @@ public class ClientCSVProcessor extends CSVHelper {
 	public static void setClientData(List<Client> clients) {
 		try (BufferedWriter bw = getFileWriter(CLIENTS_CSV)) {
 			// Write header
-			bw.write("name,email,password,licencePlate,type,approved");
+			bw.write(HEADER);
 			bw.newLine();
 
 			for (Client client : clients) {

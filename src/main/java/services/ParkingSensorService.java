@@ -1,7 +1,6 @@
 package services;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import models.booking.Booking;
 import models.booking.Booking.BookingStatus;

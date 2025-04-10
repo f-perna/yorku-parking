@@ -10,6 +10,7 @@ import controllers.factory.ControllerFactory;
 import models.client.Client;
 import models.ParkingSystemException;
 
+@SuppressWarnings("serial")
 public class RegisterPage extends JPanel {
 
 	private JTextField nameField, emailField, licencePlateField;
@@ -20,6 +21,7 @@ public class RegisterPage extends JPanel {
 	private Border defaultBorder;
 	private Border errorBorder;
 
+	@SuppressWarnings("unused")
 	public RegisterPage(JFrame parent) {
 		clientController = ControllerFactory.getInstance().getClientController();
 		setLayout(new BorderLayout());

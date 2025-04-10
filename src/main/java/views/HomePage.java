@@ -12,11 +12,9 @@ import controllers.NavigationController;
 import models.auth.AuthStateObserver;
 import models.auth.AuthenticationState;
 
+@SuppressWarnings("serial")
 public class HomePage extends JPanel implements AuthStateObserver {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	
 	private JPanel buttonArea;
 	private JButton loginButton;
 	private JButton registerButton;
@@ -25,6 +23,7 @@ public class HomePage extends JPanel implements AuthStateObserver {
 	private JButton superManagerButton;
 	private JLabel welcomeLabel;
 
+	@SuppressWarnings("unused")
 	public HomePage(JFrame parent) {
 		setLayout(new GridBagLayout());
 		buttonArea = new JPanel();

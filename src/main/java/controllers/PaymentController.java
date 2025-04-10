@@ -8,7 +8,6 @@ import models.auth.AuthenticationState;
 import models.booking.Booking;
 import models.client.Client;
 import models.payment.Payment;
-import services.BookingService;
 import services.PaymentService;
 
 public class PaymentController {

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import controllers.ParkingSensorController;
-import controllers.factory.ControllerFactory;
 import models.booking.Booking;
 import models.booking.Booking.BookingStatus;
 import models.parkingSpace.ParkingSpace;

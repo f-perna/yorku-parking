@@ -14,7 +14,18 @@ import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 
 public class ParkingSpaceCSVProcessor extends CSVHelper {
-	private static final String SPACES_CSV = DATA_DIRECTORY + "parkingSpaces.csv";
+	private static String SPACES_CSV = DATA_DIRECTORY + "parkingSpaces.csv";
+	private static final String HEADER = "id,lotID,status,name,enabled";
+	
+	public static void initializeTestFile(String filePath) throws IOException {
+		SPACES_CSV = filePath;
+		initializeTestFile(filePath, HEADER);
+	}
+
+	public static void cleanupAndReset(String filePath) {
+		cleanupTestFile(filePath);
+		SPACES_CSV = DATA_DIRECTORY + "parkingSpaces.csv";
+	}
 
 	public static List<ParkingSpace> readSpaceData() {
 		List<ParkingSpace> spaces = new ArrayList<>();

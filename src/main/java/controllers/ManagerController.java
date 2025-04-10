@@ -7,7 +7,6 @@ import models.client.Client;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import services.ClientService;
-import services.ManagerService;
 import services.ParkingLotService;
 import services.ParkingSpaceService;
 

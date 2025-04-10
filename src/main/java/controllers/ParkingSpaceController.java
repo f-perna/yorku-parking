@@ -15,5 +15,7 @@ public class ParkingSpaceController {
 	public List<ParkingSpace> getAvailableSpaces(ParkingLot lot) {
 		return parkingSpaceService.getAvailableSpaces(lot);
 	}
+	
+	
 
 }

@@ -18,6 +18,7 @@ public class Navbar extends JPanel implements AuthStateObserver {
 	private JButton logoutButton;
 	private AuthController authController;
 
+	@SuppressWarnings("unused")
 	public Navbar(JFrame parent) {
 		setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.authController = ControllerFactory.getInstance().getAuthController();

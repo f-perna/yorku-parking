@@ -10,7 +10,18 @@ import java.util.UUID;
 import models.parkingLot.ParkingLot;
 
 public class ParkingLotCSVProcessor extends CSVHelper {
-	private static final String PARKING_LOTS_CSV = DATA_DIRECTORY + "parkingLots.csv";
+	private static String PARKING_LOTS_CSV = DATA_DIRECTORY + "parkingLots.csv";
+	private static final String HEADER = "name,id,enabled";
+	
+	public static void initializeTestFile(String filePath) throws IOException {
+		PARKING_LOTS_CSV = filePath;
+		initializeTestFile(filePath, HEADER);
+	}
+
+	public static void cleanupAndReset(String filePath) {
+		cleanupTestFile(filePath);
+		PARKING_LOTS_CSV = DATA_DIRECTORY + "parkingLots.csv";
+	}
 
 	public static List<ParkingLot> readLotData() {
 		List<ParkingLot> parkingLots = new ArrayList<>();
@@ -47,7 +58,7 @@ public class ParkingLotCSVProcessor extends CSVHelper {
 	public static void setLotData(List<ParkingLot> parkingLots) {
 		try (BufferedWriter bw = getFileWriter(PARKING_LOTS_CSV)) {
 			// Write header
-			bw.write("name,id,enabled");
+			bw.write(HEADER);
 			bw.newLine();
 
 			for (ParkingLot parkingLot : parkingLots) {

@@ -17,15 +17,12 @@ public class ManagerService {
 		this.authState = AuthenticationState.getInstance();
 	}
 
-	public boolean login(String email, String password) {
+	public Manager login(String email, String password) {
 		Manager manager = managerRepository.authenticateManager(email, password);
-
-		if (manager != null) {
-			authState.setLoggedInUser(manager);
-			return true;
+		if (manager == null) {
+			throw new ParkingSystemException("Invalid email address or password", ErrorType.AUTHENTICATION);
 		}
-
-		return false;
+		return manager;
 	}
 
 	private void superManagerAuth() {

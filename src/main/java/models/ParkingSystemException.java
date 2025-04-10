@@ -1,5 +1,6 @@
 package models;
 
+@SuppressWarnings("serial")
 public class ParkingSystemException extends RuntimeException {
 
 	public enum ErrorType {

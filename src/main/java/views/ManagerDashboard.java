@@ -13,6 +13,7 @@ import controllers.NavigationController;
 import controllers.factory.ControllerFactory;
 import models.client.Client;
 
+@SuppressWarnings("serial")
 public class ManagerDashboard extends JPanel {
 	private JTable clientsTable;
 	private DefaultTableModel tableModel;
@@ -58,6 +59,7 @@ public class ManagerDashboard extends JPanel {
 		loadClients();
 	}
 
+	@SuppressWarnings("unused")
 	private JPanel createParkingManagementPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Parking Management"));
@@ -69,6 +71,7 @@ public class ManagerDashboard extends JPanel {
 		return panel;
 	}
 
+	@SuppressWarnings({ "unused" })
 	private JPanel createClientApprovalPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createTitledBorder("Client Approval"));

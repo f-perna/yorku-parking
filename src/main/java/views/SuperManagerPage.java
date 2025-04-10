@@ -24,6 +24,7 @@ import controllers.SuperManagerController;
 import controllers.factory.ControllerFactory;
 import models.manager.Manager;
 
+@SuppressWarnings("serial")
 public class SuperManagerPage extends JPanel {
 
 	private SuperManagerController superManagerController;
@@ -32,6 +33,7 @@ public class SuperManagerPage extends JPanel {
 	private JLabel statusLabel;
 	private JPanel credentialsPanel;
 
+	@SuppressWarnings("unused")
 	public SuperManagerPage(JFrame parent) {
 		superManagerController = ControllerFactory.getInstance().getSuperManagerController();
 		setLayout(new BorderLayout(10, 10));
@@ -134,6 +136,7 @@ public class SuperManagerPage extends JPanel {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void showCredentials(String email, String password) {
 		// Clear the panel
 		credentialsPanel.removeAll();

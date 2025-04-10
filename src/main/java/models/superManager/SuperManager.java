@@ -6,7 +6,7 @@ public class SuperManager implements User {
 	private static SuperManager instance;
 	private String email;
 	private String password;
-
+	
 	private SuperManager(String email, String password) {
 		this.email = email;
 		this.password = password;
@@ -14,7 +14,7 @@ public class SuperManager implements User {
 
 	public static synchronized SuperManager getInstance() {
 		if (instance == null) {
-			instance = new SuperManager("superadmin", "Super@dmin123!");
+			instance = new SuperManager("superadmin@parking.yorku.ca", "Super@dmin123!");
 		}
 		return instance;
 	}

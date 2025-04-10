@@ -127,7 +127,7 @@ public class BookingService {
 		ParkingSpace parkingSpace = booking.getParkingSpace();
 
 		if (now.isBefore(startTime)) {
-			ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(parkingSpace,
+			parkingSpaceRepository.updateParkingSpaceStatus(parkingSpace,
 					ParkingSpaceStatus.AVAILABLE);
 			bookingRepository.cancelBooking(booking);
 			return true;

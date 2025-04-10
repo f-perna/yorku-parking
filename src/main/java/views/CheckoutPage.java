@@ -23,6 +23,7 @@ import models.booking.Booking;
 import views.dialog.ErrorDialog;
 import views.dialog.SuccessDialog;
 
+@SuppressWarnings("serial")
 public class CheckoutPage extends JPanel {
 
 	private PaymentController paymentController;
@@ -32,6 +33,7 @@ public class CheckoutPage extends JPanel {
 	private final String[] METHODS = { "Debit", "Credit", "Mobile", "Cash" };
 	private DecimalFormat currencyFormat = new DecimalFormat("$#,##0.00");
 
+	@SuppressWarnings("unused")
 	public CheckoutPage(JFrame parent) {
 		this.paymentController = ControllerFactory.getInstance().getPaymentController();
 		setLayout(new GridBagLayout());

@@ -6,16 +6,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.client.Client;
-import models.client.GenerateClientFactory;
 import models.manager.Manager;
 
 /**
  * CSV processor for client operations
  */
 public class ManagerCSVProcessor extends CSVHelper {
-	private static final String MANAGERS_CSV = DATA_DIRECTORY + "managers.csv";
+	private static String MANAGERS_CSV = DATA_DIRECTORY + "managers.csv";
+	private static final String HEADER = "email,password";
 
+	
+	public static void initializeTestFile(String filePath) throws IOException {
+		MANAGERS_CSV = filePath;
+		initializeTestFile(filePath, HEADER);
+	}
+
+	public static void cleanupAndReset(String filePath) {
+		cleanupTestFile(filePath);
+		MANAGERS_CSV = DATA_DIRECTORY + "managers.csv";
+	}
+	
+	
 	public static List<Manager> readManagerData() {
 		List<Manager> managers = new ArrayList<>();
 
@@ -53,7 +64,7 @@ public class ManagerCSVProcessor extends CSVHelper {
 	public static void setManagerData(List<Manager> managers) {
 		try (BufferedWriter bw = getFileWriter(MANAGERS_CSV)) {
 			// Write header
-			bw.write("email,password");
+			bw.write(HEADER);
 			bw.newLine();
 
 			for (Manager manager : managers) {
