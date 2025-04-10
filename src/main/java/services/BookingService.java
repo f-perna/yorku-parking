@@ -61,6 +61,9 @@ public class BookingService {
 		if (booking == null) {
 			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
 		}
+		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
+				ParkingSpaceStatus.AVAILABLE);
+		booking.setParkingSpace(updatedSpace);
 		bookingRepository.deleteBooking(booking);
 	}
 
