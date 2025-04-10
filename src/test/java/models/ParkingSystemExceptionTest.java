@@ -49,7 +49,7 @@ public class ParkingSystemExceptionTest {
     public void testExceptionThrowingAndCatching() {
         ParkingSystemException exception = assertThrows(
             ParkingSystemException.class,
-            () -> { throw new ParkingSystemException("Business rule violation", ParkingSystemException.ErrorType.BUSINESS_LOGIC); }
+            () -> { throw new ParkingSystemException("Business rule/system requirement violation", ParkingSystemException.ErrorType.BUSINESS_LOGIC); }
         );
         assertEquals("Business rule violation", exception.getMessage());
         assertEquals(ParkingSystemException.ErrorType.BUSINESS_LOGIC, exception.getErrorType());
