@@ -74,7 +74,7 @@ public class SuperManagerTest {
         SuperManager[] instances = new SuperManager[2];
         Thread[] threads = new Thread[2];
 
-        // Create two threads that try to get the instance simultaneously
+        // Creating two threads that try to get the instance simultaneously
         for (int i = 0; i < 2; i++) {
             final int index = i;
             threads[i] = new Thread(() -> {
