@@ -27,7 +27,7 @@ public class ParkingSystemExceptionTest {
     @Test
     public void testConstructorWithMessageAndCause() {
         String message = "Database error";
-        Throwable cause = new RuntimeException("SQL exception");
+        Throwable cause = new RuntimeException("CSV exception");
         ParkingSystemException exception = new ParkingSystemException(message, cause);
         assertEquals(message, exception.getMessage());
         assertEquals(ParkingSystemException.ErrorType.SYSTEM_ERROR, exception.getErrorType());
@@ -49,7 +49,7 @@ public class ParkingSystemExceptionTest {
     public void testExceptionThrowingAndCatching() {
         ParkingSystemException exception = assertThrows(
             ParkingSystemException.class,
-            () -> { throw new ParkingSystemException("Business rule violation", ParkingSystemException.ErrorType.BUSINESS_LOGIC); }
+            () -> { throw new ParkingSystemException("Business rule/system requirement violation", ParkingSystemException.ErrorType.BUSINESS_LOGIC); }
         );
         assertEquals("Business rule violation", exception.getMessage());
         assertEquals(ParkingSystemException.ErrorType.BUSINESS_LOGIC, exception.getErrorType());
