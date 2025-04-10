@@ -69,7 +69,7 @@ public class ParkingSpaceService {
 		}
 
 		if (lot == null) {
-			throw new ParkingSystemException("Lot cannot be null", ErrorType.VALIDATION);
+			throw new ParkingSystemException("Space cannot be null", ErrorType.VALIDATION);
 		}
 		if (spaceName == null || spaceName.trim().isEmpty()) {
 			throw new ParkingSystemException("Space name cannot be empty", ErrorType.VALIDATION);
