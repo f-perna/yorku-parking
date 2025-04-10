@@ -27,7 +27,7 @@ public class ParkingSystemExceptionTest {
     @Test
     public void testConstructorWithMessageAndCause() {
         String message = "Database error";
-        Throwable cause = new RuntimeException("SQL exception");
+        Throwable cause = new RuntimeException("CSV exception");
         ParkingSystemException exception = new ParkingSystemException(message, cause);
         assertEquals(message, exception.getMessage());
         assertEquals(ParkingSystemException.ErrorType.SYSTEM_ERROR, exception.getErrorType());
