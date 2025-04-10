@@ -1,6 +1,8 @@
 package services;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -14,9 +16,6 @@ import models.parkingLot.ParkingLot;
 import models.parkingSensor.ParkingSensor;
 import models.parkingSpace.ParkingSpace;
 import models.superManager.SuperManager;
-import repositories.BookingRepository;
-import repositories.ParkingSensorRepository;
-import repositories.ParkingSpaceRepository;
 import services.factory.ServiceFactory;
 
 public class ParkingSensorServiceTest {
@@ -75,4 +74,72 @@ public class ParkingSensorServiceTest {
 		
 		assertFalse(carPresent);
 	}
+	
+	@Test
+	public void verifySensorAutoCreation() {
+	    ParkingSensor sensor = serviceFactory.getParkingSensorService().getSensorForSpace(testSpace);
+	    assertFalse(sensor == null);
+	}
+	
+	@Test
+	public void verifySimulateCarArrivalSuccess() {
+	    boolean success = serviceFactory.getParkingSensorService().simulateCarArrival(testSpace, "TEST 123");
+	    assertTrue(success);
+
+	    assertTrue(serviceFactory.getParkingSensorService().isCarPresentAtSpace(testSpace));
+	    assertTrue(serviceFactory.getParkingSensorService().getDetectedLicencePlate(testSpace).equals("TEST 123"));
+	}
+ 
+	@Test
+	public void verifySimulateCarDeparture() {
+	    serviceFactory.getParkingSensorService().simulateCarArrival(testSpace, "TEST 123");
+	    serviceFactory.getParkingSensorService().simulateCarDeparture(testSpace);
+
+	    assertFalse(serviceFactory.getParkingSensorService().isCarPresentAtSpace(testSpace));
+	}
+	
+	@Test
+	public void verifyGetLicencePlateWhenNoCarPresent() {
+	    String plate = serviceFactory.getParkingSensorService().getDetectedLicencePlate(testSpace);
+	    assertEquals(null, plate);
+	}
+
+	@Test
+	public void verifyGetSensorForSpaceReturnsSameSensor() {
+	    ParkingSensor sensor1 = serviceFactory.getParkingSensorService().getSensorForSpace(testSpace);
+	    ParkingSensor sensor2 = serviceFactory.getParkingSensorService().getSensorForSpace(testSpace);
+
+	    assertEquals(sensor1.getId(), sensor2.getId());
+	}
+	
+	@Test
+	public void verifySimulateCarArrivalOnOccupiedSpaceFails() {
+	    serviceFactory.getParkingSensorService().simulateCarArrival(testSpace, "TEST 123");
+	    boolean result = serviceFactory.getParkingSensorService().simulateCarArrival(testSpace, "TEST 456");
+
+	    assertFalse(result);
+	}
+
+	@Test
+	public void verifyCarParkedAnywhereTrue() {
+	    serviceFactory.getParkingSensorService().simulateCarArrival(testSpace, "TEST 123");
+	    assertTrue(serviceFactory.getParkingSensorService().isClientCarParkedAnywhere("TEST 123"));
+	}
+	
+	@Test
+	public void verifyClientCarParkedAnywhereWithNull() {
+	    boolean result = serviceFactory.getParkingSensorService().isClientCarParkedAnywhere(null);
+	    assertFalse(result);
+	}
+
+	@Test
+	public void verifyRemoveSensorAndRecreateOnAccess() {
+	    serviceFactory.getParkingSensorService().removeSensor(testSpace);
+
+	    ParkingSensor newSensor = serviceFactory.getParkingSensorService().getSensorForSpace(testSpace);
+
+	    assertFalse(newSensor == null);
+	    assertEquals(testSpace.getID(), newSensor.getParkingSpace().getID());
+	}
+
 }
