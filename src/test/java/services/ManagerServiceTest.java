@@ -46,10 +46,42 @@ public class ManagerServiceTest {
 	}
 	
 	@Test
-	public void verifyInvalidManagerLogin() {
+	public void verifyInvalidAutoGenerateManagerAccount() {
+		Manager testManager = serviceFactory.getManagerService().generateAndGetManagerAccount();
+		
+		Boolean login = serviceFactory.getManagerService().login(testManager.getEmail(), testManager.getPassword());
+		
+		assertTrue(login);
+		
+		try {
+			serviceFactory.getManagerService().generateAndGetManagerAccount();
+		} catch (ParkingSystemException e) {
+			assertEquals("Only super managers can add new managers", e.getMessage());
+		}
+		
+		authState.setLoggedInUser(superManager);
+		
+		serviceFactory.getManagerService().removeManager(testManager.getEmail());
+		
+	}
+	
+	@Test
+	public void verifyInvalidManagerLoginEmail() {
 		Manager testManager = serviceFactory.getManagerService().generateAndGetManagerAccount();
 		
 		Boolean login = serviceFactory.getManagerService().login(testManager.getEmail()+"bad", testManager.getPassword());
+		
+		assertFalse(login);
+		
+		serviceFactory.getManagerService().removeManager(testManager.getEmail());
+		
+	}
+	
+	@Test
+	public void verifyInvalidManagerLoginPassword() {
+		Manager testManager = serviceFactory.getManagerService().generateAndGetManagerAccount();
+		
+		Boolean login = serviceFactory.getManagerService().login(testManager.getEmail(), testManager.getPassword()+"bad");
 		
 		assertFalse(login);
 		
@@ -65,8 +97,15 @@ public class ManagerServiceTest {
 	}
 	
 	@Test
-	public void verifyInvalidSuperManagerLogin() {
+	public void verifyInvalidSuperManagerLoginEmail() {
 		Boolean login = serviceFactory.getManagerService().login("superadminbad", "Super@dmin123!");
+		
+		assertFalse(login);
+	}
+	
+	@Test
+	public void verifyInvalidSuperManagerLoginPassword() {
+		Boolean login = serviceFactory.getManagerService().login("superadmin", "Super@dmin123!bad");
 		
 		assertFalse(login);
 	}
