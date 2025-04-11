@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class RegressionTest0 {
+public class ControllerRegressionTest0 {
 
     public static boolean debug = false;
 
@@ -1104,33 +1104,6 @@ public class RegressionTest0 {
     }
 
     @Test
-    public void test078() throws Throwable {
-        if (debug)
-            System.out.format("%n%s%n", "RegressionTest0.test078");
-        services.ClientService clientService0 = null;
-        services.ManagerService managerService1 = null;
-        services.SuperManagerService superManagerService2 = null;
-        controllers.AuthController authController3 = new controllers.AuthController(clientService0, managerService1, superManagerService2);
-        models.superManager.SuperManager superManager4 = authController3.getLoggedInSuperManager();
-        models.superManager.SuperManager superManager5 = authController3.getLoggedInSuperManager();
-        models.manager.Manager manager6 = authController3.getLoggedInManager();
-        models.user.UserType userType9 = null;
-        // The following exception was thrown during execution in test generation
-        try {
-            boolean boolean10 = authController3.login("hi!", "hi!", userType9);
-            org.junit.Assert.fail("Expected exception of type models.ParkingSystemException; message: User type cannot be null");
-        } catch (models.ParkingSystemException e) {
-        // Expected exception.
-        }
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertNull(superManager4);
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertNull(superManager5);
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertNull(manager6);
-    }
-
-    @Test
     public void test079() throws Throwable {
         if (debug)
             System.out.format("%n%s%n", "RegressionTest0.test079");
@@ -1238,32 +1211,6 @@ public class RegressionTest0 {
     }
 
     @Test
-    public void test086() throws Throwable {
-        if (debug)
-            System.out.format("%n%s%n", "RegressionTest0.test086");
-        services.ClientService clientService0 = null;
-        services.ManagerService managerService1 = null;
-        services.SuperManagerService superManagerService2 = null;
-        controllers.AuthController authController3 = new controllers.AuthController(clientService0, managerService1, superManagerService2);
-        boolean boolean4 = authController3.isLoggedIn();
-        boolean boolean5 = authController3.isLoggedIn();
-        models.client.Client client6 = authController3.getLoggedInClient();
-        // The following exception was thrown during execution in test generation
-        try {
-            authController3.logout();
-            org.junit.Assert.fail("Expected exception of type models.ParkingSystemException; message: No user is currently logged in");
-        } catch (models.ParkingSystemException e) {
-        // Expected exception.
-        }
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertTrue("'" + boolean4 + "' != '" + false + "'", boolean4 == false);
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertTrue("'" + boolean5 + "' != '" + false + "'", boolean5 == false);
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertNull(client6);
-    }
-
-    @Test
     public void test087() throws Throwable {
         if (debug)
             System.out.format("%n%s%n", "RegressionTest0.test087");
@@ -1365,27 +1312,6 @@ public class RegressionTest0 {
     }
 
     @Test
-    public void test093() throws Throwable {
-        if (debug)
-            System.out.format("%n%s%n", "RegressionTest0.test093");
-        services.ClientService clientService0 = null;
-        services.ManagerService managerService1 = null;
-        services.SuperManagerService superManagerService2 = null;
-        controllers.AuthController authController3 = new controllers.AuthController(clientService0, managerService1, superManagerService2);
-        boolean boolean4 = authController3.isLoggedIn();
-        models.user.UserType userType7 = null;
-        // The following exception was thrown during execution in test generation
-        try {
-            boolean boolean8 = authController3.login("", "hi!", userType7);
-            org.junit.Assert.fail("Expected exception of type models.ParkingSystemException; message: Email cannot be empty");
-        } catch (models.ParkingSystemException e) {
-        // Expected exception.
-        }
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertTrue("'" + boolean4 + "' != '" + false + "'", boolean4 == false);
-    }
-
-    @Test
     public void test094() throws Throwable {
         if (debug)
             System.out.format("%n%s%n", "RegressionTest0.test094");
@@ -1431,32 +1357,6 @@ public class RegressionTest0 {
         } catch (java.lang.NullPointerException e) {
         // Expected exception.
         }
-    }
-
-    @Test
-    public void test097() throws Throwable {
-        if (debug)
-            System.out.format("%n%s%n", "RegressionTest0.test097");
-        services.ClientService clientService0 = null;
-        services.ManagerService managerService1 = null;
-        services.SuperManagerService superManagerService2 = null;
-        controllers.AuthController authController3 = new controllers.AuthController(clientService0, managerService1, superManagerService2);
-        boolean boolean4 = authController3.isLoggedIn();
-        models.superManager.SuperManager superManager5 = authController3.getLoggedInSuperManager();
-        boolean boolean6 = authController3.isLoggedIn();
-        // The following exception was thrown during execution in test generation
-        try {
-            authController3.logout();
-            org.junit.Assert.fail("Expected exception of type models.ParkingSystemException; message: No user is currently logged in");
-        } catch (models.ParkingSystemException e) {
-        // Expected exception.
-        }
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertTrue("'" + boolean4 + "' != '" + false + "'", boolean4 == false);
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertNull(superManager5);
-        // Regression assertion (captures the current behavior of the code)
-        org.junit.Assert.assertTrue("'" + boolean6 + "' != '" + false + "'", boolean6 == false);
     }
 
     @Test
