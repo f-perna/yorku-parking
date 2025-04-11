@@ -28,6 +28,14 @@ public class ParkingSpaceRepository {
 		}
 		return null;
 	}
+	
+	public void removeParkingSpace(ParkingSpace parkingSpace) {
+		if (parkingSpace == null) {
+			throw new IllegalArgumentException("Parking Space can't be null!");
+		}
+		parkingSpaces.remove(parkingSpace);
+		saveSpaces();
+	}
 
 	public List<ParkingSpace> getAvailableSpaces(ParkingLot lot) {
 		List<ParkingSpace> availableSpaces = new ArrayList<>();

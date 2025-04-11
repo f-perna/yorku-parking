@@ -117,7 +117,7 @@ public class ParkingSpaceService {
 		}
 
 		if (lot == null) {
-			throw new ParkingSystemException("Lot cannot be null", ErrorType.VALIDATION);
+			throw new ParkingSystemException("Space cannot be null", ErrorType.VALIDATION);
 		}
 		if (spaceName == null || spaceName.trim().isEmpty()) {
 			throw new ParkingSystemException("Space name cannot be empty", ErrorType.VALIDATION);
@@ -179,6 +179,13 @@ public class ParkingSpaceService {
 		space.setEnabled(false);
 
 		return parkingSpaceRepository.updateParkingSpaceStatus(space, space.getStatus());
+	}
+	
+	public void removeParkingSpace(ParkingSpace parkingSpace) {
+		if (parkingSpace == null) {
+			throw new ParkingSystemException("Parking space canot be null", ErrorType.VALIDATION);
+		}
+		parkingSpaceRepository.removeParkingSpace(parkingSpace);
 	}
 
 	public ParkingSpace getParkingSpaceById(UUID spaceId) {

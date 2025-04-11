@@ -56,6 +56,16 @@ public class BookingService {
 
 		return bookingRepository.createBooking(parkingSpace, durationHours, client);
 	}
+	
+	public void deleteBooking(Booking booking) {
+		if (booking == null) {
+			throw new ParkingSystemException("Booking cannot be null", ErrorType.VALIDATION);
+		}
+		ParkingSpace updatedSpace = parkingSpaceRepository.updateParkingSpaceStatus(booking.getParkingSpace(),
+				ParkingSpaceStatus.AVAILABLE);
+		booking.setParkingSpace(updatedSpace);
+		bookingRepository.deleteBooking(booking);
+	}
 
 	public void confirmBooking(Booking booking, Payment payment) {
 		if (booking == null) {

@@ -99,4 +99,11 @@ public class ClientService {
 		clientRepository.saveClients();
 		return true;
 	}
+	
+	public void removeClient(String email) {
+		if (email == null) {
+			throw new ParkingSystemException("email cannot be null", ErrorType.VALIDATION);
+		}
+		clientRepository.deleteClient(email);
+	}
 }

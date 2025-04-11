@@ -1,9 +1,6 @@
 name,email,password,licencePlate,type,approved
 John Doe,johndoe@gmail.com,123456Ab!,123 ANB,STUDENT,true
 Bob Doe,bobdoe@gmail.com,123456Ab!,ABC 123,STUDENT,true
-test,test@gmail.com,123456Ab!,AA,FACULTY,true
 test2,test2@gmail.com,123456Ab!,AA,NON_FACULTY,true
 Bob Doe,visitor@test.com,AAbbbc1!,XYZ 345,VISITOR,true
 John Doe,student@test.com,AAbbbc1!,ABC 123,STUDENT,true
-Test User,test@example.com,Password123!,TEST123,STUDENT,false
-John Doe,john@example.com,Password123!,ABC123,STUDENT,false
