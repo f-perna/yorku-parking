@@ -1,3 +1,1 @@
 id,bookingID,amount,status,method,type
-05827db5-6b31-44d3-b453-5cfb1494c145,731a8fc4-2580-48c5-8abd-1ec5dad743d6,5.0,PAID,Credit,DEPOSIT
-db198732-adaa-4735-bba0-437db2352da0,731a8fc4-2580-48c5-8abd-1ec5dad743d6,5.0,PAID,Credit,FINAL
