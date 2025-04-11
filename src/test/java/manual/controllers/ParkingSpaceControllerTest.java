@@ -12,58 +12,34 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import controllers.AuthController;
 import controllers.ManagerController;
 import controllers.ParkingSpaceController;
-import controllers.SuperManagerController;
-import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.user.UserType;
 
 public class ParkingSpaceControllerTest extends BaseControllerTest {
 	private ParkingSpaceController parkingSpaceController;
-	private AuthController authController;
-	private SuperManagerController superManagerController;
 	private ManagerController managerController;
-	private Manager testManager;
 	private ParkingLot testLot;
 
 	@BeforeEach
 	protected void setUp() throws IOException {
 		super.setUp();
 		initializeControllers();
-		createTestManager();
-		createTestParkingLot();
+		this.testLot = super.createTestParkingLot();
+		super.createAndLogInAsTestManager();
 	}
 
 	private void initializeControllers() {
 		parkingSpaceController = controllerFactory.getParkingSpaceController();
-		authController = controllerFactory.getAuthController();
-		superManagerController = controllerFactory.getSuperManagerController();
 		managerController = controllerFactory.getManagerController();
-	}
-
-	private void createTestManager() {
-		// Login as SuperManager
-		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
-
-		// Generate manager
-		testManager = superManagerController.generateAndGetManagerAccount();
-
-		// Logout and login as manager
-		authController.logout();
-		authController.login(testManager.getEmail(), testManager.getPassword(), UserType.MANAGER);
-	}
-
-	private void createTestParkingLot() {
-		managerController.addParkingLot("Test Lot");
-		testLot = controllerFactory.getParkingLotController().getParkingLotByName("Test Lot");
 	}
 
 	@AfterEach
 	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
-		super.ensureLoggedOut();
+		this.testLot = null;
+		this.parkingSpaceController = null;
+		this.managerController = null;
 		super.tearDown();
 	}
 

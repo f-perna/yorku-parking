@@ -20,7 +20,6 @@ import controllers.SuperManagerController;
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
 import models.manager.Manager;
-import models.user.UserType;
 import repositories.ManagerRepository;
 import services.ManagerService;
 
@@ -32,7 +31,7 @@ public class SuperManagerControllerTest extends BaseControllerTest {
 	protected void setUp() throws IOException {
 		super.setUp();
 		initializeControllers();
-		loginAsSuperManager();
+		super.loginAsSuperManager();
 	}
 
 	private void initializeControllers() {
@@ -40,12 +39,10 @@ public class SuperManagerControllerTest extends BaseControllerTest {
 		authController = controllerFactory.getAuthController();
 	}
 
-	private void loginAsSuperManager() {
-		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
-	}
-
 	@AfterEach
 	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		this.superManagerController = null;
+		this.authController = null;
 		super.tearDown();
 	}
 

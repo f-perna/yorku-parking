@@ -12,53 +12,33 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import controllers.AuthController;
 import controllers.ClientController;
 import controllers.ManagerController;
-import controllers.SuperManagerController;
 import models.ParkingSystemException;
 import models.client.Client;
-import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.user.UserType;
 
 public class ManagerControllerTest extends BaseControllerTest {
 	private ManagerController managerController;
-	private AuthController authController;
-	private SuperManagerController superManagerController;
 	private ClientController clientController;
-	private Manager testManager;
 
 	@BeforeEach
 	protected void setUp() throws IOException {
 		super.setUp();
 		initializeControllers();
-		createTestManager();
+		super.createAndLogInAsTestManager();
 	}
 
 	private void initializeControllers() {
 		managerController = controllerFactory.getManagerController();
-		authController = controllerFactory.getAuthController();
-		superManagerController = controllerFactory.getSuperManagerController();
 		clientController = controllerFactory.getClientController();
-	}
-
-	private void createTestManager() {
-		// Login as SuperManager
-		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
-
-		// Generate manager
-		testManager = superManagerController.generateAndGetManagerAccount();
-
-		// Logout and login as manager
-		authController.logout();
-		authController.login(testManager.getEmail(), testManager.getPassword(), UserType.MANAGER);
 	}
 
 	@AfterEach
 	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
-		super.ensureLoggedOut();
+		this.managerController = null;
+		this.clientController = null;
 		super.tearDown();
 	}
 

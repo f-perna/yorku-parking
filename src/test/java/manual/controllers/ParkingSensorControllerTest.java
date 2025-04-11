@@ -1,15 +1,12 @@
 package manual.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,10 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import controllers.AuthController;
 import controllers.BookingController;
-import controllers.ManagerController;
 import controllers.ParkingSensorController;
-import controllers.SuperManagerController;
-import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import models.user.UserType;
@@ -32,9 +26,7 @@ public class ParkingSensorControllerTest extends BaseControllerTest {
 	private ParkingSensorController parkingSensorController;
 	private AuthController authController;
 	private BookingController bookingController;
-	private ManagerController managerController;
-	private SuperManagerController superManagerController;
-	private Manager testManager;
+
 	private ParkingLot testLot;
 	private ParkingSpace testSpace;
 	private Client testClient;
@@ -44,72 +36,27 @@ public class ParkingSensorControllerTest extends BaseControllerTest {
 	protected void setUp() throws IOException {
 		super.setUp();
 		initializeControllers();
-		createTestManager();
-		createTestParkingLotAndSpace();
-		createTestClient();
-		createTestBooking();
+
+		this.testLot = super.createTestParkingLot();
+		this.testSpace = super.createTestParkingSpace(testLot);
+		this.testClient = super.createTestClient();
+		this.testBooking = super.createTestBooking(testClient, testSpace);
 	}
 
 	private void initializeControllers() {
 		parkingSensorController = controllerFactory.getParkingSensorController();
 		authController = controllerFactory.getAuthController();
 		bookingController = controllerFactory.getBookingController();
-		managerController = controllerFactory.getManagerController();
-		superManagerController = controllerFactory.getSuperManagerController();
-	}
-
-	private void createTestManager() {
-		ensureLoggedOut();
-		// Login as SuperManager
-		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
-
-		// Generate manager
-		testManager = superManagerController.generateAndGetManagerAccount();
-
-		// Logout and login as manager
-		authController.logout();
-		authController.login(testManager.getEmail(), testManager.getPassword(), UserType.MANAGER);
-	}
-
-	private void createTestParkingLotAndSpace() {
-		// Create test parking lot
-		managerController.addParkingLot("Test Lot");
-		testLot = controllerFactory.getParkingLotController().getParkingLotByName("Test Lot");
-		if (testLot == null) {
-			throw new IllegalStateException("Failed to create test parking lot");
-		}
-
-		// Create test parking space
-		managerController.addParkingSpace(testLot, "Test Space");
-		List<ParkingSpace> spaces = controllerFactory.getParkingSpaceController()
-				.getParkingSpacesForLot(testLot.getID());
-		if (spaces.isEmpty()) {
-			throw new IllegalStateException("Failed to create test parking space");
-		}
-		testSpace = spaces.get(0);
-	}
-
-	private void createTestClient() {
-		// Create and approve test client
-		controllerFactory.getClientController().registerClient("Test Client", "test@example.com", "123456Ab!",
-				type.STUDENT, "ABC123");
-		testClient = controllerFactory.getManagerController().getClientByEmail("test@example.com");
-		if (testClient == null) {
-			throw new IllegalStateException("Failed to create test client");
-		}
-		testClient.setApproved(true);
-	}
-
-	private void createTestBooking() {
-		// Login as client and create booking
-		ensureLoggedOut();
-		authController.login(testClient.getEmail(), "123456Ab!", UserType.CLIENT);
-		testBooking = bookingController.createBooking(testSpace, 2);
-		ensureLoggedOut();
 	}
 
 	@AfterEach
 	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		this.testLot = null;
+		this.testSpace = null;
+		this.testClient = null;
+		this.testBooking = null;
+		this.parkingSensorController = null;
+		this.bookingController = null;
 		super.tearDown();
 	}
 

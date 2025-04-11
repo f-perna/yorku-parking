@@ -14,11 +14,8 @@ import models.booking.Booking;
 import models.booking.Booking.BookingStatus;
 import models.client.Client;
 import models.client.Client.type;
-import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.user.UserType;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BookingControllerTest extends BaseControllerTest {
@@ -28,16 +25,15 @@ public class BookingControllerTest extends BaseControllerTest {
 	private ParkingLot testLot;
 	private ParkingSpace testSpace;
 	private Client testClient;
-	private Manager testManager;
 
 	@BeforeEach
 	protected void setUp() throws IOException {
 		super.setUp();
 		initializeControllers();
-		createTestManager();
-		createTestParkingLotAndSpace();
-		createTestClient();
-		ensureLoggedOut();
+
+		this.testLot = super.createTestParkingLot();
+		this.testSpace = super.createTestParkingSpace(testLot);
+		this.testClient = super.createTestClient();
 	}
 
 	private void initializeControllers() {
@@ -45,53 +41,13 @@ public class BookingControllerTest extends BaseControllerTest {
 		bookingController = controllerFactory.getBookingController();
 	}
 
-	private void createTestManager() {
-		// Login as SuperManager
-		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
-
-		// Generate manager
-		testManager = controllerFactory.getSuperManagerController().generateAndGetManagerAccount();
-
-		// Logout and login as manager
-		authController.logout();
-		authController.login(testManager.getEmail(), testManager.getPassword(), UserType.MANAGER);
-	}
-
-	private void createTestParkingLotAndSpace() {
-		// Create test parking lot
-		controllerFactory.getManagerController().addParkingLot("Test Lot");
-		testLot = controllerFactory.getParkingLotController().getParkingLotByName("Test Lot");
-		if (testLot == null) {
-			throw new IllegalStateException("Failed to create test parking lot");
-		}
-
-		// Create test parking space
-		controllerFactory.getManagerController().addParkingSpace(testLot, "Test Space");
-		List<ParkingSpace> spaces = controllerFactory.getParkingSpaceController()
-				.getParkingSpacesForLot(testLot.getID());
-		if (spaces.isEmpty()) {
-			throw new IllegalStateException("Failed to create test parking space");
-		}
-		testSpace = spaces.get(0);
-	}
-
-	private void createTestClient() {
-		// Create and approve test client
-		controllerFactory.getClientController().registerClient("Test Client", "test@example.com", "123456Ab!",
-				type.STUDENT, "ABC123");
-		testClient = controllerFactory.getManagerController().getClientByEmail("test@example.com");
-		if (testClient == null) {
-			throw new IllegalStateException("Failed to create test client");
-		}
-		testClient.setApproved(true);
-
-		// Logout after setup
-		authController.logout();
-	}
-
 	@AfterEach
 	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
-		ensureLoggedOut();
+		this.testLot = null;
+		this.testSpace = null;
+		this.testClient = null;
+		this.authController = null;
+		this.bookingController = null;
 		super.tearDown();
 	}
 
