@@ -13,7 +13,7 @@ import csv.ClientCSVProcessor;
 import models.ParkingSystemException;
 import models.client.Client;
 
-class ClientControllerTest extends BaseControllerTest {
+	public class ClientControllerTest extends BaseControllerTest {
 
 	@BeforeEach
 	protected void setUp() throws IOException {
