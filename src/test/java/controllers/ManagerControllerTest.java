@@ -22,6 +22,7 @@ import models.parkingSpace.ParkingSpace;
 import repositories.ClientRepository;
 import repositories.ManagerRepository;
 import repositories.ParkingLotRepository;
+import repositories.ParkingSensorRepository;
 import repositories.ParkingSpaceRepository;
 import services.ClientService;
 import services.ManagerService;
@@ -31,6 +32,7 @@ import services.SuperManagerService;
 import csv.ClientCSVProcessor;
 import csv.ManagerCSVProcessor;
 import csv.ParkingLotCSVProcessor;
+import csv.ParkingSensorCSVProcessor;
 import csv.ParkingSpaceCSVProcessor;
 
 public class ManagerControllerTest {
@@ -46,9 +48,13 @@ public class ManagerControllerTest {
 
 	private String testParkingLotsFilePath;
 	private String testParkingSpacesFilePath;
+	private String testParkingSensorsFilePath;
 	private String testClientsFilePath;
 	private String testManagersFilePath;
 
+	//// TEST PARKING SENSORS TOO
+	
+	
 	@TempDir
 	File tempDir;
 
@@ -57,23 +63,26 @@ public class ManagerControllerTest {
 		// Initialize test CSV files
 		testParkingLotsFilePath = tempDir.getAbsolutePath() + "/test_parking_lots.csv";
 		testParkingSpacesFilePath = tempDir.getAbsolutePath() + "/test_parking_spaces.csv";
+		testParkingSensorsFilePath = tempDir.getAbsolutePath() + "/test_parking_sensors.csv";
 		testClientsFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
 		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
 
 		ParkingLotCSVProcessor.initializeTestFile(testParkingLotsFilePath);
 		ParkingSpaceCSVProcessor.initializeTestFile(testParkingSpacesFilePath);
+		ParkingSensorCSVProcessor.initializeTestFile(testParkingSensorsFilePath);
 		ClientCSVProcessor.initializeTestFile(testClientsFilePath);
 		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
 
 		// Initialize repositories
 		ParkingLotRepository parkingLotRepository = new ParkingLotRepository();
 		ParkingSpaceRepository parkingSpaceRepository = new ParkingSpaceRepository();
+		ParkingSensorRepository parkingSensorRepository = new ParkingSensorRepository();
 		ClientRepository clientRepository = new ClientRepository();
 		ManagerRepository managerRepository = new ManagerRepository();
 
 		// Initialize services with repositories
 		parkingLotService = new ParkingLotService(parkingLotRepository);
-		parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository);
+		parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository, parkingSensorRepository);
 		clientService = new ClientService(clientRepository);
 		managerService = new ManagerService(managerRepository);
 		superManagerService = new SuperManagerService();
@@ -103,6 +112,7 @@ public class ManagerControllerTest {
 	void tearDown() {
 		ParkingLotCSVProcessor.cleanupAndReset(testParkingLotsFilePath);
 		ParkingSpaceCSVProcessor.cleanupAndReset(testParkingSpacesFilePath);
+		ParkingSensorCSVProcessor.cleanupAndReset(testParkingSensorsFilePath);
 		ClientCSVProcessor.cleanupAndReset(testClientsFilePath);
 		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
 

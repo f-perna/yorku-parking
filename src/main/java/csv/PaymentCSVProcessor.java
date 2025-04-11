@@ -16,8 +16,19 @@ import models.payment.Payment.PaymentType;
 import models.payment.PaymentMethod;
 
 public class PaymentCSVProcessor extends CSVHelper {
-	private static final String PAYMENTS_CSV = DATA_DIRECTORY + "payments.csv";
+	private static String PAYMENTS_CSV = DATA_DIRECTORY + "payments.csv";
 	private static final int EXPECTED_FIELDS = 6;
+	private static final String HEADER = "id,bookingID,amount,status,method,type";
+
+	public static void initializeTestFile(String filePath) throws IOException {
+		PAYMENTS_CSV = filePath;
+		initializeTestFile(filePath, HEADER);
+	}
+
+	public static void cleanupAndReset(String filePath) {
+		cleanupTestFile(filePath);
+		PAYMENTS_CSV = DATA_DIRECTORY + "payments.csv";
+	}
 
 	public static List<Payment> readPaymentData() {
 		List<Payment> payments = new ArrayList<>();
@@ -85,7 +96,7 @@ public class PaymentCSVProcessor extends CSVHelper {
 	public static void setPaymentData(List<Payment> payments) {
 		try (BufferedWriter bw = getFileWriter(PAYMENTS_CSV)) {
 			// Write header
-			bw.write("id,bookingID,amount,status,method,type");
+			bw.write(HEADER);
 			bw.newLine();
 
 			for (Payment payment : payments) {

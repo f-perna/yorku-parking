@@ -18,7 +18,6 @@ import org.junit.jupiter.api.io.TempDir;
 import csv.ClientCSVProcessor;
 import csv.ManagerCSVProcessor;
 import csv.ParkingLotCSVProcessor;
-import csv.ParkingSpaceCSVProcessor;
 import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import repositories.ManagerRepository;
@@ -37,7 +36,6 @@ public class ParkingLotControllerTest {
 	private SuperManagerService superManagerService;
 
 	private String testParkingLotsFilePath;
-	private String testParkingSpacesFilePath;
 	private String testClientsFilePath;
 	private String testManagersFilePath;
 
@@ -48,12 +46,10 @@ public class ParkingLotControllerTest {
 	void setUp() throws IOException {
 		// Initialize test CSV files
 		testParkingLotsFilePath = tempDir.getAbsolutePath() + "/test_parking_lots.csv";
-		testParkingSpacesFilePath = tempDir.getAbsolutePath() + "/test_parking_spaces.csv";
 		testClientsFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
 		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
 
 		ParkingLotCSVProcessor.initializeTestFile(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.initializeTestFile(testParkingSpacesFilePath);
 		ClientCSVProcessor.initializeTestFile(testClientsFilePath);
 		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
 
@@ -91,7 +87,6 @@ public class ParkingLotControllerTest {
 	@AfterEach
 	void tearDown() {
 		ParkingLotCSVProcessor.cleanupAndReset(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.cleanupAndReset(testParkingSpacesFilePath);
 		ClientCSVProcessor.cleanupAndReset(testClientsFilePath);
 		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
 

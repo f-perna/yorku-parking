@@ -19,12 +19,6 @@ public class ParkingSpaceService {
 	private final ParkingSensorRepository parkingSensorRepository;
 	private final AuthenticationState authState;
 
-	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceRepository) {
-		this.parkingSpaceRepository = parkingSpaceRepository;
-		this.parkingSensorRepository = null;
-		this.authState = AuthenticationState.getInstance();
-	}
-
 	public ParkingSpaceService(ParkingSpaceRepository parkingSpaceRepository,
 			ParkingSensorRepository parkingSensorRepository) {
 		this.parkingSpaceRepository = parkingSpaceRepository;
@@ -38,26 +32,83 @@ public class ParkingSpaceService {
 		}
 
 		List<ParkingSpace> availableSpaces = parkingSpaceRepository.getAvailableSpaces(lot);
+		List<ParkingSpace> unOccupiedAvailableSpaces = new ArrayList<>();
 
-		// If we have access to the sensor repository, filter out spaces that have cars
-		// in them
-		if (parkingSensorRepository != null) {
-			List<ParkingSpace> trulyAvailableSpaces = new ArrayList<>();
+		for (ParkingSpace space : availableSpaces) {
+			ParkingSensor sensor = parkingSensorRepository.getSensorBySpaceId(space.getID());
 
-			for (ParkingSpace space : availableSpaces) {
-				// Get the sensor for this space and check if a car is present
-				ParkingSensor sensor = parkingSensorRepository.getSensorBySpaceId(space.getID());
-
-				// If no sensor exists yet or no car is present, the space is truly available
-				if (sensor == null || !sensor.isCarPresent()) {
-					trulyAvailableSpaces.add(space);
-				}
+			// If no sensor exists yet or no car is present, the space is truly available
+			if (sensor == null || !sensor.isCarPresent()) {
+				unOccupiedAvailableSpaces.add(space);
 			}
-
-			return trulyAvailableSpaces;
 		}
 
-		return availableSpaces;
+		return unOccupiedAvailableSpaces;
+	}
+
+	public List<ParkingSpace> getBookedSpaces(ParkingLot lot) {
+		if (lot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
+
+		List<ParkingSpace> bookedSpaces = parkingSpaceRepository.getBookedSpaces(lot);
+		return bookedSpaces;
+	}
+
+	public List<ParkingSpace> getOccupiedSpaces(ParkingLot lot) {
+		if (lot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
+
+		List<ParkingSpace> allSpaces = parkingSpaceRepository.getSpacesForLot(lot.getID());
+		List<ParkingSpace> occupiedSpaces = new ArrayList<>();
+
+		for (ParkingSpace space : allSpaces) {
+			ParkingSensor sensor = parkingSensorRepository.getSensorBySpaceId(space.getID());
+
+			// A space is occupied only if it has a sensor AND that sensor detects a car
+			if (sensor != null && sensor.isCarPresent()) {
+				occupiedSpaces.add(space);
+			}
+		}
+
+		return occupiedSpaces;
+	}
+
+	public List<ParkingSpace> getUnOccupiedSpaces(ParkingLot lot) {
+		if (lot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
+
+		List<ParkingSpace> allSpaces = parkingSpaceRepository.getSpacesForLot(lot.getID());
+		List<ParkingSpace> unOccupiedSpaces = new ArrayList<>();
+
+		for (ParkingSpace space : allSpaces) {
+			ParkingSensor sensor = parkingSensorRepository.getSensorBySpaceId(space.getID());
+
+			// A space is unoccupied if it has no sensor OR its sensor doesn't detect a car
+			if (sensor == null || !sensor.isCarPresent()) {
+				unOccupiedSpaces.add(space);
+			}
+		}
+
+		return unOccupiedSpaces;
+	}
+	
+	public List<ParkingSpace> getEnabledSpaces(ParkingLot lot) {
+		if (lot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
+		
+		return parkingSpaceRepository.getEnabledSpaces(lot);
+	}
+	
+	public List<ParkingSpace> getDisabledSpaces(ParkingLot lot) {
+		if (lot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
+		
+		return parkingSpaceRepository.getDisabledSpaces(lot);
 	}
 
 	public void addParkingSpace(ParkingLot lot, String spaceName) {
@@ -87,9 +138,8 @@ public class ParkingSpaceService {
 
 		ParkingSpace newSpace = parkingSpaceRepository.addParkingSpace(lot, spaceName.trim());
 
-		if (parkingSensorRepository != null) {
-			parkingSensorRepository.createSensor(newSpace);
-		}
+		parkingSensorRepository.createSensor(newSpace);
+
 	}
 
 	public ParkingSpace enableParkingSpace(ParkingSpace parkingSpace) {

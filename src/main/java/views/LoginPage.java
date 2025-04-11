@@ -181,10 +181,17 @@ public class LoginPage extends JPanel {
 				resetFields();
 
 				if (loginType == UserType.MANAGER) {
+					SuperManagerPage managerPage = (SuperManagerPage) NavigationController.getPage("Manager");
+					managerPage.refresh();
 					NavigationController.showPage("Manager");
 				} else if (loginType == UserType.SUPER_MANAGER) {
+					SuperManagerPage superManagerPage = (SuperManagerPage) NavigationController.getPage("SuperManager");
+					superManagerPage.refresh();
 					NavigationController.showPage("SuperManager");
+					
 				} else {
+					ClientPage clientPage = (ClientPage) NavigationController.getPage("Client");
+					clientPage.refresh();
 					NavigationController.showPage("Client");
 				}
 			}

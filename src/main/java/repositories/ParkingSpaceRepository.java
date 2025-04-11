@@ -38,6 +38,41 @@ public class ParkingSpaceRepository {
 		}
 		return availableSpaces;
 	}
+	
+	public List<ParkingSpace> getBookedSpaces(ParkingLot lot) {
+		List<ParkingSpace> bookedSpaces = new ArrayList<>();
+		for (ParkingSpace space : parkingSpaces) {
+			if (space.getLot().equals(lot) && space.getStatus() == ParkingSpaceStatus.BOOKED) {
+				bookedSpaces.add(space);
+			}
+		}
+		
+		return bookedSpaces;
+	}
+	
+	public List<ParkingSpace> getEnabledSpaces(ParkingLot lot) {
+		List<ParkingSpace> enabledSpaces = new ArrayList<>();
+		
+		for (ParkingSpace space : parkingSpaces) {
+			if (space.isEnabled()) {
+				enabledSpaces.add(space);
+			}
+		}
+		
+		return enabledSpaces;
+	}
+	
+	public List<ParkingSpace> getDisabledSpaces(ParkingLot lot) {
+		List<ParkingSpace> disabledSpaces = new ArrayList<>();
+		
+		for (ParkingSpace space : parkingSpaces) {
+			if (!space.isEnabled()) {
+				disabledSpaces.add(space);
+			}
+		}
+		
+		return disabledSpaces;
+	}
 
 	public ParkingSpace updateParkingSpaceStatus(ParkingSpace space, ParkingSpaceStatus newStatus) {
 		ParkingSpace storedSpace = getParkingSpaceByID(space.getID());

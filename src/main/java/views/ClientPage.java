@@ -282,15 +282,10 @@ public class ClientPage extends JPanel {
 		}
 
 		try {
-			// Check if the booking has started or if it's an early arrival
 			boolean isEarlyArrival = LocalDateTime.now().isBefore(selectedBooking.getStartTime());
+			Client loggedInClient = authController.getLoggedInClient();
+			parkingSensorController.simulateCarArrival(selectedBooking.getParkingSpace(), loggedInClient.getLicencePlate());
 
-			// Park the user's car (using the licence plate from the booking)
-			// We'll pass a new parameter to the controller to separate car detection from
-			// check-in
-			parkingSensorController.simulateCarArrival(selectedBooking, !isEarlyArrival);
-
-			// Different messages based on early arrival or regular check-in
 			String message;
 			if (isEarlyArrival) {
 				message = "Your car has been detected at the parking space.\n"
@@ -316,7 +311,8 @@ public class ClientPage extends JPanel {
 		}
 
 		try {
-			parkingSensorController.simulateCarDeparture(selectedBooking);
+			Client loggedInClient = authController.getLoggedInClient();
+			parkingSensorController.simulateCarDeparture(selectedBooking.getParkingSpace(), loggedInClient.getLicencePlate());
 
 			// Car departure success message
 			String message = "Your car has been removed from the parking space.";
@@ -325,8 +321,6 @@ public class ClientPage extends JPanel {
 			// Skip payment flow if booking is already canceled or still in CONFIRMED status
 			// (early arrival)
 			if (selectedBooking.getStatus() == Booking.BookingStatus.CANCELED) {
-				JOptionPane.showMessageDialog(this, "Your car has been removed from a cancelled booking space.",
-						"Car Removed", JOptionPane.INFORMATION_MESSAGE);
 				refresh();
 				return;
 			} else if (selectedBooking.getStatus() == Booking.BookingStatus.CONFIRMED) {
@@ -432,10 +426,9 @@ public class ClientPage extends JPanel {
 	}
 
 	private void hideAllBookingDetails() {
-		setVisibility(false, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue,
-				statusLabel, statusValue, depositLabel, depositValue, totalLabel, totalValue,
-				paymentsLabel, paymentsScrollPane, carPresenceLabel, carPresenceValue,
-				licencePlateLabel, licencePlateValue);
+		setVisibility(false, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue, statusLabel,
+				statusValue, depositLabel, depositValue, totalLabel, totalValue, paymentsLabel, paymentsScrollPane,
+				carPresenceLabel, carPresenceValue, licencePlateLabel, licencePlateValue);
 
 		hideAllActionButtons();
 	}
@@ -447,8 +440,8 @@ public class ClientPage extends JPanel {
 	}
 
 	private void hideAllActionButtons() {
-		setVisibility(false, simulateCarArrivalButton, simulateCarDepartureButton,
-				completeCheckoutButton, extendTimeButton, deleteButton);
+		setVisibility(false, simulateCarArrivalButton, simulateCarDepartureButton, completeCheckoutButton,
+				extendTimeButton, deleteButton);
 	}
 
 	public void refreshBookingInfo() {
@@ -536,10 +529,9 @@ public class ClientPage extends JPanel {
 	}
 
 	private void showAllBookingDetails() {
-		setVisibility(true, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue,
-				statusLabel, statusValue, depositLabel, depositValue, totalLabel, totalValue,
-				paymentsLabel, paymentsScrollPane, carPresenceLabel, carPresenceValue,
-				licencePlateLabel, licencePlateValue);
+		setVisibility(true, lotLabel, lotValue, spaceLabel, spaceValue, durationLabel, durationValue, statusLabel,
+				statusValue, depositLabel, depositValue, totalLabel, totalValue, paymentsLabel, paymentsScrollPane,
+				carPresenceLabel, carPresenceValue, licencePlateLabel, licencePlateValue);
 	}
 
 	private void updateActionButtonsForStatus(Booking booking) {
@@ -550,56 +542,51 @@ public class ClientPage extends JPanel {
 		boolean isCarPresent = parkingSensorController.isCarPresentAtSpace(booking.getParkingSpace());
 		boolean isOwnerCar = parkingSensorController.isBookingOwnerCar(booking);
 
+		// Show remove car button if user's car is present, regardless of status
+		if (isCarPresent && isOwnerCar) {
+			simulateCarDepartureButton.setVisible(true);
+		}
+
 		switch (status) {
-			case CONFIRMED:
-				simulateCarArrivalButton.setVisible(!isCarPresent);
-				simulateCarDepartureButton.setVisible(isCarPresent);
-				break;
+		case CONFIRMED:
+			simulateCarArrivalButton.setVisible(!isCarPresent);
+			break;
 
-			case CHECKED_IN:
-				simulateCarArrivalButton.setVisible(!isCarPresent);
-				simulateCarDepartureButton.setVisible(isCarPresent);
-				completeCheckoutButton.setVisible(!isCarPresent);
-				if (!isCarPresent) {
-					styleCheckoutButton(completeCheckoutButton);
-				}
-				break;
-
-			case OVERSTAYED:
-				simulateCarDepartureButton.setVisible(isCarPresent);
-				completeCheckoutButton.setVisible(!isCarPresent);
-				if (!isCarPresent) {
-					styleCheckoutButton(completeCheckoutButton);
-				}
-				if (!warningShown && isCarPresent) {
-					showOverstayWarning();
-				}
-				break;
-
-			case EXPIRED:
-				completeCheckoutButton.setVisible(true);
+		case CHECKED_IN:
+			simulateCarArrivalButton.setVisible(!isCarPresent);
+			completeCheckoutButton.setVisible(!isCarPresent);
+			if (!isCarPresent) {
 				styleCheckoutButton(completeCheckoutButton);
-				if (!warningShown) {
-					showExpiredNotification();
-				}
-				break;
+			}
+			break;
 
-			case CANCELED:
-				boolean isLatestBooking = bookingController.isLatestBookingForSpaceAndClient(booking);
-				simulateCarDepartureButton.setVisible(isCarPresent && isOwnerCar && isLatestBooking);
-				break;
+		case OVERSTAYED:
+			completeCheckoutButton.setVisible(!isCarPresent);
+			if (!isCarPresent) {
+				styleCheckoutButton(completeCheckoutButton);
+			}
+			if (!warningShown && isCarPresent) {
+				showOverstayWarning();
+			}
+			break;
+
+		case EXPIRED:
+			completeCheckoutButton.setVisible(true);
+			styleCheckoutButton(completeCheckoutButton);
+			if (!warningShown) {
+				showExpiredNotification();
+			}
+			break;
 		default:
 			break;
 		}
 
 		// Update extend time button (for PENDING, CONFIRMED, CHECKED_IN)
-		extendTimeButton.setVisible(status == Booking.BookingStatus.PENDING
-				|| status == Booking.BookingStatus.CONFIRMED
+		extendTimeButton.setVisible(status == Booking.BookingStatus.PENDING || status == Booking.BookingStatus.CONFIRMED
 				|| status == Booking.BookingStatus.CHECKED_IN);
 
 		// Update cancel button (for PENDING or CONFIRMED before start time)
-		deleteButton.setVisible((status == Booking.BookingStatus.PENDING
-				|| status == Booking.BookingStatus.CONFIRMED)
+		deleteButton.setVisible((status == Booking.BookingStatus.PENDING || status == Booking.BookingStatus.CONFIRMED)
 				&& !LocalDateTime.now().isAfter(booking.getStartTime()));
 	}
 
@@ -656,37 +643,47 @@ public class ClientPage extends JPanel {
 
 		if (confirm == JOptionPane.YES_OPTION) {
 			try {
-				double depositAmount = selectedBooking.getDeposit();
-				String message = String
-						.format("To cancel your booking, you must select a refund method for your deposit of $%.2f.\n\n"
-								+ "Please select your preferred refund method:", depositAmount);
+				if (selectedBooking.getStatus() == Booking.BookingStatus.CONFIRMED) {
+					double depositAmount = selectedBooking.getDeposit();
+					String message = String.format(
+							"To cancel your booking, you must select a refund method for your deposit of $%.2f.\n\n"
+									+ "Please select your preferred refund method:",
+							depositAmount);
 
-				String[] refundMethods = { "Credit", "Debit", "Cash", "Mobile" };
-				String selectedMethod = (String) JOptionPane.showInputDialog(this, message, "Deposit Refund Required",
-						JOptionPane.INFORMATION_MESSAGE, null, refundMethods, refundMethods[0]);
+					String[] refundMethods = { "Credit", "Debit", "Cash", "Mobile" };
+					String selectedMethod = (String) JOptionPane.showInputDialog(this, message,
+							"Deposit Refund Required", JOptionPane.INFORMATION_MESSAGE, null, refundMethods,
+							refundMethods[0]);
 
-				if (selectedMethod != null) {
-					bookingController.cancelBooking(selectedBooking);
+					if (selectedMethod != null) {
+						bookingController.cancelBooking(selectedBooking);
 
-					try {
-						paymentController.processRefundPayment(selectedBooking, selectedMethod);
+						try {
+							paymentController.processRefundPayment(selectedBooking, selectedMethod);
 
-						JOptionPane.showMessageDialog(this, String.format(
-								"Your booking has been cancelled and your deposit of $%.2f has been refunded via %s.",
-								depositAmount, selectedMethod), "Cancellation Complete",
-								JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(this, String.format(
+									"Your booking has been cancelled and your deposit of $%.2f has been refunded via %s.",
+									depositAmount, selectedMethod), "Cancellation Complete",
+									JOptionPane.INFORMATION_MESSAGE);
 
-						refresh();
-					} catch (Exception ex) {
+							refresh();
+						} catch (Exception ex) {
+							JOptionPane.showMessageDialog(this,
+									"Error processing refund: " + ex.getMessage() + "\n"
+											+ "Please contact customer support for assistance with your refund.",
+									"Refund Error", JOptionPane.ERROR_MESSAGE);
+						}
+					} else {
 						JOptionPane.showMessageDialog(this,
-								"Error processing refund: " + ex.getMessage() + "\n"
-										+ "Please contact customer support for assistance with your refund.",
-								"Refund Error", JOptionPane.ERROR_MESSAGE);
+								"Booking cancellation was cancelled. Your booking remains active.",
+								"Cancellation Aborted", JOptionPane.INFORMATION_MESSAGE);
 					}
 				} else {
-					JOptionPane.showMessageDialog(this,
-							"Booking cancellation was cancelled. Your booking remains active.", "Cancellation Aborted",
-							JOptionPane.INFORMATION_MESSAGE);
+					// For pending bookings, just cancel without refund
+					bookingController.cancelBooking(selectedBooking);
+					JOptionPane.showMessageDialog(this, "Your pending booking has been cancelled.",
+							"Cancellation Complete", JOptionPane.INFORMATION_MESSAGE);
+					refresh();
 				}
 			} catch (ParkingSystemException ex) {
 				JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

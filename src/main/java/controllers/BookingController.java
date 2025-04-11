@@ -19,7 +19,7 @@ public class BookingController {
 		this.authState = AuthenticationState.getInstance();
 	}
 
-	public void authCheck() {
+	private void authCheck() {
 		Client client = authState.getLoggedInClient();
 		if (client == null) {
 			throw new ParkingSystemException("User must be logged in to create a booking", ErrorType.AUTHENTICATION);

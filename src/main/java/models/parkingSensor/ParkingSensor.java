@@ -55,9 +55,6 @@ public class ParkingSensor {
 		}
 	}
 
-	/**
-	 * Simulates a car leaving the parking space
-	 */
 	public void removeCar() {
 		if (carPresent) {
 			carPresent = false;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.time.LocalDateTime;
 
 import csv.BookingCSVProcessor;
 import models.ParkingSystemException;
@@ -110,10 +111,12 @@ public class BookingRepository {
 		booking.completeBooking();
 		saveBookings();
 	}
-	
+
 	public void cancelBooking(Booking booking) {
-		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
-			throw new ParkingSystemException("Only confirmed bookings can be canceled", ErrorType.BUSINESS_LOGIC);
+		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED
+				&& booking.getStatus() != Booking.BookingStatus.PENDING) {
+			throw new ParkingSystemException("Only pending or confirmed bookings can be canceled",
+					ErrorType.BUSINESS_LOGIC);
 		}
 		booking.cancelBooking();
 		saveBookings();
@@ -126,6 +129,18 @@ public class BookingRepository {
 		if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
 			throw new ParkingSystemException("Only confirmed bookings can be checked-in", ErrorType.BUSINESS_LOGIC);
 		}
+
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime startTime = booking.getStartTime();
+		LocalDateTime earliestCheckIn = startTime.minusMinutes(5);
+		LocalDateTime latestCheckIn = startTime.plusHours(1);
+
+		if (now.isBefore(earliestCheckIn)) {
+			return;
+		} else if (now.isAfter(latestCheckIn)) {
+			return;
+		}
+
 		booking.checkIn();
 		saveBookings();
 	}

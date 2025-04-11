@@ -1,10 +1,12 @@
 package controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,150 +26,180 @@ import services.SuperManagerService;
 import csv.ManagerCSVProcessor;
 
 public class SuperManagerControllerTest {
-    private SuperManagerController superManagerController;
-    private ManagerService managerService;
-    private SuperManagerService superManagerService;
-    private AuthController authController;
-    private String testManagersFilePath;
+	private SuperManagerController superManagerController;
+	private ManagerService managerService;
+	private SuperManagerService superManagerService;
+	private AuthController authController;
+	private String testManagersFilePath;
 
-    @TempDir
-    File tempDir;
+	@TempDir
+	File tempDir;
 
-    @BeforeEach
-    void setUp() throws IOException {
-        testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
-        ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
+	@BeforeEach
+	void setUp() throws IOException {
+		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
+		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
 
-        ManagerRepository managerRepository = new ManagerRepository();
-        managerService = new ManagerService(managerRepository);
-        superManagerController = new SuperManagerController(managerService);
+		ManagerRepository managerRepository = new ManagerRepository();
+		managerService = new ManagerService(managerRepository);
+		superManagerController = new SuperManagerController(managerService);
 
-        superManagerService = new SuperManagerService();
-        authController = new AuthController(null, managerService, superManagerService);
+		superManagerService = new SuperManagerService();
+		authController = new AuthController(null, managerService, superManagerService);
 
-        String superEmail = "superadmin@parking.yorku.ca";
-        String superPassword = "Super@dmin123!";
-        authController.login(superEmail, superPassword, models.user.UserType.SUPER_MANAGER);
-    }
+		String superEmail = "superadmin@parking.yorku.ca";
+		String superPassword = "Super@dmin123!";
+		authController.login(superEmail, superPassword, models.user.UserType.SUPER_MANAGER);
+	}
 
-    @AfterEach
-    void tearDown() {
-        ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
-        if (authController.isLoggedIn()) {
-            authController.logout();
-        }
-    }
+	@AfterEach
+	void tearDown() {
+		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
+		if (authController.isLoggedIn()) {
+			authController.logout();
+		}
+	}
 
-    @Test
-    void testGenerateAndGetManagerAccount() {
-        Manager newManager = superManagerController.generateAndGetManagerAccount();
+	@Test
+	void testGenerateAndGetManagerAccount() {
+		Manager newManager = superManagerController.generateAndGetManagerAccount();
 
-        assertNotNull(newManager);
-        assertNotNull(newManager.getEmail());
-        assertNotNull(newManager.getPassword());
+		assertNotNull(newManager);
+		assertNotNull(newManager.getEmail());
+		assertNotNull(newManager.getPassword());
 
-        List<Manager> managers = superManagerController.getAllManagers();
-        assertTrue(managers.contains(newManager));
-    }
+		List<Manager> managers = superManagerController.getAllManagers();
+		assertTrue(managers.contains(newManager));
+	}
 
-    @Test
-    void testRemoveManager() {
-        Manager newManager = superManagerController.generateAndGetManagerAccount();
-        assertNotNull(newManager);
+	@Test
+	void testRemoveManager() {
+		// Create a manager
+		Manager newManager = superManagerController.generateAndGetManagerAccount();
+		assertNotNull(newManager);
 
-        boolean removeResult = superManagerController.removeManager(newManager.getEmail());
-        assertTrue(removeResult);
+		// Verify manager exists in the list before removal (covers the TRUE branch)
+		List<Manager> managersBeforeRemoval = superManagerController.getAllManagers();
+		assertTrue(managersBeforeRemoval.contains(newManager));
 
-        List<Manager> managers = superManagerController.getAllManagers();
-        assertTrue(!managers.contains(newManager));
-    }
+		// Remove the manager
+		boolean removeResult = superManagerController.removeManager(newManager.getEmail());
+		assertTrue(removeResult);
 
-    @Test
-    void testRemoveManagerWithNullEmail() {
-        ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> {
-            superManagerController.removeManager(null);
-        });
-        assertEquals("Email cannot be null", exception.getMessage());
-        assertEquals(ErrorType.VALIDATION, exception.getErrorType());
-    }
+		// Verify manager no longer exists in the list (covers the FALSE branch)
+		List<Manager> managersAfterRemoval = superManagerController.getAllManagers();
+		assertFalse(managersAfterRemoval.contains(newManager));
+	}
 
-    @Test
-    void testRemoveNonExistentManager() {
-        boolean removeResult = superManagerController.removeManager("nonexistent@example.com");
-        assertTrue(!removeResult);
-    }
+	@Test
+	void testRemoveManagerWithNullEmail() {
+		// Arrange & Act & Assert
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
+				() -> superManagerController.removeManager(null));
 
-    @Test
-    void testGetAllManagers() {
-        Manager manager1 = superManagerController.generateAndGetManagerAccount();
-        Manager manager2 = superManagerController.generateAndGetManagerAccount();
+		// Additional assertions on the exception
+		assertEquals("Email cannot be null", exception.getMessage());
+		assertEquals(ErrorType.VALIDATION, exception.getErrorType());
+	}
 
-        List<Manager> managers = superManagerController.getAllManagers();
+	@Test
+	void testGetAllManagers() {
+		Manager manager1 = superManagerController.generateAndGetManagerAccount();
+		Manager manager2 = superManagerController.generateAndGetManagerAccount();
 
-        assertTrue(managers.contains(manager1));
-        assertTrue(managers.contains(manager2));
-    }
+		List<Manager> managers = superManagerController.getAllManagers();
 
-    @Test
-    void testGenerateManagerWithoutSuperManagerLogin() {
-        authController.logout();
+		assertTrue(managers.contains(manager1));
+		assertTrue(managers.contains(manager2));
+	}
 
-        ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> {
-            superManagerController.generateAndGetManagerAccount();
-        });
-        assertEquals("Only super managers can add new managers", exception.getMessage());
-        assertEquals(ErrorType.AUTHORIZATION, exception.getErrorType());
-    }
+	@Test
+	void testGenerateManagerWithoutSuperManagerLogin() {
+		authController.logout();
 
-    @Test
-    void testRemoveManagerWithoutSuperManagerLogin() {
-        Manager newManager = superManagerController.generateAndGetManagerAccount();
-        assertNotNull(newManager);
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
+				() -> superManagerController.generateAndGetManagerAccount());
 
-        authController.logout();
+		assertEquals("Only super managers can add new managers", exception.getMessage());
+		assertEquals(ErrorType.AUTHORIZATION, exception.getErrorType());
+	}
 
-        ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> {
-            superManagerController.removeManager(newManager.getEmail());
-        });
-        assertEquals("Only super managers can add new managers", exception.getMessage());
-        assertEquals(ErrorType.AUTHORIZATION, exception.getErrorType());
-    }
+	@Test
+	void testRemoveManagerWithoutSuperManagerLogin() {
+		Manager newManager = superManagerController.generateAndGetManagerAccount();
+		assertNotNull(newManager);
 
-    @Test
-    void testGetAllManagersWithoutSuperManagerLogin() {
-        authController.logout();
+		authController.logout();
 
-        ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> {
-            superManagerController.getAllManagers();
-        });
-        assertEquals("Only super managers can add new managers", exception.getMessage());
-        assertEquals(ErrorType.AUTHORIZATION, exception.getErrorType());
-    }
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
+				() -> superManagerController.removeManager(newManager.getEmail()));
+		assertEquals("Only super managers can add new managers", exception.getMessage());
+		assertEquals(ErrorType.AUTHORIZATION, exception.getErrorType());
+	}
 
-    @Test
-    void testManagerPasswordValidation() {
-        Manager newManager = superManagerController.generateAndGetManagerAccount();
-        assertNotNull(newManager);
+	@Test
+	void testGetAllManagersWithoutSuperManagerLogin() {
+		authController.logout();
 
-        String password = newManager.getPassword();
-        assertTrue(password.length() >= 8, "Password should be at least 8 characters long");
-        assertTrue(password.matches(".*[A-Z].*"), "Password should contain at least one uppercase letter");
-        assertTrue(password.matches(".*[a-z].*"), "Password should contain at least one lowercase letter");
-        assertTrue(password.matches(".*[0-9].*"), "Password should contain at least one number");
-        assertTrue(password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"),
-                "Password should contain at least one special character");
-    }
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
+				() -> superManagerController.getAllManagers());
+		assertEquals("Only super managers can add new managers", exception.getMessage());
+		assertEquals(ErrorType.AUTHORIZATION, exception.getErrorType());
+	}
 
-    @Test
-    void testManagerAccountUniqueness() {
-        Manager manager1 = superManagerController.generateAndGetManagerAccount();
-        Manager manager2 = superManagerController.generateAndGetManagerAccount();
+	@Test
+	void testManagerPasswordValidation() {
+		Manager newManager = superManagerController.generateAndGetManagerAccount();
+		assertNotNull(newManager);
 
-        assertNotNull(manager1);
-        assertNotNull(manager2);
-        assertNotEquals(manager1.getEmail(), manager2.getEmail(), "Generated managers should have unique emails");
-        assertNotEquals(manager1.getPassword(), manager2.getPassword(),
-                "Generated managers should have unique passwords");
-    }
+		String password = newManager.getPassword();
+		assertTrue(password.matches(".*[A-Z].*"), "Password should contain at least one uppercase letter");
+		assertTrue(password.matches(".*[a-z].*"), "Password should contain at least one lowercase letter");
+		assertTrue(password.matches(".*[0-9].*"), "Password should contain at least one number");
+		assertTrue(password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*"),
+				"Password should contain at least one special character");
+	}
+
+	@Test
+	void testManagerPasswordLength() {
+		Manager newManager = superManagerController.generateAndGetManagerAccount();
+		assertNotNull(newManager);
+		String password = newManager.getPassword();
+
+		// Test minimum length
+		assertTrue(password.length() >= 12, "Password should be at least 12 characters long");
+
+		// Test maximum length
+		assertTrue(password.length() <= 15, "Password should be at most 15 characters long");
+	}
+
+	@Test
+	void testManagerAccountUniqueness() {
+		Manager manager1 = superManagerController.generateAndGetManagerAccount();
+		Manager manager2 = superManagerController.generateAndGetManagerAccount();
+
+		assertNotNull(manager1);
+		assertNotNull(manager2);
+		assertNotEquals(manager1.getEmail(), manager2.getEmail(), "Generated managers should have unique emails");
+		assertNotEquals(manager1.getPassword(), manager2.getPassword(),
+				"Generated managers should have unique passwords");
+	}
+
+	@Test
+	void testGenerateManagerAccountWhenAdditionFails() {
+		// Create a ManagerService with a repository that always fails to add managers
+		ManagerRepository failingRepository = new ManagerRepository() {
+			@Override
+			public boolean addManager(Manager manager) {
+				return false;
+			}
+		};
+		ManagerService failingManagerService = new ManagerService(failingRepository);
+		SuperManagerController controller = new SuperManagerController(failingManagerService);
+
+		// Test that null is returned when manager addition fails
+		Manager result = controller.generateAndGetManagerAccount();
+		assertNull(result);
+	}
 
 }

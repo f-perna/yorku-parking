@@ -18,8 +18,19 @@ import models.client.Client;
 import models.parkingSpace.ParkingSpace;
 
 public class BookingCSVProcessor extends CSVHelper {
-	private static final String BOOKINGS_CSV = DATA_DIRECTORY + "bookings.csv";
+	private static String BOOKINGS_CSV = DATA_DIRECTORY + "bookings.csv";
 	private static final int EXPECTED_FIELDS = 7;
+	private static final String HEADER = "id,clientEmail,spaceId,status,startTime,endTime,deposit";
+	
+	public static void initializeTestFile(String filePath) throws IOException {
+		BOOKINGS_CSV = filePath;
+		initializeTestFile(filePath, HEADER);
+	}
+
+	public static void cleanupAndReset(String filePath) {
+		cleanupTestFile(filePath);
+		BOOKINGS_CSV = DATA_DIRECTORY + "bookings.csv";
+	}
 
 	public static List<Booking> readBookingData() {
 		List<Booking> bookings = new ArrayList<>();
@@ -110,7 +121,7 @@ public class BookingCSVProcessor extends CSVHelper {
 	public static void setBookingData(List<Booking> bookings) {
 		try (BufferedWriter bw = getFileWriter(BOOKINGS_CSV)) {
 			// Write header
-			bw.write("id,clientEmail,spaceId,status,startTime,endTime,deposit");
+			bw.write(HEADER);
 			bw.newLine();
 
 			for (Booking booking : bookings) {
