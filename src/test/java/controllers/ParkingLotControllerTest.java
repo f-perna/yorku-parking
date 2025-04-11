@@ -26,8 +26,7 @@ public class ParkingLotControllerTest extends BaseControllerTest {
 	private ManagerController managerController;
 	private Manager testManager;
 
-	@TempDir
-	File tempDir;
+	
 
 	@BeforeEach
 	protected void setUp() throws IOException {
