@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class ClientService {
 	private final ClientRepository clientRepository;
-	
+
 	private static final Pattern PASSWORD_PATTERN = Pattern
 			.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&_#])[A-Za-z\\d@$!%*?&_#]{8,}$");
 
@@ -99,11 +99,18 @@ public class ClientService {
 		clientRepository.saveClients();
 		return true;
 	}
-	
+
 	public void removeClient(String email) {
 		if (email == null) {
 			throw new ParkingSystemException("email cannot be null", ErrorType.VALIDATION);
 		}
 		clientRepository.deleteClient(email);
+	}
+
+	public Client getClientByEmail(String email) {
+		if (email == null) {
+			throw new ParkingSystemException("Email cannot be null", ErrorType.VALIDATION);
+		}
+		return clientRepository.getClientByEmail(email);
 	}
 }

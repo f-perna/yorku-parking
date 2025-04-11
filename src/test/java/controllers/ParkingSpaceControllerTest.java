@@ -1,6 +1,9 @@
 package controllers;
 
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -8,130 +11,63 @@ import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import csv.BookingCSVProcessor;
-import csv.ClientCSVProcessor;
-import csv.ManagerCSVProcessor;
-import csv.ParkingLotCSVProcessor;
-import csv.ParkingSensorCSVProcessor;
-import csv.ParkingSpaceCSVProcessor;
 import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import models.parkingSensor.ParkingSensor;
-import repositories.BookingRepository;
-import repositories.ManagerRepository;
-import repositories.ParkingLotRepository;
-import repositories.ParkingSensorRepository;
-import repositories.ParkingSpaceRepository;
-import services.ManagerService;
-import services.ParkingLotService;
-import services.ParkingSensorService;
-import services.ParkingSpaceService;
-import services.SuperManagerService;
+import models.user.UserType;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-public class ParkingSpaceControllerTest {
-
+public class ParkingSpaceControllerTest extends BaseControllerTest {
+	private ParkingSpaceController parkingSpaceController;
 	private AuthController authController;
 	private SuperManagerController superManagerController;
-	private ParkingSpaceController parkingSpaceController;
-	private ParkingLotService parkingLotService;
-	private ParkingSpaceService parkingSpaceService;
-	private ParkingSensorService parkingSensorService;
-	private ManagerService managerService;
-	private SuperManagerService superManagerService;
-
-	private String testParkingLotsFilePath;
-	private String testParkingSpacesFilePath;
-	private String testParkingSensorFilePath;
-	private String testClientsFilePath;
-	private String testManagersFilePath;
-	private String testBookingsFilePath;
-
+	private ManagerController managerController;
+	private Manager testManager;
 	private ParkingLot testLot;
 
-	@TempDir
-	File tempDir;
-
 	@BeforeEach
-	void setUp() throws IOException {
-		// Initialize test CSV files
-		testParkingLotsFilePath = tempDir.getAbsolutePath() + "/test_parking_lots.csv";
-		testParkingSpacesFilePath = tempDir.getAbsolutePath() + "/test_parking_spaces.csv";
-		testParkingSensorFilePath = tempDir.getAbsolutePath() + "/test_parking_sensors.csv";
-		testClientsFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
-		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
-		testBookingsFilePath = tempDir.getAbsoluteFile() + "/test_bookings.csv";
+	protected void setUp() throws IOException {
+		super.setUp();
+		initializeControllers();
+		createTestManager();
+		createTestParkingLot();
+	}
 
-		ParkingLotCSVProcessor.initializeTestFile(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.initializeTestFile(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.initializeTestFile(testParkingSensorFilePath);
-		ClientCSVProcessor.initializeTestFile(testClientsFilePath);
-		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
-		BookingCSVProcessor.initializeTestFile(testBookingsFilePath);
+	private void initializeControllers() {
+		parkingSpaceController = controllerFactory.getParkingSpaceController();
+		authController = controllerFactory.getAuthController();
+		superManagerController = controllerFactory.getSuperManagerController();
+		managerController = controllerFactory.getManagerController();
+	}
 
-		// Initialize repositories
-		ParkingLotRepository parkingLotRepository = new ParkingLotRepository();
-		ParkingSpaceRepository parkingSpaceRepository = new ParkingSpaceRepository();
-		ParkingSensorRepository parkingSensorRepository = new ParkingSensorRepository();
-		ManagerRepository managerRepository = new ManagerRepository();
-		BookingRepository bookingRepository = new BookingRepository();
-
-		// Initialize services with repositories
-		parkingLotService = new ParkingLotService(parkingLotRepository);
-		parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository, parkingSensorRepository);
-		parkingSensorService = new ParkingSensorService(bookingRepository, parkingSpaceRepository, parkingSensorRepository);
-		managerService = new ManagerService(managerRepository);
-		superManagerService = new SuperManagerService();
-
-		// Create manager controller
-		superManagerController = new SuperManagerController(managerService);
-
-		parkingSpaceController = new ParkingSpaceController(parkingSpaceService);
-
-		authController = new AuthController(null, managerService, superManagerService);
-
+	private void createTestManager() {
 		// Login as SuperManager
-		String superEmail = "superadmin@parking.yorku.ca";
-		String superPassword = "Super@dmin123!";
-		authController.login(superEmail, superPassword, models.user.UserType.SUPER_MANAGER);
+		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
 
 		// Generate manager
-		Manager newManager = superManagerController.generateAndGetManagerAccount();
+		testManager = superManagerController.generateAndGetManagerAccount();
 
-		// logout as SuperManager
+		// Logout and login as manager
 		authController.logout();
+		authController.login(testManager.getEmail(), testManager.getPassword(), UserType.MANAGER);
+	}
 
-		// Login as manager
-		authController.login(newManager.getEmail(), newManager.getPassword(), models.user.UserType.MANAGER);
-
-		// Create test parking lot
-		parkingLotService.addParkingLot("Test Lot");
-		testLot = parkingLotService.getParkingLotByName("Test Lot");
+	private void createTestParkingLot() {
+		managerController.addParkingLot("Test Lot");
+		testLot = controllerFactory.getParkingLotController().getParkingLotByName("Test Lot");
 	}
 
 	@AfterEach
-	void tearDown() {
-		ParkingLotCSVProcessor.cleanupAndReset(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.cleanupAndReset(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.cleanupAndReset(testParkingSensorFilePath);
-		ClientCSVProcessor.cleanupAndReset(testClientsFilePath);
-		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
-		BookingCSVProcessor.cleanupAndReset(testBookingsFilePath);
-
-		if (authController.isLoggedIn()) {
-			authController.logout();
-		}
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		super.ensureLoggedOut();
+		super.tearDown();
 	}
 
 	@Test
 	void testGetAvailableSpaces() {
 		// Add some parking spaces
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		parkingSpaceService.addParkingSpace(testLot, "Space 2");
+		managerController.addParkingSpace(testLot, "Space 1");
+		managerController.addParkingSpace(testLot, "Space 2");
 
 		// Get available spaces
 		List<ParkingSpace> availableSpaces = parkingSpaceController.getAvailableSpaces(testLot);
@@ -148,8 +84,8 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetParkingSpaceById() {
 		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Test Space");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
+		managerController.addParkingSpace(testLot, "Test Space");
+		List<ParkingSpace> spaces = parkingSpaceController.getParkingSpacesForLot(testLot.getID());
 		ParkingSpace space = spaces.get(0);
 
 		// Get space by ID
@@ -170,8 +106,8 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetParkingSpacesForLot() {
 		// Add some parking spaces
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		parkingSpaceService.addParkingSpace(testLot, "Space 2");
+		managerController.addParkingSpace(testLot, "Space 1");
+		managerController.addParkingSpace(testLot, "Space 2");
 
 		// Get spaces for lot
 		List<ParkingSpace> spaces = parkingSpaceController.getParkingSpacesForLot(testLot.getID());
@@ -188,8 +124,8 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetAllSpaces() {
 		// Add some parking spaces
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		parkingSpaceService.addParkingSpace(testLot, "Space 2");
+		managerController.addParkingSpace(testLot, "Space 1");
+		managerController.addParkingSpace(testLot, "Space 2");
 
 		// Get all spaces
 		List<ParkingSpace> allSpaces = parkingSpaceController.getAllSpaces();
@@ -201,8 +137,8 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetOccupiedSpaces() {
 		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
+		managerController.addParkingSpace(testLot, "Space 1");
+		List<ParkingSpace> spaces = parkingSpaceController.getParkingSpacesForLot(testLot.getID());
 		ParkingSpace space = spaces.get(0);
 
 		// Initially should be unoccupied
@@ -210,7 +146,7 @@ public class ParkingSpaceControllerTest {
 		assertEquals(0, occupiedSpaces.size());
 
 		// Simulate car presence
-		parkingSensorService.simulateCarArrival(space, "ABC123");
+		controllerFactory.getParkingSensorController().simulateCarArrival(space, "ABC123");
 
 		// Now should be occupied
 		occupiedSpaces = parkingSpaceController.getOccupiedSpaces(testLot);
@@ -226,8 +162,8 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetUnOccupiedSpaces() {
 		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
+		managerController.addParkingSpace(testLot, "Space 1");
+		List<ParkingSpace> spaces = parkingSpaceController.getParkingSpacesForLot(testLot.getID());
 		ParkingSpace space = spaces.get(0);
 
 		// Initially should be unoccupied
@@ -236,7 +172,7 @@ public class ParkingSpaceControllerTest {
 		assertEquals(space.getID(), unOccupiedSpaces.get(0).getID());
 
 		// Simulate car presence
-		parkingSensorService.simulateCarArrival(space, "ABC 123");
+		controllerFactory.getParkingSensorController().simulateCarArrival(space, "ABC 123");
 
 		// Now should be occupied (not unoccupied)
 		unOccupiedSpaces = parkingSpaceController.getUnOccupiedSpaces(testLot);
@@ -251,8 +187,8 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetBookedSpaces() {
 		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
+		managerController.addParkingSpace(testLot, "Space 1");
+		List<ParkingSpace> spaces = parkingSpaceController.getParkingSpacesForLot(testLot.getID());
 		ParkingSpace space = spaces.get(0);
 
 		// Initially should not be booked
@@ -276,16 +212,17 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetEnabledSpaces() {
 		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
+		managerController.addParkingSpace(testLot, "Space 1");
+		List<ParkingSpace> spaces = parkingSpaceController.getParkingSpacesForLot(testLot.getID());
 		ParkingSpace space = spaces.get(0);
+
 		// Initially should be enabled
 		List<ParkingSpace> enabledSpaces = parkingSpaceController.getEnabledSpaces(testLot);
 		assertEquals(1, enabledSpaces.size());
 		assertEquals(space.getID(), enabledSpaces.get(0).getID());
 
 		// Disable the space
-		parkingSpaceService.disableParkingSpace(space);
+		managerController.disableParkingSpace(space);
 
 		// Now should not be in enabled spaces
 		enabledSpaces = parkingSpaceController.getEnabledSpaces(testLot);
@@ -300,8 +237,8 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetDisabledSpaces() {
 		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
+		managerController.addParkingSpace(testLot, "Space 1");
+		List<ParkingSpace> spaces = parkingSpaceController.getParkingSpacesForLot(testLot.getID());
 		ParkingSpace space = spaces.get(0);
 
 		// Initially should not be disabled
@@ -309,7 +246,7 @@ public class ParkingSpaceControllerTest {
 		assertEquals(0, disabledSpaces.size());
 
 		// Disable the space
-		parkingSpaceService.disableParkingSpace(space);
+		managerController.disableParkingSpace(space);
 
 		// Now should be in disabled spaces
 		disabledSpaces = parkingSpaceController.getDisabledSpaces(testLot);
@@ -320,74 +257,5 @@ public class ParkingSpaceControllerTest {
 	@Test
 	void testGetDisabledSpacesWithNullLot() {
 		assertThrows(models.ParkingSystemException.class, () -> parkingSpaceController.getDisabledSpaces(null));
-	}
-
-	@Test
-	void testEnableParkingSpace() {
-		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
-		ParkingSpace space = spaces.get(0);
-
-		// Initially should be enabled
-		assertTrue(space.isEnabled());
-
-		// Disable the space
-		parkingSpaceService.disableParkingSpace(space);
-		assertFalse(space.isEnabled());
-
-		// Enable the space
-		ParkingSpace enabledSpace = parkingSpaceService.enableParkingSpace(space);
-		assertTrue(enabledSpace.isEnabled());
-	}
-
-	@Test
-	void testEnableParkingSpaceWhenAlreadyEnabled() {
-		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
-		ParkingSpace space = spaces.get(0);
-
-		// Try to enable an already enabled space
-		assertThrows(models.ParkingSystemException.class, () -> parkingSpaceService.enableParkingSpace(space));
-	}
-
-	@Test
-	void testEnableParkingSpaceWithNullSpace() {
-		assertThrows(models.ParkingSystemException.class, () -> parkingSpaceService.enableParkingSpace(null));
-	}
-
-	@Test
-	void testDisableParkingSpace() {
-		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
-		ParkingSpace space = spaces.get(0);
-
-		// Initially should be enabled
-		assertTrue(space.isEnabled());
-
-		// Disable the space
-		ParkingSpace disabledSpace = parkingSpaceService.disableParkingSpace(space);
-		assertFalse(disabledSpace.isEnabled());
-	}
-
-	@Test
-	void testDisableParkingSpaceWhenAlreadyDisabled() {
-		// Add a parking space
-		parkingSpaceService.addParkingSpace(testLot, "Space 1");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
-		ParkingSpace space = spaces.get(0);
-
-		// Disable the space
-		parkingSpaceService.disableParkingSpace(space);
-
-		// Try to disable an already disabled space
-		assertThrows(models.ParkingSystemException.class, () -> parkingSpaceService.disableParkingSpace(space));
-	}
-
-	@Test
-	void testDisableParkingSpaceWithNullSpace() {
-		assertThrows(models.ParkingSystemException.class, () -> parkingSpaceService.disableParkingSpace(null));
 	}
 }

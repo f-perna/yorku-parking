@@ -183,7 +183,7 @@ public class ParkingSpaceService {
 	
 	public void removeParkingSpace(ParkingSpace parkingSpace) {
 		if (parkingSpace == null) {
-			throw new ParkingSystemException("Parking space canot be null", ErrorType.VALIDATION);
+			throw new ParkingSystemException("Parking space cannot be null", ErrorType.VALIDATION);
 		}
 		parkingSpaceRepository.removeParkingSpace(parkingSpace);
 	}

@@ -2,18 +2,24 @@ package controllers.factory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 
 import controllers.*;
 
-public class ControllerFactoryTest {
-
-    private ControllerFactory controllerFactory;
+public class ControllerFactoryTest extends BaseControllerTest {
 
     @BeforeEach
-    void setUp() {
-        controllerFactory = ControllerFactory.getInstance();
+    protected void setUp() throws IOException {
+        super.setUp();
+    }
+
+    @AfterEach
+    protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+        super.tearDown();
     }
 
     @Test

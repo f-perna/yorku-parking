@@ -8,56 +8,43 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
 import models.manager.Manager;
+import models.user.UserType;
 import repositories.ManagerRepository;
 import services.ManagerService;
-import services.SuperManagerService;
-import csv.ManagerCSVProcessor;
 
-public class SuperManagerControllerTest {
+public class SuperManagerControllerTest extends BaseControllerTest {
 	private SuperManagerController superManagerController;
-	private ManagerService managerService;
-	private SuperManagerService superManagerService;
 	private AuthController authController;
-	private String testManagersFilePath;
-
-	@TempDir
-	File tempDir;
 
 	@BeforeEach
-	void setUp() throws IOException {
-		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
-		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
+	protected void setUp() throws IOException {
+		super.setUp();
+		initializeControllers();
+		loginAsSuperManager();
+	}
 
-		ManagerRepository managerRepository = new ManagerRepository();
-		managerService = new ManagerService(managerRepository);
-		superManagerController = new SuperManagerController(managerService);
+	private void initializeControllers() {
+		superManagerController = controllerFactory.getSuperManagerController();
+		authController = controllerFactory.getAuthController();
+	}
 
-		superManagerService = new SuperManagerService();
-		authController = new AuthController(null, managerService, superManagerService);
-
-		String superEmail = "superadmin@parking.yorku.ca";
-		String superPassword = "Super@dmin123!";
-		authController.login(superEmail, superPassword, models.user.UserType.SUPER_MANAGER);
+	private void loginAsSuperManager() {
+		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
 	}
 
 	@AfterEach
-	void tearDown() {
-		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
-		if (authController.isLoggedIn()) {
-			authController.logout();
-		}
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		super.tearDown();
 	}
 
 	@Test
@@ -201,5 +188,4 @@ public class SuperManagerControllerTest {
 		Manager result = controller.generateAndGetManagerAccount();
 		assertNull(result);
 	}
-
 }

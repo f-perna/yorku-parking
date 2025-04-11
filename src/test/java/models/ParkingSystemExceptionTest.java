@@ -48,10 +48,12 @@ public class ParkingSystemExceptionTest {
     @Test
     public void testExceptionThrowingAndCatching() {
         ParkingSystemException exception = assertThrows(
-            ParkingSystemException.class,
-            () -> { throw new ParkingSystemException("Business rule/system requirement violation", ParkingSystemException.ErrorType.BUSINESS_LOGIC); }
-        );
-        assertEquals("Business rule violation", exception.getMessage());
+                ParkingSystemException.class,
+                () -> {
+                    throw new ParkingSystemException("Business rule/system requirement violation",
+                            ParkingSystemException.ErrorType.BUSINESS_LOGIC);
+                });
+        assertEquals("Business rule/system requirement violation", exception.getMessage());
         assertEquals(ParkingSystemException.ErrorType.BUSINESS_LOGIC, exception.getErrorType());
         assertNull(exception.getCause());
     }
@@ -63,8 +65,6 @@ public class ParkingSystemExceptionTest {
         assertEquals(ParkingSystemException.ErrorType.NOT_FOUND, exception.getErrorType());
         assertNull(exception.getCause());
     }
-
-    
 
     @Test
     public void testConstructorWithNullCause() {

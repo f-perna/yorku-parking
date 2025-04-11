@@ -2,43 +2,27 @@ package controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import csv.ClientCSVProcessor;
 import models.ParkingSystemException;
 import models.client.Client;
-import repositories.ClientRepository;
-import services.ClientService;
 
-class ClientControllerTest {
-
-	private ClientService clientService;
-	private ClientController clientController;
-	private String testFilePath;
-
-	@TempDir
-	File tempDir;
+class ClientControllerTest extends BaseControllerTest {
 
 	@BeforeEach
-	void setUp() throws IOException {
-		testFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
-		ClientCSVProcessor.initializeTestFile(testFilePath);
-
-		ClientRepository repository = new ClientRepository();
-		clientService = new ClientService(repository);
-		clientController = new ClientController(clientService);
+	protected void setUp() throws IOException {
+		super.setUp();
 	}
 
 	@AfterEach
-	void tearDown() {
-		ClientCSVProcessor.cleanupAndReset(testFilePath);
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		super.tearDown();
 	}
 
 	@Test
@@ -49,7 +33,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "ABC123";
 
-		boolean result = clientController.registerClient(name, email, password, clientType, licencePlate);
+		boolean result = controllerFactory.getClientController().registerClient(name, email, password, clientType,
+				licencePlate);
 
 		assertTrue(result);
 
@@ -72,11 +57,12 @@ class ClientControllerTest {
 		String name2 = "James Smith";
 		String email2 = "james_smith@example.com";
 
-		boolean result = clientController.registerClient(name1, email1, password, clientType, licencePlate);
+		boolean result = controllerFactory.getClientController().registerClient(name1, email1, password, clientType,
+				licencePlate);
 		assertTrue(result);
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name2, email2, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name2, email2, password, clientType, licencePlate));
 
 		assertEquals("License Plate is already being used by a user in the system", exception.getMessage());
 	}
@@ -93,11 +79,12 @@ class ClientControllerTest {
 		String name2 = "James Smith";
 		String licencePlate2 = "XYZ123";
 
-		boolean result = clientController.registerClient(name1, email, password, clientType, licencePlate1);
+		boolean result = controllerFactory.getClientController().registerClient(name1, email, password, clientType,
+				licencePlate1);
 		assertTrue(result);
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name2, email, password, clientType, licencePlate2));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name2, email, password, clientType, licencePlate2));
 
 		assertEquals("Email address is already registered in the system", exception.getMessage());
 	}
@@ -110,8 +97,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "ABC123";
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Name must be provided", exception.getMessage());
 	}
@@ -124,8 +111,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "ABC123";
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Email address must be in a valid format (e.g., user@domain.com)", exception.getMessage());
 	}
@@ -138,8 +125,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "ABC123";
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Password must be at least 8 characters long", exception.getMessage());
 	}
@@ -152,8 +139,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "ABC123";
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Password must include uppercase, lowercase, number and symbol (min 8 chars)",
 				exception.getMessage());
@@ -167,8 +154,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "ABC123";
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Password must include uppercase, lowercase, number and symbol (min 8 chars)",
 				exception.getMessage());
@@ -182,8 +169,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "ABC123";
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Password must include uppercase, lowercase, number and symbol (min 8 chars)",
 				exception.getMessage());
@@ -197,8 +184,8 @@ class ClientControllerTest {
 		Client.type clientType = Client.type.STUDENT;
 		String licencePlate = "a-b-c"; // Invalid format
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Licence plate must contain 2-8 uppercase letters, numbers, and spaces", exception.getMessage());
 	}
@@ -211,22 +198,21 @@ class ClientControllerTest {
 		Client.type clientType = null;
 		String licencePlate = "ABC123";
 
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> clientController.registerClient(name, email, password, clientType, licencePlate));
+		ParkingSystemException exception = assertThrows(ParkingSystemException.class, () -> controllerFactory
+				.getClientController().registerClient(name, email, password, clientType, licencePlate));
 
 		assertEquals("Client type must be specified", exception.getMessage());
 	}
 
 	@Test
 	void testGetAllClients() {
-		clientController.registerClient("Test User", "test@example.com", "Password123!", Client.type.STUDENT,
-				"TEST123");
+		controllerFactory.getClientController().registerClient("Test User", "test@example.com", "Password123!",
+				Client.type.STUDENT, "TEST123");
 
-		List<Client> clients = clientController.getAllClients();
+		List<Client> clients = controllerFactory.getClientController().getAllClients();
 
 		assertEquals(1, clients.size());
 		assertEquals("Test User", clients.get(0).getName());
 		assertEquals("test@example.com", clients.get(0).getEmail());
 	}
-
 }

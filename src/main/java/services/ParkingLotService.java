@@ -14,6 +14,9 @@ public class ParkingLotService {
 	private AuthenticationState authState;
 
 	public ParkingLotService(ParkingLotRepository parkingLotRepository) {
+		if (parkingLotRepository == null) {
+			throw new ParkingSystemException("Parking lot repository cannot be null", ErrorType.VALIDATION);
+		}
 		this.parkingLotRepository = parkingLotRepository;
 		this.authState = AuthenticationState.getInstance();
 	}
@@ -29,16 +32,33 @@ public class ParkingLotService {
 	}
 
 	public void addParkingLot(String name) {
+		if (name == null || name.trim().isEmpty()) {
+			throw new ParkingSystemException("Parking lot name cannot be null or empty", ErrorType.VALIDATION);
+		}
 		managerAuth();
 		parkingLotRepository.addParkingLot(name);
 	}
 
+	public void removeParkingLot(ParkingLot parkingLot) {
+		if (parkingLot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
+		managerAuth();
+		parkingLotRepository.removeParkingLot(parkingLot.getID());
+	}
+
 	public boolean enableParkingLot(ParkingLot parkingLot) {
+		if (parkingLot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
 		managerAuth();
 		return parkingLotRepository.enableParkingLot(parkingLot);
 	}
 
 	public boolean disableParkingLot(ParkingLot parkingLot) {
+		if (parkingLot == null) {
+			throw new ParkingSystemException("Parking lot cannot be null", ErrorType.VALIDATION);
+		}
 		managerAuth();
 		return parkingLotRepository.disableParkingLot(parkingLot);
 	}
@@ -52,10 +72,16 @@ public class ParkingLotService {
 	}
 
 	public ParkingLot getParkingLotByName(String name) {
+		if (name == null || name.trim().isEmpty()) {
+			throw new ParkingSystemException("Parking lot name cannot be null or empty", ErrorType.VALIDATION);
+		}
 		return parkingLotRepository.getParkingLotByName(name);
 	}
 
 	public ParkingLot getParkingLotById(UUID id) {
+		if (id == null) {
+			throw new ParkingSystemException("Parking lot ID cannot be null", ErrorType.VALIDATION);
+		}
 		return parkingLotRepository.getParkingLotById(id);
 	}
 

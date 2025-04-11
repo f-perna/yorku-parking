@@ -5,120 +5,57 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import models.ParkingSystemException;
 import models.client.Client;
 import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
-import repositories.ClientRepository;
-import repositories.ManagerRepository;
-import repositories.ParkingLotRepository;
-import repositories.ParkingSensorRepository;
-import repositories.ParkingSpaceRepository;
-import services.ClientService;
-import services.ManagerService;
-import services.ParkingLotService;
-import services.ParkingSpaceService;
-import services.SuperManagerService;
-import csv.ClientCSVProcessor;
-import csv.ManagerCSVProcessor;
-import csv.ParkingLotCSVProcessor;
-import csv.ParkingSensorCSVProcessor;
-import csv.ParkingSpaceCSVProcessor;
+import models.user.UserType;
 
-public class ManagerControllerTest {
+public class ManagerControllerTest extends BaseControllerTest {
 	private ManagerController managerController;
 	private AuthController authController;
 	private SuperManagerController superManagerController;
-
-	private ParkingLotService parkingLotService;
-	private ParkingSpaceService parkingSpaceService;
-	private ClientService clientService;
-	private ManagerService managerService;
-	private SuperManagerService superManagerService;
-
-	private String testParkingLotsFilePath;
-	private String testParkingSpacesFilePath;
-	private String testParkingSensorsFilePath;
-	private String testClientsFilePath;
-	private String testManagersFilePath;
-
-	//// TEST PARKING SENSORS TOO
-	
-	
-	@TempDir
-	File tempDir;
+	private ClientController clientController;
+	private Manager testManager;
 
 	@BeforeEach
-	void setUp() throws IOException {
-		// Initialize test CSV files
-		testParkingLotsFilePath = tempDir.getAbsolutePath() + "/test_parking_lots.csv";
-		testParkingSpacesFilePath = tempDir.getAbsolutePath() + "/test_parking_spaces.csv";
-		testParkingSensorsFilePath = tempDir.getAbsolutePath() + "/test_parking_sensors.csv";
-		testClientsFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
-		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
+	protected void setUp() throws IOException {
+		super.setUp();
+		initializeControllers();
+		createTestManager();
+	}
 
-		ParkingLotCSVProcessor.initializeTestFile(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.initializeTestFile(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.initializeTestFile(testParkingSensorsFilePath);
-		ClientCSVProcessor.initializeTestFile(testClientsFilePath);
-		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
+	private void initializeControllers() {
+		managerController = controllerFactory.getManagerController();
+		authController = controllerFactory.getAuthController();
+		superManagerController = controllerFactory.getSuperManagerController();
+		clientController = controllerFactory.getClientController();
+	}
 
-		// Initialize repositories
-		ParkingLotRepository parkingLotRepository = new ParkingLotRepository();
-		ParkingSpaceRepository parkingSpaceRepository = new ParkingSpaceRepository();
-		ParkingSensorRepository parkingSensorRepository = new ParkingSensorRepository();
-		ClientRepository clientRepository = new ClientRepository();
-		ManagerRepository managerRepository = new ManagerRepository();
-
-		// Initialize services with repositories
-		parkingLotService = new ParkingLotService(parkingLotRepository);
-		parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository, parkingSensorRepository);
-		clientService = new ClientService(clientRepository);
-		managerService = new ManagerService(managerRepository);
-		superManagerService = new SuperManagerService();
-
-		// Create manager controller
-		managerController = new ManagerController(parkingLotService, parkingSpaceService, clientService);
-		superManagerController = new SuperManagerController(managerService);
-
-		authController = new AuthController(null, managerService, superManagerService);
-
+	private void createTestManager() {
 		// Login as SuperManager
-		String superEmail = "superadmin@parking.yorku.ca";
-		String superPassword = "Super@dmin123!";
-		authController.login(superEmail, superPassword, models.user.UserType.SUPER_MANAGER);
+		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
 
 		// Generate manager
-		Manager newManager = superManagerController.generateAndGetManagerAccount();
+		testManager = superManagerController.generateAndGetManagerAccount();
 
-		// logout as SuperManager
+		// Logout and login as manager
 		authController.logout();
-
-		// Login as manager
-		authController.login(newManager.getEmail(), newManager.getPassword(), models.user.UserType.MANAGER);
+		authController.login(testManager.getEmail(), testManager.getPassword(), UserType.MANAGER);
 	}
 
 	@AfterEach
-	void tearDown() {
-		ParkingLotCSVProcessor.cleanupAndReset(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.cleanupAndReset(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.cleanupAndReset(testParkingSensorsFilePath);
-		ClientCSVProcessor.cleanupAndReset(testClientsFilePath);
-		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
-
-		if (authController.isLoggedIn()) {
-			authController.logout();
-		}
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		super.ensureLoggedOut();
+		super.tearDown();
 	}
 
 	@Test
@@ -187,7 +124,8 @@ public class ManagerControllerTest {
 
 	@Test
 	void testGetAllClients() {
-		clientService.registerClient("Test Client", "test@example.com", "Password@123", Client.type.STUDENT, "ABC123");
+		clientController.registerClient("Test Client", "test@example.com", "Password@123", Client.type.STUDENT,
+				"ABC123");
 
 		List<Client> clients = managerController.getAllClients();
 		assertNotNull(clients);
@@ -197,7 +135,7 @@ public class ManagerControllerTest {
 	@Test
 	void testApproveDenyClient() {
 		String clientEmail = "test@example.com";
-		clientService.registerClient("Test Client", clientEmail, "Password@123", Client.type.STUDENT, "ABC123");
+		clientController.registerClient("Test Client", clientEmail, "Password@123", Client.type.STUDENT, "ABC123");
 
 		// Approve the client
 		boolean approveResult = managerController.approveClient(clientEmail);

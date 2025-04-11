@@ -1,14 +1,13 @@
 package services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,9 +16,13 @@ import org.junit.jupiter.api.io.TempDir;
 
 import models.ParkingSystemException;
 import models.auth.AuthenticationState;
+import models.booking.Booking;
+import models.client.Client;
+import models.client.GenerateClientFactory;
 import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
+import models.payment.Payment;
 import models.superManager.SuperManager;
 import services.factory.ServiceFactory;
 import csv.BookingCSVProcessor;
@@ -28,12 +31,15 @@ import csv.ManagerCSVProcessor;
 import csv.ParkingLotCSVProcessor;
 import csv.ParkingSensorCSVProcessor;
 import csv.ParkingSpaceCSVProcessor;
+import csv.PaymentCSVProcessor;
 
-public class ParkingSpaceServiceTest {
+public class PaymentServiceTest {
+	private ServiceFactory serviceFactory;
+	private Booking testBooking;
+	private Client testClient;
+	private ParkingSpace testSpace;
 	private AuthenticationState authState;
 	private SuperManager superManager;
-	private ServiceFactory serviceFactory;
-	private ParkingLot testLot;
 	private Manager testManager;
 
 	private String testBookingsFilePath;
@@ -42,6 +48,7 @@ public class ParkingSpaceServiceTest {
 	private String testParkingSensorFilePath;
 	private String testClientsFilePath;
 	private String testManagersFilePath;
+	private String testPaymentsFilePath;
 
 	@TempDir
 	File tempDir;
@@ -51,7 +58,7 @@ public class ParkingSpaceServiceTest {
 		initializeTestFiles();
 		initializeFactories();
 		initializeAuth();
-		createTestLot();
+		createTestData();
 	}
 
 	private void initializeTestFiles() throws IOException {
@@ -62,6 +69,7 @@ public class ParkingSpaceServiceTest {
 		testParkingSensorFilePath = tempDir.getAbsolutePath() + "/test_parking_sensors.csv";
 		testClientsFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
 		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
+		testPaymentsFilePath = tempDir.getAbsolutePath() + "/test_payments.csv";
 
 		// Initialize test CSV files
 		BookingCSVProcessor.initializeTestFile(testBookingsFilePath);
@@ -70,6 +78,7 @@ public class ParkingSpaceServiceTest {
 		ParkingSensorCSVProcessor.initializeTestFile(testParkingSensorFilePath);
 		ClientCSVProcessor.initializeTestFile(testClientsFilePath);
 		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
+		PaymentCSVProcessor.initializeTestFile(testPaymentsFilePath);
 	}
 
 	private void initializeFactories() {
@@ -86,9 +95,20 @@ public class ParkingSpaceServiceTest {
 		authState.setLoggedInUser(testManager);
 	}
 
-	private void createTestLot() {
+	private void createTestData() {
+		// Create test parking lot and space
 		serviceFactory.getParkingLotService().addParkingLot("Test Lot");
-		testLot = serviceFactory.getParkingLotService().getParkingLotByName("Test Lot");
+		ParkingLot testLot = serviceFactory.getParkingLotService().getParkingLotByName("Test Lot");
+		serviceFactory.getParkingSpaceService().addParkingSpace(testLot, "Test Space");
+		testSpace = serviceFactory.getParkingSpaceService().getAllSpaces().stream()
+				.filter(space -> space.getName().equals("Test Space")).findFirst().orElse(null);
+
+		// Create test client and booking
+		serviceFactory.getClientService().registerClient("Bob", "test@gmail.com", "ABc123!!", Client.type.VISITOR,
+				"ABC 123");
+		serviceFactory.getClientService().login("test@gmail.com", "ABc123!!");
+		testClient = serviceFactory.getClientService().getClientByEmail("test@gmail.com");
+		testBooking = serviceFactory.getBookingService().createBooking(testSpace, 5, testClient);
 	}
 
 	@AfterEach
@@ -105,6 +125,7 @@ public class ParkingSpaceServiceTest {
 		ParkingSensorCSVProcessor.cleanupAndReset(testParkingSensorFilePath);
 		ClientCSVProcessor.cleanupAndReset(testClientsFilePath);
 		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
+		PaymentCSVProcessor.cleanupAndReset(testPaymentsFilePath);
 	}
 
 	private void resetFactories() throws NoSuchFieldException, IllegalAccessException {
@@ -119,90 +140,79 @@ public class ParkingSpaceServiceTest {
 		instance.set(null, null);
 	}
 
-	private ParkingSpace findParkingSpaceByName(String name) {
-		return serviceFactory.getParkingSpaceService().getAllSpaces().stream()
-				.filter(space -> space.getName().equals(name)).findFirst().orElse(null);
+	@Test
+	public void verifyProcessDepositPayment() {
+		Payment testPayment = serviceFactory.getPaymentService().processDepositPayment(testBooking, "Debit",
+				testClient);
+		assertNotNull(testPayment);
 	}
 
 	@Test
-	public void verifyAddParkingSpace() {
-		System.out.println(authState.getLoggedInUser().getEmail());
-		serviceFactory.getParkingSpaceService().addParkingSpace(testLot, "Test Space");
-		ParkingSpace testSpace = findParkingSpaceByName("Test Space");
-		assertTrue(testSpace != null);
-	}
-
-	@Test
-	public void verifyAddParkingSpaceWithoutManagerLogin() {
-		authState.setLoggedInUser(null);
+	public void verifyDepositPaymentWithNullBooking() {
 		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> serviceFactory.getParkingSpaceService().addParkingSpace(testLot, "Test Space"));
-		assertEquals("Only managers can add parking spaces", exception.getMessage());
+				() -> serviceFactory.getPaymentService().processDepositPayment(null, "Credit", testClient));
+		assertEquals("Booking cannot be null", exception.getMessage());
 	}
 
 	@Test
-	public void verifyAddDuplicateParkingSpace() {
-		serviceFactory.getParkingSpaceService().addParkingSpace(testLot, "Test Space");
+	public void verifyDepositPaymentWithEmptyMethod() {
 		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> serviceFactory.getParkingSpaceService().addParkingSpace(testLot, "Test Space"));
-		assertEquals("A parking space with name 'Test Space' already exists in lot 'Test Lot'", exception.getMessage());
-
+				() -> serviceFactory.getPaymentService().processDepositPayment(testBooking, "", testClient));
+		assertEquals("Payment method must be specified", exception.getMessage());
 	}
 
 	@Test
-	public void verifyAddParkingSpaceWithNullLot() {
+	public void depositPaymentWithWrongClientThrows() {
+		Client wrongClient = GenerateClientFactory.getClientType("Dan", "dan@gmail.com", "123", Client.type.VISITOR,
+				"ABC 123", false);
 		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> serviceFactory.getParkingSpaceService().addParkingSpace(null, "InvalidSpace"));
-		assertEquals("Space cannot be null", exception.getMessage());
+				() -> serviceFactory.getPaymentService().processDepositPayment(testBooking, "Credit", wrongClient));
+		assertEquals("Cannot process payment for another user's booking", exception.getMessage());
 	}
 
 	@Test
-	public void verifyAddParkingSpaceWithEmptyName() {
+	public void verifyGetPaymentsForBooking() {
+		Payment payment = serviceFactory.getPaymentService().processDepositPayment(testBooking, "Credit", testClient);
+		assertTrue(serviceFactory.getPaymentService().getPaymentsForBooking(testBooking).contains(payment));
+	}
+
+	@Test
+	public void verifyGetPaymentByIdReturnsCorrectPayment() {
+		Payment payment = serviceFactory.getPaymentService().processDepositPayment(testBooking, "Credit", testClient);
+		Payment fetched = serviceFactory.getPaymentService().getPaymentById(payment.getPaymentID());
+		assertEquals(payment.getPaymentID(), fetched.getPaymentID());
+	}
+
+	@Test
+	public void verifyGetPaymentByNullId() {
 		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> serviceFactory.getParkingSpaceService().addParkingSpace(testLot, ""));
-		assertEquals("Space name cannot be empty", exception.getMessage());
+				() -> serviceFactory.getPaymentService().getPaymentById(null));
+		assertEquals("Payment ID cannot be null", exception.getMessage());
 	}
 
 	@Test
-	public void verifyEnableParkingSpace() {
-		serviceFactory.getParkingSpaceService().addParkingSpace(testLot, "Test Space");
-		ParkingSpace testSpace = findParkingSpaceByName("Test Space");
-
-		if (!testSpace.isEnabled()) {
-			serviceFactory.getParkingSpaceService().enableParkingSpace(testSpace);
-			ParkingSpace updated = serviceFactory.getParkingSpaceService().getParkingSpaceById(testSpace.getID());
-			assertTrue(updated.isEnabled());
-		}
-	}
-
-	@Test
-	public void verifyDisableParkingSpace() {
-		serviceFactory.getParkingSpaceService().addParkingSpace(testLot, "Test Space");
-		ParkingSpace testSpace = findParkingSpaceByName("Test Space");
-
-		serviceFactory.getParkingSpaceService().disableParkingSpace(testSpace);
-		ParkingSpace updated = serviceFactory.getParkingSpaceService().getParkingSpaceById(testSpace.getID());
-		assertTrue(!updated.isEnabled());
-	}
-
-	@Test
-	public void verifyRemoveNullParkingSpace() {
+	public void verifyFinalPaymentWithInvalidStatus() {
 		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> serviceFactory.getParkingSpaceService().removeParkingSpace(null));
-		assertEquals("Parking space cannot be null", exception.getMessage());
+				() -> serviceFactory.getPaymentService().processFinalPayment(testBooking, "Credit", testClient));
+		assertEquals("Can only process final payment for checked-in, overstayed or expired bookings",
+				exception.getMessage());
 	}
 
 	@Test
-	public void verifyGetParkingSpaceByInvalidId() {
+	public void refundPaymentWithInvalidStatus() {
+		// Booking is not canceled, refund not allowed
 		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> serviceFactory.getParkingSpaceService().getParkingSpaceById(null));
-		assertEquals("Space ID cannot be null", exception.getMessage());
+				() -> serviceFactory.getPaymentService().processRefundPayment(testBooking, "Credit", testClient));
+		assertEquals("Can only process refund for canceled bookings", exception.getMessage());
 	}
 
 	@Test
-	public void verifyGetParkingSpaceByIdNotFound() {
-		ParkingSystemException exception = assertThrows(ParkingSystemException.class,
-				() -> serviceFactory.getParkingSpaceService().getParkingSpaceById(UUID.randomUUID()));
-		assertEquals("Parking space not found", exception.getMessage());
+	public void refundPaymentSuccessfully() {
+		Payment deposit = serviceFactory.getPaymentService().processDepositPayment(testBooking, "Credit", testClient);
+
+		serviceFactory.getBookingService().cancelBooking(testBooking, testClient);
+
+		Payment refund = serviceFactory.getPaymentService().processRefundPayment(testBooking, "Credit", testClient);
+		assertNotNull(refund);
 	}
 }

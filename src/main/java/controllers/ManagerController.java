@@ -61,6 +61,10 @@ public class ManagerController {
 	public List<Client> getAllClients() {
 		return clientService.getAllClients();
 	}
+	
+	public Client getClientByEmail(String email) {
+		return clientService.getClientByEmail(email);
+	}
 
 	public boolean approveClient(String email) {
 		return clientService.approveClient(email, true);

@@ -1,22 +1,13 @@
 package controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
-import csv.BookingCSVProcessor;
-import csv.ClientCSVProcessor;
-import csv.ManagerCSVProcessor;
-import csv.ParkingLotCSVProcessor;
-import csv.ParkingSensorCSVProcessor;
-import csv.ParkingSpaceCSVProcessor;
 import models.booking.Booking;
 import models.booking.Booking.BookingStatus;
 import models.client.Client;
@@ -25,136 +16,81 @@ import models.manager.Manager;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import models.user.UserType;
-import repositories.BookingRepository;
-import repositories.ClientRepository;
-import repositories.ManagerRepository;
-import repositories.ParkingLotRepository;
-import repositories.ParkingSensorRepository;
-import repositories.ParkingSpaceRepository;
-import services.BookingService;
-import services.ClientService;
-import services.ManagerService;
-import services.ParkingLotService;
-import services.ParkingSensorService;
-import services.ParkingSpaceService;
-import services.SuperManagerService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BookingControllerTest {
-
+public class BookingControllerTest extends BaseControllerTest {
 	private AuthController authController;
 	private BookingController bookingController;
-	private ParkingLotService parkingLotService;
-	private ParkingSpaceService parkingSpaceService;
-	private ParkingSensorService parkingSensorService;
-	private ClientService clientService;
-	private ClientRepository clientRepository;
-	private ManagerService managerService;
-	private SuperManagerService superManagerService;
-	private SuperManagerController superManagerController;
-
-	private String testBookingsFilePath;
-	private String testParkingLotsFilePath;
-	private String testParkingSpacesFilePath;
-	private String testParkingSensorFilePath;
-	private String testClientsFilePath;
-	private String testManagersFilePath;
 
 	private ParkingLot testLot;
 	private ParkingSpace testSpace;
 	private Client testClient;
 	private Manager testManager;
 
-	@TempDir
-	File tempDir;
-
 	@BeforeEach
-	void setUp() throws IOException {
-		// Initialize test CSV files
-		testBookingsFilePath = tempDir.getAbsolutePath() + "/test_bookings.csv";
-		testParkingLotsFilePath = tempDir.getAbsolutePath() + "/test_parking_lots.csv";
-		testParkingSpacesFilePath = tempDir.getAbsolutePath() + "/test_parking_spaces.csv";
-		testParkingSensorFilePath = tempDir.getAbsolutePath() + "/test_parking_sensors.csv";
-		testClientsFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
-		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
+	protected void setUp() throws IOException {
+		super.setUp();
+		initializeControllers();
+		createTestManager();
+		createTestParkingLotAndSpace();
+		createTestClient();
+		ensureLoggedOut();
+	}
 
-		BookingCSVProcessor.initializeTestFile(testBookingsFilePath);
-		ParkingLotCSVProcessor.initializeTestFile(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.initializeTestFile(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.initializeTestFile(testParkingSensorFilePath);
-		ClientCSVProcessor.initializeTestFile(testClientsFilePath);
-		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
+	private void initializeControllers() {
+		authController = controllerFactory.getAuthController();
+		bookingController = controllerFactory.getBookingController();
+	}
 
-		// Initialize repositories
-		BookingRepository bookingRepository = new BookingRepository();
-		ParkingLotRepository parkingLotRepository = new ParkingLotRepository();
-		ParkingSpaceRepository parkingSpaceRepository = new ParkingSpaceRepository();
-		ParkingSensorRepository parkingSensorRepository = new ParkingSensorRepository();
-		clientRepository = new ClientRepository();
-		ManagerRepository managerRepository = new ManagerRepository();
-
-		// Initialize services with repositories
-		parkingLotService = new ParkingLotService(parkingLotRepository);
-		parkingSpaceService = new ParkingSpaceService(parkingSpaceRepository, parkingSensorRepository);
-		parkingSensorService = new ParkingSensorService(bookingRepository, parkingSpaceRepository,
-				parkingSensorRepository);
-		clientService = new ClientService(clientRepository);
-		managerService = new ManagerService(managerRepository);
-		superManagerService = new SuperManagerService();
-
-		// Create manager controller
-		superManagerController = new SuperManagerController(managerService);
-
-		// Create booking service and controller
-		BookingService bookingService = new BookingService(bookingRepository, parkingSpaceRepository,
-				parkingSensorService);
-		bookingController = new BookingController(bookingService);
-
-		// Create auth controller
-		authController = new AuthController(clientService, managerService, superManagerService);
-
+	private void createTestManager() {
 		// Login as SuperManager
-		String superEmail = "superadmin@parking.yorku.ca";
-		String superPassword = "Super@dmin123!";
-		authController.login(superEmail, superPassword, models.user.UserType.SUPER_MANAGER);
+		authController.login("superadmin@parking.yorku.ca", "Super@dmin123!", UserType.SUPER_MANAGER);
 
 		// Generate manager
-		testManager = superManagerController.generateAndGetManagerAccount();
+		testManager = controllerFactory.getSuperManagerController().generateAndGetManagerAccount();
 
-		// logout as SuperManager
+		// Logout and login as manager
 		authController.logout();
+		authController.login(testManager.getEmail(), testManager.getPassword(), UserType.MANAGER);
+	}
 
-		// Login as manager
-		authController.login(testManager.getEmail(), testManager.getPassword(), models.user.UserType.MANAGER);
+	private void createTestParkingLotAndSpace() {
+		// Create test parking lot
+		controllerFactory.getManagerController().addParkingLot("Test Lot");
+		testLot = controllerFactory.getParkingLotController().getParkingLotByName("Test Lot");
+		if (testLot == null) {
+			throw new IllegalStateException("Failed to create test parking lot");
+		}
 
-		// Create test parking lot and space
-		parkingLotService.addParkingLot("Test Lot");
-		testLot = parkingLotService.getParkingLotByName("Test Lot");
-		parkingSpaceService.addParkingSpace(testLot, "Test Space");
-		List<ParkingSpace> spaces = parkingSpaceService.getSpacesForLot(testLot.getID());
+		// Create test parking space
+		controllerFactory.getManagerController().addParkingSpace(testLot, "Test Space");
+		List<ParkingSpace> spaces = controllerFactory.getParkingSpaceController()
+				.getParkingSpacesForLot(testLot.getID());
+		if (spaces.isEmpty()) {
+			throw new IllegalStateException("Failed to create test parking space");
+		}
 		testSpace = spaces.get(0);
+	}
 
-		// Create test client
-		clientService.registerClient("Test Client", "test@example.com", "123456Ab!", type.STUDENT, "ABC123");
-		testClient = clientRepository.getClientByEmail("test@example.com");
+	private void createTestClient() {
+		// Create and approve test client
+		controllerFactory.getClientController().registerClient("Test Client", "test@example.com", "123456Ab!",
+				type.STUDENT, "ABC123");
+		testClient = controllerFactory.getManagerController().getClientByEmail("test@example.com");
+		if (testClient == null) {
+			throw new IllegalStateException("Failed to create test client");
+		}
 		testClient.setApproved(true);
 
+		// Logout after setup
 		authController.logout();
 	}
 
 	@AfterEach
-	void tearDown() {
-		BookingCSVProcessor.cleanupAndReset(testBookingsFilePath);
-		ParkingLotCSVProcessor.cleanupAndReset(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.cleanupAndReset(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.cleanupAndReset(testParkingSensorFilePath);
-		ClientCSVProcessor.cleanupAndReset(testClientsFilePath);
-		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
-
-		if (authController.isLoggedIn()) {
-			authController.logout();
-		}
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		ensureLoggedOut();
+		super.tearDown();
 	}
 
 	@Test
@@ -219,8 +155,9 @@ public class BookingControllerTest {
 		authController.logout();
 
 		// Create another client and try to cancel
-		clientService.registerClient("Other Client", "other@example.com", "123456Ab!", type.STUDENT, "XYZ789");
-		Client otherClient = clientRepository.getClientByEmail("other@example.com");
+		controllerFactory.getClientController().registerClient("Other Client", "other@example.com", "123456Ab!",
+				type.STUDENT, "XYZ789");
+		Client otherClient = controllerFactory.getManagerController().getClientByEmail("other@example.com");
 		otherClient.setApproved(true);
 		authController.login(otherClient.getEmail(), "123456Ab!", models.user.UserType.CLIENT);
 
@@ -259,8 +196,9 @@ public class BookingControllerTest {
 		authController.logout();
 
 		// Create another client and try to check in
-		clientService.registerClient("Other Client", "other@example.com", "123456Ab!", type.STUDENT, "XYZ789");
-		Client otherClient = clientRepository.getClientByEmail("other@example.com");
+		controllerFactory.getClientController().registerClient("Other Client", "other@example.com", "123456Ab!",
+				type.STUDENT, "XYZ789");
+		Client otherClient = controllerFactory.getManagerController().getClientByEmail("other@example.com");
 		otherClient.setApproved(true);
 		authController.login(otherClient.getEmail(), "123456Ab!", models.user.UserType.CLIENT);
 
@@ -316,8 +254,9 @@ public class BookingControllerTest {
 		authController.logout();
 
 		// Create another client and try to extend
-		clientService.registerClient("Other Client", "other@example.com", "123456Ab!", type.STUDENT, "XYZ789");
-		Client otherClient = clientRepository.getClientByEmail("other@example.com");
+		controllerFactory.getClientController().registerClient("Other Client", "other@example.com", "123456Ab!",
+				type.STUDENT, "XYZ789");
+		Client otherClient = controllerFactory.getManagerController().getClientByEmail("other@example.com");
 		otherClient.setApproved(true);
 		authController.login(otherClient.getEmail(), "123456Ab!", models.user.UserType.CLIENT);
 
@@ -357,8 +296,9 @@ public class BookingControllerTest {
 		authController.logout();
 
 		// Create another client and try to cancel
-		clientService.registerClient("Other Client", "other@example.com", "123456Ab!", type.STUDENT, "XYZ789");
-		Client otherClient = clientRepository.getClientByEmail("other@example.com");
+		controllerFactory.getClientController().registerClient("Other Client", "other@example.com", "123456Ab!",
+				type.STUDENT, "XYZ789");
+		Client otherClient = controllerFactory.getManagerController().getClientByEmail("other@example.com");
 		otherClient.setApproved(true);
 		authController.login(otherClient.getEmail(), "123456Ab!", models.user.UserType.CLIENT);
 

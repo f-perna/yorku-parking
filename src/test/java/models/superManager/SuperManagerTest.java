@@ -1,6 +1,5 @@
 package models.superManager;
 
-import models.superManager.SuperManager;
 import models.user.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,7 @@ public class SuperManagerTest {
     @Test
     public void testDefaultCredentials() {
         SuperManager manager = SuperManager.getInstance();
-        assertEquals("Email should be superadmin", "superadmin", manager.getEmail());
+        assertEquals("Email should be superadmin", "superadmin@parking.yorku.ca", manager.getEmail());
         assertEquals("Password should be something like Super@dmin123!", "Super@dmin123!", 
                     manager.getPassword());
     }
@@ -37,7 +36,7 @@ public class SuperManagerTest {
     @Test
     public void testAuthenticationSuccess() {
         SuperManager manager = SuperManager.getInstance();
-        boolean authenticated = manager.authenticate("superadmin", "Super@dmin123!");
+        boolean authenticated = manager.authenticate("superadmin@parking.yorku.ca", "Super@dmin123!");
         assertTrue("Authentication should succeed with correct credentials", 
                   authenticated);
     }
