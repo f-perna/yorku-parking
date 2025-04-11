@@ -130,4 +130,11 @@ public class PaymentService {
 			throw new ParkingSystemException("Refund processing failed", ErrorType.BUSINESS_LOGIC);
 		}
 	}
+	
+	public void removePayment(Payment payment) {
+		if (payment == null) {
+			throw new ParkingSystemException("Payment cannot be null", ErrorType.VALIDATION);
+		}
+		paymentModel.removePayment(payment);
+	}
 }

@@ -132,4 +132,9 @@ public class PaymentRepository {
 		savePayments();
 		return refundPayment;
 	}
+	
+	public void removePayment(Payment payment) {
+		payments.remove(payment);
+		savePayments();
+	}
 }
