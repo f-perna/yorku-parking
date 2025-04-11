@@ -63,9 +63,6 @@ public abstract class BaseControllerTest {
 
     @AfterEach
     protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
-        if (controllerFactory.getAuthController().isLoggedIn()) {
-            controllerFactory.getAuthController().logout();
-        }
         ensureLoggedOut();
         cleanupTestFiles();
         resetFactories();

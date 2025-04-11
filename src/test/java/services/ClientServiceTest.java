@@ -5,103 +5,25 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import models.ParkingSystemException;
-import models.auth.AuthenticationState;
 import models.client.Client;
-import services.factory.ServiceFactory;
-import controllers.factory.ControllerFactory;
-import controllers.AuthController;
-import csv.BookingCSVProcessor;
-import csv.ClientCSVProcessor;
-import csv.ManagerCSVProcessor;
-import csv.ParkingLotCSVProcessor;
-import csv.ParkingSensorCSVProcessor;
-import csv.ParkingSpaceCSVProcessor;
 
-public class ClientServiceTest {
-	private ServiceFactory serviceFactory;
-
-	private String testBookingsFilePath;
-	private String testParkingLotsFilePath;
-	private String testParkingSpacesFilePath;
-	private String testParkingSensorFilePath;
-	private String testClientsFilePath;
-	private String testManagersFilePath;
-
-	private AuthenticationState authState;
-
-	@TempDir
-	File tempDir;
+public class ClientServiceTest extends BaseServiceTest {
 
 	@BeforeEach
-	void setUp() throws IOException {
-		authState = AuthenticationState.getInstance();
-		initializeTestFiles();
-		initializeFactories();
-	}
-
-	private void initializeTestFiles() throws IOException {
-		// Initialize test CSV file paths
-		testBookingsFilePath = tempDir.getAbsolutePath() + "/test_bookings.csv";
-		testParkingLotsFilePath = tempDir.getAbsolutePath() + "/test_parking_lots.csv";
-		testParkingSpacesFilePath = tempDir.getAbsolutePath() + "/test_parking_spaces.csv";
-		testParkingSensorFilePath = tempDir.getAbsolutePath() + "/test_parking_sensors.csv";
-		testClientsFilePath = tempDir.getAbsolutePath() + "/test_clients.csv";
-		testManagersFilePath = tempDir.getAbsolutePath() + "/test_managers.csv";
-
-		// Initialize test CSV files
-		BookingCSVProcessor.initializeTestFile(testBookingsFilePath);
-		ParkingLotCSVProcessor.initializeTestFile(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.initializeTestFile(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.initializeTestFile(testParkingSensorFilePath);
-		ClientCSVProcessor.initializeTestFile(testClientsFilePath);
-		ManagerCSVProcessor.initializeTestFile(testManagersFilePath);
-	}
-
-	private void initializeFactories() {
-		// Initialize factories
-		serviceFactory = ServiceFactory.getInstance();
+	protected void setUp() throws IOException {
+		super.setUp();
 	}
 
 	@AfterEach
-	void tearDown() throws NoSuchFieldException, IllegalAccessException {
-		if (authState.getLoggedInUser() != null) {
-			authState.setLoggedInUser(null);
-		}
-		cleanupTestFiles();
-		resetFactories();
-	}
-
-	private void cleanupTestFiles() {
-		BookingCSVProcessor.cleanupAndReset(testBookingsFilePath);
-		ParkingLotCSVProcessor.cleanupAndReset(testParkingLotsFilePath);
-		ParkingSpaceCSVProcessor.cleanupAndReset(testParkingSpacesFilePath);
-		ParkingSensorCSVProcessor.cleanupAndReset(testParkingSensorFilePath);
-		ClientCSVProcessor.cleanupAndReset(testClientsFilePath);
-		ManagerCSVProcessor.cleanupAndReset(testManagersFilePath);
-	}
-
-	private void resetFactories() throws NoSuchFieldException, IllegalAccessException {
-		// Reset factories in dependency order
-		resetFactory(repositories.factory.RepositoryFactory.class, "instance");
-		resetFactory(ServiceFactory.class, "instance");
-		resetFactory(ControllerFactory.class, "instance");
-	}
-
-	private void resetFactory(Class<?> factoryClass, String instanceFieldName)
-			throws NoSuchFieldException, IllegalAccessException {
-		Field instance = factoryClass.getDeclaredField(instanceFieldName);
-		instance.setAccessible(true);
-		instance.set(null, null);
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		super.tearDown();
 	}
 
 	@Test
