@@ -1,47 +1,60 @@
 package manual.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import models.ParkingSystemException;
 import models.booking.Booking;
 import models.booking.Booking.BookingStatus;
 import models.client.Client;
-import models.client.GenerateClientFactory;
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import repositories.BookingRepository;
 
-public class BookingRepositoryTest {
-	private BookingRepository  bookingRepository;
+public class BookingRepositoryTest extends BaseRepositoryTest {
+	private BookingRepository bookingRepository;
 	private Client testClient;
 	private ParkingSpace testSpace;
-	
-	@Before
-	public void beforeBookingRepositoryTest() {
-		bookingRepository = new BookingRepository();
-		testClient = GenerateClientFactory.getClientType("Bob", "test@gmail.com", "123", Client.type.VISITOR, "TES 123", false);
-		ParkingLot testLot = new ParkingLot("Test Lot");
-		testSpace = new ParkingSpace(testLot, "Test Space");
+
+	@BeforeEach
+	protected void setUp() throws IOException {
+		super.setUp();
+		initializeRepositories();
+		this.testClient = super.createTestClient();
+		ParkingLot testLot = super.createTestParkingLot();
+		this.testSpace = super.createTestParkingSpace(testLot);
 	}
-	
+
+	private void initializeRepositories() {
+		bookingRepository = repositoryFactory.getBookingRepository();
+	}
+
+	@AfterEach
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		this.bookingRepository = null;
+		this.testClient = null;
+		super.tearDown();
+	}
+
 	@Test
 	public void verifyCreateBooking() {
 		Booking testBooking = bookingRepository.createBooking(testSpace, 5, testClient);
-		
+
 		assertNotNull(testBooking);
-		
+
 		bookingRepository.deleteBooking(testBooking);
 	}
-	
+
 	@Test
 	public void verifyGetBookingsForClient() {
 		Booking booking = bookingRepository.createBooking(testSpace, 5, testClient);
@@ -49,7 +62,7 @@ public class BookingRepositoryTest {
 		assertTrue(clientBookings.contains(booking));
 		bookingRepository.deleteBooking(booking);
 	}
-	
+
 	@Test
 	public void verifyGetBookingById() {
 		Booking booking = bookingRepository.createBooking(testSpace, 5, testClient);
@@ -57,7 +70,7 @@ public class BookingRepositoryTest {
 		assertEquals(booking, fetched);
 		bookingRepository.deleteBooking(booking);
 	}
-	
+
 	@Test
 	public void verifyConfirmBooking() {
 		Booking booking = bookingRepository.createBooking(testSpace, 5, testClient);
@@ -65,7 +78,7 @@ public class BookingRepositoryTest {
 		assertEquals(BookingStatus.CONFIRMED, booking.getStatus());
 		bookingRepository.deleteBooking(booking);
 	}
-	
+
 	@Test
 	public void verifyCancelBooking() {
 		Booking booking = bookingRepository.createBooking(testSpace, 5, testClient);
@@ -73,7 +86,7 @@ public class BookingRepositoryTest {
 		assertEquals(BookingStatus.CANCELED, booking.getStatus());
 		bookingRepository.deleteBooking(booking);
 	}
-	
+
 	@Test
 	public void verifyGetBookingsByStatus() {
 		Booking booking = bookingRepository.createBooking(testSpace, 5, testClient);
@@ -81,7 +94,7 @@ public class BookingRepositoryTest {
 		assertTrue(pending.contains(booking));
 		bookingRepository.deleteBooking(booking);
 	}
-	
+
 	@Test
 	public void verifyInvalidBookingId() {
 		UUID randomUUID = UUID.randomUUID();
@@ -92,7 +105,7 @@ public class BookingRepositoryTest {
 			assertEquals("Booking not found with ID: " + randomUUID, e.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void verifyNullBookingId() {
 		UUID nullUUID = null;
@@ -103,7 +116,7 @@ public class BookingRepositoryTest {
 			assertEquals("Booking ID cannot be null", e.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void verifyNullNoShowBooking() {
 		Booking testBooking = null;
@@ -114,7 +127,7 @@ public class BookingRepositoryTest {
 			assertEquals("Booking cannot be null", e.getMessage());
 		}
 	}
-	
+
 	@Test
 	public void verifyNullCheckoutBooking() {
 		Booking testBooking = null;

@@ -1,82 +1,94 @@
 package manual.repositories;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import models.parkingLot.ParkingLot;
 import models.parkingSpace.ParkingSpace;
 import models.parkingSpace.ParkingSpace.ParkingSpaceStatus;
 import repositories.ParkingSpaceRepository;
 
-public class ParkingSpaceRepositoryTest {
+public class ParkingSpaceRepositoryTest extends BaseRepositoryTest {
 	private ParkingSpaceRepository parkingSpaceRepository;
 	private ParkingLot testLot;
-	
-	@Before
-	public void beforeParkingSpaceRepository() {
-		parkingSpaceRepository = new ParkingSpaceRepository();
-		testLot = new ParkingLot("Test Lot");
+
+	@BeforeEach
+	protected void setUp() throws IOException {
+		super.setUp();
+		initializeRepositories();
+		this.testLot = super.createTestParkingLot();
 	}
-	
+
+	private void initializeRepositories() {
+		parkingSpaceRepository = repositoryFactory.getParkingSpaceRepository();
+	}
+
+	@AfterEach
+	protected void tearDown() throws NoSuchFieldException, IllegalAccessException {
+		this.parkingSpaceRepository = null;
+		this.testLot = null;
+		super.tearDown();
+	}
+
 	@Test
 	public void testAddParkingSpace() {
 		ParkingSpace testSpace = parkingSpaceRepository.addParkingSpace(testLot, "Test Space");
 		assertNotNull(testSpace);
 		assertEquals("Test Space", testSpace.getName());
-		
+
 		parkingSpaceRepository.removeParkingSpace(testSpace);
 	}
-	
+
 	@Test
 	public void testGetParkingSpaceById() {
 		ParkingSpace testSpace = parkingSpaceRepository.addParkingSpace(testLot, "Test Space");
 		ParkingSpace fetched = parkingSpaceRepository.getParkingSpaceById(testSpace.getID());
 		assertEquals(testSpace, fetched);
-		
+
 		parkingSpaceRepository.removeParkingSpace(testSpace);
 	}
-	
+
 	@Test
 	public void testUpdateParkingSpaceStatus() {
 		ParkingSpace testSpace = parkingSpaceRepository.addParkingSpace(testLot, "Test Space");
 		parkingSpaceRepository.updateParkingSpaceStatus(testSpace, ParkingSpaceStatus.BOOKED);
 		assertEquals(ParkingSpaceStatus.BOOKED, testSpace.getStatus());
-		
+
 		parkingSpaceRepository.removeParkingSpace(testSpace);
 	}
-	
+
 	@Test
 	public void testRemoveParkingSpace() {
 		ParkingSpace testSpace = parkingSpaceRepository.addParkingSpace(testLot, "Test Space");
 		parkingSpaceRepository.removeParkingSpace(testSpace);
 		assertNull(parkingSpaceRepository.getParkingSpaceById(testSpace.getID()));
 	}
-	
+
 	@Test
 	public void testRemoveParkingSpaceNullThrowsException() {
-		try {
+		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
 			parkingSpaceRepository.removeParkingSpace(null);
-			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
-			assertEquals("Parking Space can't be null!", e.getMessage());
-		}
+		});
+		assertEquals("Parking Space can't be null!", exception.getMessage());
 	}
-	
+
 	@Test
 	public void testGetAvailableSpaces() {
 		ParkingSpace available = parkingSpaceRepository.addParkingSpace(testLot, "Test Space");
 		List<ParkingSpace> result = parkingSpaceRepository.getAvailableSpaces(testLot);
 		assertTrue(result.contains(available));
 	}
-	
+
 	@Test
 	public void testGetBookedSpaces() {
 		ParkingSpace booked = parkingSpaceRepository.addParkingSpace(testLot, "Test Space");
@@ -84,7 +96,7 @@ public class ParkingSpaceRepositoryTest {
 		List<ParkingSpace> result = parkingSpaceRepository.getBookedSpaces(testLot);
 		assertTrue(result.contains(booked));
 	}
-	
+
 	@Test
 	public void testGetEnabledSpaces() {
 		ParkingSpace space = parkingSpaceRepository.addParkingSpace(testLot, "Test Space");

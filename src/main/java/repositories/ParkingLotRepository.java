@@ -63,7 +63,7 @@ public class ParkingLotRepository {
 		return null;
 	}
 
-	public void addParkingLot(String name) {
+	public ParkingLot addParkingLot(String name) {
 		for (ParkingLot lot : parkingLots) {
 			if (lot.getName().equalsIgnoreCase(name)) {
 				throw new ParkingSystemException("A parking lot with name '" + name + "' already exists",
@@ -74,6 +74,8 @@ public class ParkingLotRepository {
 		ParkingLot newLot = new ParkingLot(name);
 		parkingLots.add(newLot);
 		saveLots();
+		
+		return newLot;
 	}
 
 	public void removeParkingLot(UUID id) {
