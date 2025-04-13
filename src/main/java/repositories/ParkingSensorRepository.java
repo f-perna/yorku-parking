@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import csv.ParkingSensorCSVProcessor;
+import csvs.ParkingSensorCSVProcessor;
 import models.parkingSensor.ParkingSensor;
 import models.parkingSpace.ParkingSpace;
 

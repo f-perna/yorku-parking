@@ -3,7 +3,8 @@ package repositories;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import csv.ClientCSVProcessor;
+
+import csvs.ClientCSVProcessor;
 import models.client.Client;
 
 public class ClientRepository {

@@ -3,7 +3,8 @@ package repositories;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import csv.ParkingLotCSVProcessor;
+
+import csvs.ParkingLotCSVProcessor;
 import models.ParkingSystemException;
 import models.ParkingSystemException.ErrorType;
 import models.parkingLot.ParkingLot;
