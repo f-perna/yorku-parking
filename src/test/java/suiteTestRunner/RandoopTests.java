@@ -19,7 +19,8 @@ import org.junit.runners.Suite;
     randoop.models.superManager.SuperManagerRegressionTest0.class,
     randoop.repositories.RepositoriesRegressionTest0.class,
     randoop.services.ServicesRegressionTest0.class,
-    randoop.utils.RegressionTest0.class
+    randoop.utils.UtilsRegressionTest0.class,
+    randoop.csvs.CsvsRegressionTest0.class
 })
 public class RandoopTests {
 
