@@ -1,2 +1,2 @@
-# eecs3311-parking
+# yorku-parking
 YorkU Parking Booking System
